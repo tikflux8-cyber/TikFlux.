@@ -13,7 +13,7 @@ const { URL } = require('url');
 // === Configuration ===
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const APP_DATA = process.env.APP_DATA || path.join(__dirname, 'public');
-const USER_DATA = process.env.USER_DATA || path.join(__dirname, '..', 'data');
+const USER_DATA = process.env.USER_DATA || path.join(__dirname, 'data');
 const SUPPORTERS_FILE = path.join(USER_DATA, 'supporters_data.json');
 const ALERT_CATALOG_FILE = path.join(APP_DATA, 'alert_catalog.json');
 
