@@ -1514,7 +1514,7 @@ wss.on('connection', (ws) => {
 });
 
 // === Start Server ===
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`\n========================================`);
   console.log(`  TikFlux Desktop Server`);
   console.log(`  Port: ${PORT}`);
