@@ -857,18 +857,19 @@ const AUTH_BYPASS_SCRIPT = `
 
   // === 8. Override subscription guard globally ===
   var _subPatchIV=setInterval(function(){
-    // Patch vn (SubscriptionGuard)
-    if(typeof vn!=='undefined'&&vn){
-      vn.hasActiveSubscription=function(){return Promise.resolve(true)};
-      vn.guardFeature=function(){return Promise.resolve(true)};
-      vn.showSubscriptionModal=function(){};
-    }
-    // Patch _o (SubscriptionManager)
-    if(typeof _o!=='undefined'&&_o){
-      _o.hasActiveSubscription=true;
-      _o.checkSubscriptionStatus=function(){return Promise.resolve()};
-    }
-    // Remove modal if it appears
+    try{
+      if(typeof window.vn!=='undefined'&&window.vn){
+        window.vn.hasActiveSubscription=function(){return Promise.resolve(true)};
+        window.vn.guardFeature=function(){return Promise.resolve(true)};
+        window.vn.showSubscriptionModal=function(){};
+      }
+    }catch(e){}
+    try{
+      if(typeof window._o!=='undefined'&&window._o){
+        window._o.hasActiveSubscription=true;
+        window._o.checkSubscriptionStatus=function(){return Promise.resolve()};
+      }
+    }catch(e){}
     var sg=document.getElementById('subscriptionGuardModal');if(sg)sg.remove();
     var sgs=document.getElementById('subscriptionGuardStyles');if(sgs)sgs.remove();
   },50);
