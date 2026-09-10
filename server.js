@@ -736,22 +736,7 @@ const AUTH_BYPASS_SCRIPT = `
 
   // === 2. Create Supabase client factory ===
   function makeMockClient(){
-    var client={auth:{},from:function(table){
-      return{
-        select:function(){return Promise.resolve({data:[],error:null})},
-        insert:function(){return Promise.resolve({data:[],error:null})},
-        update:function(){return Promise.resolve({data:[],error:null})},
-        delete:function(){return Promise.resolve({data:[],error:null})},
-        eq:function(){return this},
-        single:function(){return Promise.resolve({data:null,error:null})},
-        maybeSingle:function(){return Promise.resolve({data:null,error:null})}
-      };
-    },
-    rpc:function(){return Promise.resolve({data:true,error:null})},
-    storage:{from:function(){return{getPublicUrl:function(){return{data:{publicUrl:''}}}}}}};
-    client.auth.getSession=function(){return Promise.resolve({data:{session:MOCK_SESSION},error:null})};
-    client.auth.getUser=function(){return Promise.resolve({data:{user:MOCK_USER},error:null})};
-    client.auth.signOut=function(){return Promise.resolve({error:null})};
+    var client={auth:{},from:function(){return{select:function(){return{data:[],error:null}}}}};
     client.auth.getSession=function(){return Promise.resolve({data:{session:MOCK_SESSION},error:null})};
     client.auth.getUser=function(){return Promise.resolve({data:{user:MOCK_USER},error:null})};
     client.auth.signOut=function(){return Promise.resolve({error:null})};
@@ -840,7 +825,7 @@ const AUTH_BYPASS_SCRIPT = `
     });
   }
 
-  // === 7. Hide login UI ===
+  // === 7. Hide login UI and subscription guard ===
   function hideLogin(){
     ['loginForm','login-form','loginOverlay','loginScreen','authScreen','auth-overlay'].forEach(function(id){
       var el=document.getElementById(id);if(el)el.style.display='none';
@@ -854,26 +839,6 @@ const AUTH_BYPASS_SCRIPT = `
   }
   hideLogin();
   for(var d=100;d<=10000;d+=d<1000?200:500)setTimeout(hideLogin,d);
-
-  // === 8. Override subscription guard globally ===
-  var _subPatchIV=setInterval(function(){
-    try{
-      if(typeof window.vn!=='undefined'&&window.vn){
-        window.vn.hasActiveSubscription=function(){return Promise.resolve(true)};
-        window.vn.guardFeature=function(){return Promise.resolve(true)};
-        window.vn.showSubscriptionModal=function(){};
-      }
-    }catch(e){}
-    try{
-      if(typeof window._o!=='undefined'&&window._o){
-        window._o.hasActiveSubscription=true;
-        window._o.checkSubscriptionStatus=function(){return Promise.resolve()};
-      }
-    }catch(e){}
-    var sg=document.getElementById('subscriptionGuardModal');if(sg)sg.remove();
-    var sgs=document.getElementById('subscriptionGuardStyles');if(sgs)sgs.remove();
-  },50);
-  setTimeout(function(){clearInterval(_subPatchIV)},30000);
 })();
 </script>`;
 
