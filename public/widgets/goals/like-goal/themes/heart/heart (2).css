@@ -1,0 +1,192 @@
+/* Heart theme — aligned with /heart/style.css, scoped to widget panel */
+/* خط Lemon للإنجليزي والأرقام؛ Foda للعربي (نفس شريط الثيم) */
+@font-face {
+  font-family: "Foda";
+  src: url("/assets/fonts/Foda-Free-Font.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* متغيّرات القلب — مطابقة heart/style.css (.heart-container) */
+#like-goal-theme-root {
+  box-sizing: border-box;
+
+  --goal-accent: #ff0000;
+  --goal-accent-rgb: 255, 0, 0;
+  --heart-bubble-fill: var(--goal-accent);
+
+  /* تدرج الموجة: داكن أعلى → أحمر ساطع أسفل */
+  --wave-stop-1: #5a0000;
+  --wave-stop-2: #af0000;
+  --wave-stop-3: #ff0000;
+
+  /* توهج القلوب الصغيرة — طبقات بنفس لون الأساس (قلب مرجعي) */
+  --glow-color-1: #ff0000;
+  --glow-color-2: #ff0000;
+  --glow-color-3: #ff0000;
+  --glow-color-4: #ff0000;
+
+  --liquid-glow-1: #ff0000;
+  --liquid-glow-2: #ff0000;
+  --liquid-glow-3: #ff0000;
+  --liquid-glow-4: #ff0000;
+
+  --goal-wave-back: #8d0000;
+
+  /* نصوص — نفس تدرجات heart/style.css */
+  --goal-percent-text-from: #c82424;
+  --goal-percent-text-to: #ffffff;
+  --goal-label-ink: #ffffff;
+  --goal-value-text-to: #c6c6c6;
+}
+
+#like-goal-theme-root *,
+#like-goal-theme-root *::before,
+#like-goal-theme-root *::after {
+  box-sizing: border-box;
+}
+
+#like-goal-theme-root .scene {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+#like-goal-theme-root .goal-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#like-goal-theme-root .heart-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  max-width: min(72vw, 300px);
+  max-height: min(72vw, 300px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: lgFloatHeart 4.5s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+@keyframes lgFloatHeart {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+#like-goal-theme-root .liquid-svg,
+#like-goal-theme-root .heart-shape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#like-goal-theme-root .heart-shape {
+  z-index: 3;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+#like-goal-theme-root .goal-center-text {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  text-align: center;
+  padding-top: 18px;
+}
+
+#like-goal-theme-root .goal-percent {
+  font-family: "Lemon", "Foda", sans-serif;
+  font-size: 46px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  background: linear-gradient(
+    180deg,
+    var(--goal-percent-text-from, #c82424) 0%,
+    var(--goal-percent-text-to, #ffffff) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  filter:
+    drop-shadow(0 1px 0 rgba(0, 0, 0, 0.85))
+    drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.65))
+    drop-shadow(1px 0 0 rgba(0, 0, 0, 0.55))
+    drop-shadow(-1px 0 0 rgba(0, 0, 0, 0.55))
+    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.65))
+    drop-shadow(0 0 12px rgba(var(--goal-accent-rgb, 255, 21, 21), 0.75))
+    drop-shadow(0 0 25px rgba(var(--goal-accent-rgb, 255, 21, 21), 0.5))
+    drop-shadow(0 0 40px rgba(var(--goal-accent-rgb, 255, 21, 21), 0.35));
+}
+
+#like-goal-theme-root .goal-label {
+  font-family: "Lemon",  sans-serif;
+  color: var(--goal-label-ink, #ffffff);
+  font-size: 35px;
+  font-weight: 700;
+  text-transform: none;
+  text-align: center;
+  margin-top: -22px;
+  margin-bottom: 6px;
+  -webkit-font-smoothing: antialiased;
+  filter:
+    drop-shadow(0 1px 0 rgba(0, 0, 0, 0.5))
+    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45))
+    drop-shadow(0 0 12px rgba(var(--goal-accent-rgb, 255, 21, 21), 0.65))
+    drop-shadow(0 0 25px rgba(var(--goal-accent-rgb, 255, 21, 21), 0.45))
+    drop-shadow(0 0 40px rgba(var(--goal-accent-rgb, 255, 21, 21), 0.25));
+}
+
+#like-goal-theme-root .goal-value {
+  font-family: "Lemon", "Foda", sans-serif;
+  font-size: 38px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-align: center;
+  background: linear-gradient(180deg, #ffffff 0%, var(--goal-value-text-to, #c6c6c6) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  filter:
+    drop-shadow(0 1px 0 rgba(0, 0, 0, 0.85))
+    drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.65))
+    drop-shadow(1px 0 0 rgba(0, 0, 0, 0.55))
+    drop-shadow(-1px 0 0 rgba(0, 0, 0, 0.55))
+    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.65))
+    drop-shadow(0 0 12px rgba(var(--goal-accent-rgb, 255, 21, 21), 0.75))
+    drop-shadow(0 0 25px rgba(var(--goal-accent-rgb, 255, 21, 21), 0.5))
+    drop-shadow(0 0 40px rgba(var(--goal-accent-rgb, 255, 21, 21), 0.35));
+}
+
+#like-goal-theme-root #waveBack {
+  fill: var(--goal-wave-back);
+  opacity: 1;
+}
+
+#like-goal-theme-root #waveFront {
+  fill: url(#waveGradient);
+}

@@ -1,0 +1,125 @@
+<div id="donation-goal-theme-root" class="donation-goal-theme-panel is-active" data-theme="bottle">
+  <div class="scene">
+    <div class="goal-wrap">
+      <div class="goal-label" id="donationBottleGoalLabel">Donation Goal</div>
+
+      <div class="bottle-container">
+        <svg class="liquid-svg" width="520" height="520" viewBox="0 0 520 520" aria-hidden="true">
+          <defs>
+            <mask id="fgBottleLiquidMask">
+              <image
+                href="/widgets/goals/follow-goal/themes/bottle/assets/bottle_mask.png"
+                x="0"
+                y="0"
+                width="520"
+                height="520"
+                preserveAspectRatio="xMidYMid meet"
+              />
+            </mask>
+
+            <filter id="fgBottleLiquidGlowPremium" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="24" result="blur1"/>
+              <feFlood flood-color="var(--bottle-liq-glow-1, #ff0000)" flood-opacity="0.38" result="color1"/>
+              <feComposite in="color1" in2="blur1" operator="in" result="glow1"/>
+              <feGaussianBlur in="SourceAlpha" stdDeviation="14" result="blur2"/>
+              <feFlood flood-color="var(--bottle-liq-glow-2, #ff3333)" flood-opacity="0.55" result="color2"/>
+              <feComposite in="color2" in2="blur2" operator="in" result="glow2"/>
+              <feGaussianBlur in="SourceAlpha" stdDeviation="7" result="blur3"/>
+              <feFlood flood-color="var(--bottle-liq-glow-3, #ff6666)" flood-opacity="0.75" result="color3"/>
+              <feComposite in="color3" in2="blur3" operator="in" result="glow3"/>
+              <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur4"/>
+              <feFlood flood-color="var(--bottle-liq-glow-4, #ff9999)" flood-opacity="0.92" result="color4"/>
+              <feComposite in="color4" in2="blur4" operator="in" result="glow4"/>
+              <feMerge>
+                <feMergeNode in="glow1"/>
+                <feMergeNode in="glow2"/>
+                <feMergeNode in="glow3"/>
+                <feMergeNode in="glow4"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+
+            <filter id="fgBottleBottleGlow" x="-200%" y="-200%" width="500%" height="500%">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="15" result="bblur1"/>
+              <feFlood flood-color="var(--bubble-glow-1, #ff0000)" flood-opacity="0.6" result="bcolor1"/>
+              <feComposite in="bcolor1" in2="bblur1" operator="in" result="bglow1"/>
+              <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="bblur2"/>
+              <feFlood flood-color="var(--bubble-glow-2, #ff6666)" flood-opacity="0.8" result="bcolor2"/>
+              <feComposite in="bcolor2" in2="bblur2" operator="in" result="bglow2"/>
+              <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="bblur3"/>
+              <feFlood flood-color="var(--bubble-glow-3, #ff9999)" flood-opacity="1" result="bcolor3"/>
+              <feComposite in="bcolor3" in2="bblur3" operator="in" result="bglow3"/>
+              <feMerge>
+                <feMergeNode in="bglow1"/>
+                <feMergeNode in="bglow2"/>
+                <feMergeNode in="bglow3"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+
+            <linearGradient id="fgBottleWaveGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color: var(--wave-top, #520000);" />
+              <stop offset="40%" style="stop-color: var(--wave-mid, #c20000);" />
+              <stop offset="100%" style="stop-color: var(--wave-bottom, #ff0000);" />
+            </linearGradient>
+
+            <linearGradient id="fgBottleWaveGradientBack" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color: var(--wave-back-top, #ff0000);" />
+              <stop offset="40%" style="stop-color: var(--wave-back-mid, #d70303);" />
+              <stop offset="100%" style="stop-color: var(--wave-back-bottom, #870000);" />
+            </linearGradient>
+          </defs>
+
+          <g filter="url(#fgBottleLiquidGlowPremium)">
+            <path
+              id="fg-bottle-wave-back"
+              fill="url(#fgBottleWaveGradientBack)"
+              opacity="0.65"
+              mask="url(#fgBottleLiquidMask)"
+            />
+            <g id="fg-bottle-bubbles" mask="url(#fgBottleLiquidMask)"></g>
+            <path
+              id="fg-bottle-wave-front"
+              fill="url(#fgBottleWaveGradient)"
+              opacity="1"
+              mask="url(#fgBottleLiquidMask)"
+            />
+          </g>
+
+          <path
+            id="fg-bottle-wave-surface-back"
+            fill="none"
+            stroke="rgba(255,255,255,0.46)"
+            stroke-width="3.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            mask="url(#fgBottleLiquidMask)"
+          />
+          <path
+            id="fg-bottle-wave-surface"
+            fill="none"
+            stroke="rgba(255,255,255,0.52)"
+            stroke-width="4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            mask="url(#fgBottleLiquidMask)"
+          />
+        </svg>
+
+        <img
+          src="/widgets/goals/follow-goal/themes/bottle/assets/bottle_shape.webp"
+          alt=""
+          class="bottle-shape"
+          decoding="async"
+          fetchpriority="high"
+          width="512"
+          height="512"
+        />
+
+        <div class="percentage-display" id="fg-bottle-percent">0%</div>
+      </div>
+
+      <div class="goal-value" id="fg-bottle-counter">$0 / $500</div>
+    </div>
+  </div>
+</div>

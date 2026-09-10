@@ -1,0 +1,295 @@
+/**
+ * TikScale Likes Widget - like.html design (avatar ring + floating hearts)
+ * All colors/sizes use CSS variables from Like Overlay settings.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rakkas&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Changa:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=El+Messiri:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --like-name-size: 3rem;
+  --like-message-size: 2rem;
+  --like-name-color: #e141ff;
+  --like-message-color: #ffffff;
+  --like-shadow-color: #d100ff;
+  --like-border-color: #ff0000;
+  --like-butterfly-hue: 0deg;
+  --like-butterfly-hue-num: 0;
+  --like-butterfly-avatar-border-color: #ff0000;
+  --like-font-family: 'Amiri', serif;
+  --like-text-shadow: 0 0 10px var(--like-shadow-color), 0 0 20px var(--like-shadow-color), 0 0 30px var(--like-shadow-color), 3px 3px 6px #000, -1px -1px 2px #000;
+  --like-message-shadow: 0 0 8px var(--like-shadow-color), 0 0 15px var(--like-shadow-color), 2px 2px 4px #000;
+}
+
+body {
+  font-family: 'Cairo', system-ui, sans-serif;
+  background: transparent;
+  overflow: hidden;
+  color: #fff;
+}
+
+.widget-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 60px;
+  position: relative;
+}
+
+.likes-display {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  left: 0;
+  min-height: 220px;
+}
+
+.no-likes {
+  text-align: center;
+  color: rgba(255,255,255,.7);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* ============================================================
+   Like Card — like-alert layout (avatar + text + hearts)
+   ============================================================ */
+.like-card {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  position: relative;
+  animation: fadeIn 0.65s ease both;
+}
+
+.like-card.theme-butterfly {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.like-card.fade-out {
+  animation: fadeOut 0.65s ease forwards;
+}
+
+body[data-settings-preview='1'] .likes-display {
+  min-height: 160px;
+  transform: scale(0.7);
+  transform-origin: center center;
+}
+
+body[data-settings-preview='1'] .like-card {
+  animation: none !important;
+}
+
+.like-card.is-reversed {
+  direction: ltr;
+}
+
+.like-card.is-reversed .text {
+  align-items: flex-end;
+  text-align: right;
+}
+
+/* ============================================================
+   Avatar wrapper — spinning ring + glow (frame color = borderColor)
+   ============================================================ */
+.avatar-wrapper {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  position: relative;
+  flex-shrink: 0;
+  z-index: 34;
+}
+
+/* Spinning conic ring + breathing glow — uses --like-border-color */
+.avatar-wrapper.theme-hearts::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--like-border-color), #000, var(--like-border-color));
+  animation: spin 4s linear infinite, ringBreathing 3s ease-in-out infinite;
+  box-shadow: var(--like-border-color) 0 0 60px, var(--like-border-color) 0 0 80px;
+}
+
+.avatar-wrapper.theme-butterfly {
+  width: 150px;
+  height: 150px;
+}
+
+
+@keyframes ringBreathing {
+  0%, 100% {
+    box-shadow: 0 0 25px var(--like-border-color), 0 0 60px var(--like-border-color), 0 0 80px var(--like-border-color);
+    opacity: 0.85;
+  }
+  50% {
+    box-shadow: 0 0 60px var(--like-border-color), 0 0 10px var(--like-border-color), 0 0 80px var(--like-border-color);
+    opacity: 1;
+  }
+}
+
+/* Avatar image */
+.avatar {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  z-index: 2;
+  position: relative;
+  
+}
+
+.avatar-wrapper.theme-butterfly .avatar {
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--like-butterfly-avatar-border-color);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--like-butterfly-avatar-border-color) 70%, transparent);
+}
+
+.like-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  pointer-events: none;
+  background-image: url('/widgets/last-like-themes/last-lik/frame.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: hue-rotate(var(--like-butterfly-hue)) saturate(10) brightness(1.2);
+}
+
+.avatar.placeholder {
+  background: linear-gradient(135deg, #3a0000, #7a3500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   Text block — name + message (settings: nameColor, messageColor, font, shadow)
+   ============================================================ */
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  z-index: 334;
+}
+
+.like-card.theme-butterfly .name {
+  text-shadow: var(--like-text-shadow);
+}
+
+.like-card.theme-butterfly .msg {
+  color: var(--like-message-color);
+  text-shadow: var(--like-message-shadow);
+}
+
+.name {
+  font-family: var(--like-font-family);
+  font-size: var(--like-name-size);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+  color: var(--like-name-color);
+  text-shadow: var(--like-text-shadow);
+  white-space: nowrap;
+  max-width: 450px;
+  z-index: 334;
+}
+
+.msg {
+  font-family: var(--like-font-family);
+  font-size: var(--like-message-size);
+  font-weight: 600;
+  color: var(--like-message-color);
+  text-shadow: var(--like-message-shadow);
+  white-space: nowrap;
+}
+
+/* ============================================================
+   Heart area — floating hearts (color = borderColor)
+   ============================================================ */
+.heart-area {
+  position: absolute;
+  left: 160px;
+  width: 450px;
+  top: 50%;
+  transform: translateY(-90px);
+  height: 80px;
+  pointer-events: none;
+  z-index: -3;
+  color: var(--like-border-color);
+}
+
+.like-card.is-reversed .heart-area {
+  left: auto;
+  right: 160px;
+}
+
+.like-card.is-reversed .like-frame {
+  transform: scaleX(-1);
+  transform-origin: center center;
+}
+
+.heart {
+  position: absolute;
+  opacity: 0;
+  transform: translate(0, 0);
+  will-change: transform, opacity;
+  filter: drop-shadow(0 0 10px var(--like-border-color));
+  z-index: -34;
+}
+
+@keyframes heartMove {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.8); }
+  15%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.15); }
+}
+
+/* ============================================================
+   Keyframes — fade in/out (entrance/exit)
+   ============================================================ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.9); }
+}

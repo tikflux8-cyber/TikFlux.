@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <script src="/assets/b/aa9c4c6deef9b265.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/assets/img/tikoverlay-mark.png?v=20260802" type="image/png">
+  <title>Heart Me Goal - TikOverlay</title>
+
+  <style>
+    @keyframes floatUpDown {
+      0%, 100% {
+        transform: translate(-50%, -50%) translateY(0);
+      }
+      50% {
+        transform: translate(-50%, -50%) translateY(20px);
+      }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      overflow: hidden;
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+      background-color: transparent;
+      
+      /* إخفاء مبدئي حتى يتم تحميل الإعدادات */
+      opacity: 0;
+      transition: opacity 0.4s ease-in-out;
+    }
+    
+    /* إظهار بعد اكتمال التحميل */
+    body.loaded {
+      opacity: 1;
+    }
+
+    .container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      height: 300px;
+      animation: floatUpDown 4s ease-in-out infinite;
+    }
+
+    .shape {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    .progress-badge {
+      position: fixed;
+      top: calc(50% + 130px);
+      left: calc(50% + 20px);
+      transform: translateX(-50%);
+      padding: 4px 26px;
+      background: #d4522d;
+      border: 2px solid #ffe5a5;
+      border-radius: 999px;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      font-size: 20px;
+      font-weight: bold;
+      z-index: 2222;
+      box-shadow: 0 0 12px rgb(255, 255, 255);
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="progress-badge" id="progressText">0 / 100</div>
+
+  <div class="container">
+    <svg width="300" height="300" viewBox="0 0 300 300">
+      <defs>
+        <!-- ماسك -->
+        <mask id="liquidMask">
+          <image href="/assets/img/heart_me_mask.png" width="300" height="300"/>
+        </mask>
+
+        <!-- ظل أحمر -->
+        <filter id="redShadow" x="-80%" y="-80%" width="260%" height="260%">
+          <feDropShadow
+            dx="0"
+            dy="0"
+            stdDeviation="7"
+            flood-color="#ff2a2a"
+            flood-opacity="1"/>
+        </filter>
+
+        <!-- توهج الفقاعات -->
+        <filter id="bubbleGlow" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+          <feOffset dx="0" dy="0" result="offsetblur"/>
+          <feFlood flood-color="#ffffff" flood-opacity="1"/>
+          <feComposite in2="offsetblur" operator="in"/>
+          <feMerge>
+            <feMergeNode/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- موجة خلفية -->
+      <path id="wave1"
+            fill="rgba(255,225,245,1)"
+            filter="url(#redShadow)"
+            mask="url(#liquidMask)"/>
+
+      <!-- الفقاعات -->
+      <g id="bubbles" mask="url(#liquidMask)"></g>
+
+      <!-- موجة أمامية -->
+      <path id="wave3"
+            fill="rgba(252,95,68,1)"
+            filter="url(#redShadow)"
+            mask="url(#liquidMask)"/>
+    </svg>
+
+    <img src="/assets/img/heart_me_shape.png" class="shape" alt="Heart Shape">
+  </div>
+
+  <!-- Edge WS للتحديثات الفورية -->
+  <script src="/assets/b/8c386c8dbec5a57f.js"></script>
+    <script src="/assets/b/28b98888f9aaae4a.js"></script>
+    <script src="/assets/b/d0c4b61e2754a1be.js"></script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a33f39499f8fc6bf',t:'MTc4ODIxMjc0Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

@@ -1,0 +1,336 @@
+.wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    direction: ltr;
+    zoom: 0.75;
+}
+
+.wrapper[data-direction="rtl"] {
+    direction: rtl;
+}
+
+/* Asymmetric webm art: mirror only the film so the cutout matches mirrored layout */
+.wrapper[data-direction="rtl"] .bg-video {
+    transform: scaleX(-1);
+}
+
+.container {
+    width: 600px;
+    height: 700px;
+}
+
+.rank {
+    position: relative;
+    isolation: isolate;
+}
+
+/* Video above avatar only; text layers sit above the video */
+.bg-video {
+    position: absolute;
+    top: 0;
+    inset-inline-start: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 20;
+    pointer-events: none;
+}
+
+.rank-content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-top: 25px;
+    min-width: 0;
+}
+
+.avatar {
+    border-radius: 50%;
+    object-fit: cover;
+    margin-inline-end: 55px;
+    position: relative;
+    z-index: 15;
+}
+
+.name,
+.score {
+    color: white;
+    font-weight: 900;
+    position: relative;
+    z-index: 30;
+    text-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.95),
+        0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.rank-number {
+    position: absolute;
+    z-index: 30;
+    color: #ffffff;
+    font-weight: 900;
+    line-height: 1;
+    text-align: center;
+    pointer-events: none;
+    text-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.98),
+        0 0 10px rgba(0, 0, 0, 0.85);
+}
+
+.name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+}
+
+.score {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    white-space: nowrap;
+    position: absolute;
+    z-index: 30;
+}
+
+.icon-heart {
+    width: 22px;
+    height: 22px;
+    fill: #ff1f5a;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95));
+    animation: heartPulse 1s ease-in-out infinite;
+}
+
+.icon-coin {
+    width: 22px;
+    height: 22px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95));
+    animation: coinSpin 2.4s linear infinite;
+    transform-origin: center;
+}
+
+@keyframes heartPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.18); }
+}
+
+@keyframes coinSpin {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(360deg); }
+}
+
+/* --- Ranks: physical layout expressed with logical properties (mirrors in RTL) --- */
+
+.rank1 {
+    width: 600px;
+    height: 160px;
+    margin-inline-start: -10px;
+}
+
+.rank1 .avatar {
+    margin-top: 29px;
+    width: 105px;
+    height: 105px;
+    margin-inline-start: 105px;
+    margin-inline-end: 25px;
+}
+
+.rank1 .name {
+    font-size: 22px;
+    margin-top: 35px;
+    
+    max-width: 220px;
+}
+
+.rank1 .score {
+    font-size: 24px;
+    top: 64px;
+    inset-inline-end: 42px;
+}
+
+.rank1 .rank-content {
+    width: 480px;
+}
+
+.rank1 .rank-number {
+    inset-inline-start: 64px;
+    top: 66px;
+    font-size: 36px;
+    color: #ffd900;
+}
+
+.rank2 {
+    margin-inline-start: -10px;
+    width: 580px;
+    height: 130px;
+    margin-top: 10px;
+    transform: translateY(-40px);
+}
+
+.rank2 .avatar {
+    margin-top: 20px;
+    width: 94px;
+    height: 94px;
+    margin-inline-start: 115px;
+    margin-inline-end: 20px;
+}
+
+.rank2 .name {
+    font-size: 20px;
+    margin-top: 25px;
+    
+    max-width: 200px;
+}
+
+.rank2 .score {
+    font-size: 22px;
+    top: 50px;
+    inset-inline-end: 65px;
+}
+
+.rank2 .rank-content {
+    width: 430px;
+}
+
+.rank2 .rank-number {
+    inset-inline-start: 79px;
+    top: 53px;
+    font-size: 32px;
+    color: #a2a2a2;
+}
+
+.rank3 {
+    margin-inline-start: 0;
+    width: 540px;
+    height: 120px;
+    margin-top: 15px;
+    transform: translateY(-70px);
+}
+
+.rank3 .avatar {
+    width: 87px;
+    height: 87px;
+    margin-inline-start: 108px;
+    margin-inline-end: 20px;
+    margin-top: 19px;
+}
+
+.rank3 .name {
+    font-size: 19px;
+    margin-top: 20px;
+    
+    max-width: 190px;
+}
+
+.rank3 .score {
+    font-size: 21px;
+    top: 45px;
+    inset-inline-end: 52px;
+}
+
+.rank3 .rank-content {
+    width: 410px;
+}
+
+.rank3 .rank-number {
+    inset-inline-start: 75px;
+    top: 47px;
+    font-size: 30px;
+    color: #ff0000;
+}
+
+.rank4 {
+    margin-inline-start: 15px;
+    width: 490px;
+    height: 120px;
+    margin-top: 10px;
+    transform: translateY(-100px);
+}
+
+.rank4 .avatar {
+    width: 80px;
+    height: 80px;
+    margin-inline-start: 97px;
+    margin-top: 20px;
+    margin-inline-end: 20px;
+}
+
+.rank4 .name {
+    font-size: 18px;
+    margin-top: 25px;
+   
+    max-width: 170px;
+}
+
+.rank4 .score {
+    font-size: 20px;
+    top: 45px;
+    inset-inline-end: 54px;
+}
+
+.rank4 .rank-content {
+    width: 360px;
+}
+
+.rank4 .rank-number {
+    inset-inline-start: 68px;
+    top: 50px;
+    font-size: 28px;
+    color: #00ccff;
+}
+
+.rank5 {
+    margin-inline-start: 25px;
+    width: 450px;
+    height: 90px;
+    margin-top: 20px;
+    transform: translateY(-130px);
+}
+
+.rank5 .avatar {
+    width: 72px;
+    height: 72px;
+    margin-inline-start: 90px;
+    margin-inline-end: 20px;
+    margin-top: 10px;
+}
+
+.rank5 .name {
+    font-size: 17px;
+    margin-top: 10px;
+    
+    max-width: 150px;
+}
+
+.rank5 .score {
+    font-size: 19px;
+    top: 30px;
+    inset-inline-end: 52px;
+}
+
+.rank5 .rank-content {
+    width: 330px;
+}
+
+.rank5 .rank-number {
+    color: #1aff00;
+    inset-inline-start: 64px;
+    top: 37px;
+    font-size: 24px;
+}
+
+.rank1 .bg-video { filter: hue-rotate(360deg) saturate(2) brightness(1); }
+.rank2 .bg-video { filter: hue-rotate(317deg) saturate(0) brightness(1); }
+.rank3 .bg-video { filter: hue-rotate(300deg) saturate(5) brightness(1); }
+.rank4 .bg-video { filter: hue-rotate(184deg) saturate(8) brightness(1); }
+.rank5 .bg-video { filter: hue-rotate(18deg) saturate(2) brightness(1); }
+
+[data-widget-type="top_likes"] .icon-coin {
+    display: none;
+}
+
+[data-widget-type="top_gifters"] .icon-heart {
+    display: none;
+}

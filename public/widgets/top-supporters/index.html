@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/assets/img/tikflux-mark.png?v=20260802" type="image/png">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Top 20 Supporters</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/vendor/fontawesome/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            font-family: 'Cairo', Arial, sans-serif;
+            color: #fff;
+            width: 100%;
+            min-height: 100vh;
+            overflow: hidden;
+            background: transparent;
+        }
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 10px;
+        }
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 7px 12px;
+
+        }
+        /* Avatar section: crown above + avatar with rank badge */
+        .avatar-section {
+            position: relative;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .crown {
+            font-size: 0.95rem;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+        .crown.crown-gold  { color: #ffd700; filter: drop-shadow(0 0 5px #ffd70099); }
+        .crown.crown-silver{ color: #d8d8d8; filter: drop-shadow(0 0 5px #d8d8d899); }
+        .crown.crown-bronze{ color: #e08040; filter: drop-shadow(0 0 5px #e0804099); }
+        .crown-placeholder { height: 1.05rem; visibility: hidden; }
+        .avatar-frame {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            padding: 2px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.12) 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+        }
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            background: rgba(60,60,70,0.6);
+        }
+        /* Rank badge sitting on the inner corner of the avatar */
+        .rank-badge {
+            position: absolute;
+            bottom: -3px;
+            inset-inline-start: -1px;
+            background: rgba(15,15,25,0.88);
+            color: #fff;
+            font-family: 'Cairo', Arial, sans-serif;
+            font-weight: 700;
+            font-size: 0.62rem;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 3px;
+            border: 1.5px solid rgba(255,255,255,0.28);
+            line-height: 1;
+            letter-spacing: 0;
+        }
+        .rank-badge.rank-1 { background: #c89500; border-color: #ffd700; }
+        .rank-badge.rank-2 { background: #757575; border-color: #d0d0d0; }
+        .rank-badge.rank-3 { background: #7a3e10; border-color: #cd7f32; }
+        /* Info: name vertically centered against avatar, score below */
+        .info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 3px;
+            height: 50px;
+            transform: translateY(10px);
+        }
+        .name {
+            font-size: 1.22rem;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-shadow: 0 1px 5px rgba(0,0,0,0.95), 0 0 10px rgba(0,0,0,0.6);
+            line-height: 1.3;
+            letter-spacing: 0.01em;
+        }
+        .score {
+            
+            font-weight: 700;
+            color: #ffd166;
+            text-shadow: 0 1px 5px rgba(0,0,0,0.95);
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .score .icon-coin {
+            width: 1rem;
+            height: 1rem;
+            flex-shrink: 0;
+            vertical-align: middle;
+        }
+        .loading {
+            padding: 20px;
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div class="list" id="list"></div>
+        <div class="loading" id="loading">Loading...</div>
+    </div>
+    <script src="/assets/b/8c386c8dbec5a57f.js"></script>
+    <script src="/assets/b/28b98888f9aaae4a.js"></script>
+    <script>
+        (function() {
+            var hostname = window.location.hostname;
+            var isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+            var API_URL = window.ENV_CONFIG?.API_URL || (isLocal ? 'http://localhost:3000' : 'https://api.tikflux.live');
+            var EDGE_WS_URL = window.ENV_CONFIG?.EDGE_WS_URL || (isLocal ? 'ws://localhost:3000/ws' : 'wss://edge.tikflux.live/ws');
+
+            var params = new URLSearchParams(window.location.search);
+            var userId = params.get('uid');
+            var isMock = !userId || params.get('mock') === '1';
+            var uuidV4LikeRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+            var hasInvalidUid = !isMock && !uuidV4LikeRegex.test(String(userId || '').trim());
+
+            var listEl = document.getElementById('list');
+            var loadingEl = document.getElementById('loading');
+            var socket = null;
+
+            function showInvalidLinkError() {
+                document.body.innerHTML =
+                    '<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;"><div style="display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;font-family:Cairo,Arial,sans-serif;font-size:1.35rem;font-weight:800;"><img src="/assets/img/tikflux-mark.png" alt="TikFlux" style="width:170px;max-width:60vw;" /><div style="color:#ff0000;">الرابط خطأ<br/>تاكد من نسخ الرابط بشكل صحيح</div></div></div>';
+            }
+
+            function render(top20) {
+                if (!Array.isArray(top20)) top20 = [];
+                loadingEl.style.display = 'none';
+                listEl.innerHTML = '';
+                if (top20.length === 0) {
+                    listEl.style.display = 'none';
+                    loadingEl.style.display = 'block';
+                    loadingEl.textContent = 'لا يوجد داعمون بعد — سيظهرون عند استلام الهدايا أثناء البث';
+                    return;
+                }
+                listEl.style.display = 'flex';
+                top20.forEach(function(item, i) {
+                    var rank = (item.rank != null) ? item.rank : (i + 1);
+                    var nickname = item.nickname || '—';
+                    var avatar = item.avatar || '';
+                    var total = item.total_diamonds != null ? Number(item.total_diamonds) : 0;
+                    var username = item.supporter_username || '';
+                    var crownClass = rank === 1 ? 'crown crown-gold' : rank === 2 ? 'crown crown-silver' : rank === 3 ? 'crown crown-bronze' : '';
+                    var crownHtml = crownClass
+                        ? '<span class="' + crownClass + '"><i class="fas fa-crown"></i></span>'
+                        : '<span class="crown-placeholder"></span>';
+                    var badgeClass = 'rank-badge' + (rank <= 3 ? ' rank-' + rank : '');
+                    var defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 50 50\'%3E%3Ccircle fill=\'%23444\' cx=\'25\' cy=\'25\' r=\'25\'/%3E%3C/svg%3E';
+                    var row = document.createElement('div');
+                    row.className = 'row';
+                    row.setAttribute('data-username', username);
+                    row.innerHTML =
+                        '<div class="avatar-section">' +
+                            crownHtml +
+                            '<div class="avatar-frame">' +
+                                '<img class="avatar" src="" alt="" />' +
+                                '<span class="' + badgeClass + '">' + rank + '</span>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="info">' +
+                            '<span class="name">' + escapeHtml(nickname) + '</span>' +
+                            '<span class="score">' +
+                                '<svg class="icon-coin" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="coin-clip-ts"><circle cx="24" cy="24" r="24"/></clipPath></defs><g clip-path="url(#coin-clip-ts)"><path d="M48 24a24 24 0 1 1-48 0 24 24 0 0 1 48 0Z" fill="#FFB84D"/><path d="M47 24a23 23 0 1 1-46 0 23 23 0 0 1 46 0Z" fill="#FFDE55"/><path d="M42 24a18 18 0 1 1-36 0 18 18 0 0 1 36 0Z" fill="#F7A300"/><path d="M42 24a18 18 0 1 1-36 0 18 18 0 0 1 36 0Z" fill="#F7A80F"/><path d="M41.94 25.5a18 18 0 1 0-35.88 0 18 18 0 0 1 35.88 0Z" fill="#E88B00"/><path d="M41.94 25.5a18 18 0 1 0-35.88 0 18 18 0 0 1 35.88 0Z" fill="#F09207"/><path d="M34.74 17.77v5.86c-2.06 0-4.05-.44-5.81-1.55v7.2a7.79 7.79 0 0 1-7.84 7.75a7.79 7.79 0 0 1-7.8-8.35a7.79 7.79 0 0 1 9.19-8.24v6c-.47-.13-.9-.26-1.39-.26a3.14 3.14 0 0 0-3.09 2.5a3.14 3.14 0 0 0 3.1 2.5c1.74 0 3.14-1.4 3.14-3.11V12.03h4.69a5.6 5.6 0 0 0 5.81 5.74Z" fill="#F09207"/><path d="M34.34 18.18a5.78 5.78 0 0 1-5.82-5.74h-3.87v15.63c0 1.94-1.6 3.5-3.56 3.5a3.53 3.53 0 0 1-3.55-3.5a3.53 3.53 0 0 1 4.52-3.38v-3.9a7.38 7.38 0 0 0-8.4 7.28a7.38 7.38 0 0 0 7.43 7.34c4.1 0 7.43-3.29 7.43-7.34v-7.98a9.73 9.73 0 0 0 5.82 1.92v-3.83Z" fill="#fff"/></g></svg>' +
+                                total.toLocaleString('en-US') +
+                            '</span>' +
+                        '</div>';
+                    var imgEl = row.querySelector('.avatar');
+                    if (imgEl) {
+                        /* TikTok CDN (Akamai) often returns 403 Access Denied when Referer is a third-party site; no-referrer fixes many cases. */
+                        imgEl.referrerPolicy = 'no-referrer';
+                        imgEl.decoding = 'async';
+                        imgEl.onerror = function() {
+                            imgEl.onerror = null;
+                            imgEl.src = defaultAvatar;
+                        };
+                        imgEl.src = avatar || defaultAvatar;
+                    }
+                    listEl.appendChild(row);
+                });
+            }
+
+            function escapeHtml(s) {
+                var div = document.createElement('div');
+                div.textContent = s;
+                return div.innerHTML;
+            }
+
+            function loadInitial(liveRefresh) {
+                if (!userId) {
+                    loadingEl.textContent = 'No user';
+                    return;
+                }
+                var url = API_URL + '/api/widget/initial-data/' + encodeURIComponent(userId) + '/top_supporters';
+                if (liveRefresh) url += '?mode=live';
+                fetch(url, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                    .then(function(r) {
+                        if (!r.ok) {
+                            return r.text().then(function(t) {
+                                throw new Error('HTTP ' + r.status + (t ? ': ' + t.slice(0, 120) : ''));
+                            });
+                        }
+                        return r.json();
+                    })
+                    .then(function(result) {
+                        if (result.success && Array.isArray(result.data)) {
+                            var data = result.data;
+                            data.forEach(function(item, i) { item.rank = i + 1; });
+                            render(data);
+                        } else {
+                            console.warn('[TopSupporters] empty or failed payload', result);
+                            render([]);
+                        }
+                    })
+                    .catch(function(err) {
+                        console.error('[TopSupporters] load failed', err);
+                        loadingEl.style.display = 'block';
+                        loadingEl.textContent = 'تعذر تحميل التصنيف — تأكد أن API يعمل على ' + API_URL;
+                        listEl.style.display = 'none';
+                    });
+            }
+
+            function connectSocket() {
+                if (!userId || isMock || typeof createEdgeWsClient !== 'function') return;
+                socket = createEdgeWsClient({
+                    streamerId: userId,
+                    url: EDGE_WS_URL,
+                    reconnection: true,
+                    reconnectionDelay: 1000,
+                    reconnectionDelayMax: 5000,
+                });
+                socket.on('supporters_leaderboard_tick', function() {
+                    loadInitial(true);
+                });
+            }
+
+            if (hasInvalidUid) {
+                showInvalidLinkError();
+                return;
+            }
+
+            if (isMock) {
+                var mock = [
+                    { nickname: 'أحمد', avatar: '/assets/img/avatar1.png', supporter_username: 'user1', total_diamonds: 50000 },
+                    { nickname: 'علي', avatar: '/assets/img/avatar2.png', supporter_username: 'user2', total_diamonds: 43200 },
+                    { nickname: 'يوسف', avatar: '/assets/img/avatar3.png', supporter_username: 'user2', total_diamonds: 33200 },
+                    { nickname: 'محمود', avatar: '/assets/img/avatar1.png', supporter_username: 'user2', total_diamonds: 22500 },
+                    { nickname: 'عصام', avatar: '/assets/img/avatar2.png', supporter_username: 'user2', total_diamonds: 10200 }
+                ];
+                mock.forEach(function(item, i) { item.rank = i + 1; });
+                loadingEl.style.display = 'none';
+                listEl.style.display = 'flex';
+                render(mock);
+                return;
+            }
+
+            loadInitial();
+            connectSocket();
+        })();
+    </script>
+</body>
+</html>

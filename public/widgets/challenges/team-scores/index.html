@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="/assets/img/tikoverlay-mark.png?v=20260802" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Scores</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Tajawal:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --t1: #ff0000;
+      --t2: #0008ff;
+      --hit-positive: #22c55e;
+      --hit-negative: #ef4444;
+      --t1-dark: color-mix(in srgb, var(--t1) 55%, #000);
+      --t2-dark: color-mix(in srgb, var(--t2) 55%, #000);
+      --frame: #0a0f1c;
+      --spine-w: 28px;
+      --score-h: 48px;
+      --bar-h: 68px;
+      --gift-size: 50px;
+      --total-h: calc(var(--score-h) + var(--bar-h));
+      --trap-inset: 18%;
+      --score-inset: 24px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Tajawal", "Segoe UI", sans-serif;
+      color: #fff;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .board {
+      width: 100%;
+      max-width: 900px;
+      direction: rtl;
+    }
+
+    .widget {
+      position: relative;
+      width: 100%;
+      filter: drop-shadow(0 10px 32px rgba(0, 0, 0, 0.55));
+    }
+
+    /* صف السكورات — نصفان ملتصقان، شكل المثلث على الحاوية فقط */
+    .score-shell {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      height: var(--score-h);
+    }
+
+    .score-pair {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      width: min(380px, 54%);
+      min-width: 240px;
+      height: 100%;
+      overflow: hidden;
+      clip-path: polygon(
+        var(--trap-inset) 0,
+        calc(100% - var(--trap-inset)) 0,
+        100% 100%,
+        0 100%
+      );
+    }
+
+    .score-l,
+    .score-r {
+      flex: 1;
+      width: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+    }
+    .score-l {
+      background: linear-gradient(90deg, var(--t1-dark), var(--t1));
+    }
+    .score-r {
+      background: linear-gradient(270deg, var(--t2-dark), var(--t2));
+    }
+
+    /* الفاصل — فوق السكورات */
+    .spine {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+      width: var(--spine-w);
+      height: var(--total-h);
+      z-index: 10;
+      background: linear-gradient(180deg, #060a14 0%, #141c30 50%, #060a14 100%);
+      clip-path: polygon(
+        50% 0,
+        100% calc(var(--score-h) / var(--total-h) * 100%),
+        100% 100%,
+        0 100%,
+        0 calc(var(--score-h) / var(--total-h) * 100%)
+      );
+      box-shadow:
+        inset 3px 0 10px rgba(255, 50, 80, 0.5),
+        inset -3px 0 10px rgba(50, 150, 255, 0.5);
+    }
+
+    .spine-edge-l,
+    .spine-edge-r {
+      position: absolute;
+      inset: 0;
+      width: 50%;
+      pointer-events: none;
+    }
+    .spine-edge-l {
+      left: 0;
+      background: linear-gradient(105deg, rgba(255,255,255,.45), transparent 55%);
+    }
+    .spine-edge-r {
+      right: 0;
+      background: linear-gradient(-105deg, rgba(255,255,255,.45), transparent 55%);
+    }
+
+    .bolt-wrap {
+      position: absolute;
+      left: 50%;
+      top: calc(var(--score-h) - 28px);
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+    .bolt-sm {
+      width: 14px;
+      height: 22px;
+      display: block;
+      filter: drop-shadow(0 0 8px #fff);
+    }
+
+    .score-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 100%;
+      text-align: center;
+    }
+    /* قرب الأرقام نحو الوسط */
+    #teamOnePanel .score-box {
+      transform: translateX(calc(-1 * var(--score-inset)));
+    }
+    #teamTwoPanel .score-box {
+      transform: translateX(var(--score-inset));
+    }
+    .score-num {
+      display: inline-block;
+      font-family: "Bebas Neue", "Tajawal", sans-serif;
+      font-size: clamp(32px, 4.2vw, 40px);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      color: #fff;
+      transform: scale(1);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
+      transition:
+        color 0.45s ease,
+        text-shadow 0.45s ease,
+        transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .score-num.score-hit-pop {
+      transform: scale(1.07);
+    }
+    .score-num.score-hit-positive {
+      color: #4ade80;
+      text-shadow: 0 0 10px rgba(34, 197, 94, 0.7), 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+    .score-num.score-hit-negative {
+      color: #f87171;
+      text-shadow: 0 0 10px rgba(239, 68, 68, 0.7), 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    /* صف الشريط — نصفان ملتصقان خلف spine */
+    .bar-shell {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: row;
+      height: var(--bar-h);
+      border-radius: 14px;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.14);
+      background: var(--frame);
+    }
+
+    .bar-l,
+    .bar-r {
+      position: relative;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .bar-l .fill,
+    .bar-r .fill {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    .bar-l .fill {
+      background:
+        repeating-linear-gradient(-52deg, rgba(255,255,255,.07) 0 8px, transparent 8px 16px),
+        linear-gradient(90deg, var(--t1-dark) 0%, var(--t1) 72%);
+    }
+    .bar-r .fill {
+      background:
+        repeating-linear-gradient(52deg, rgba(255,255,255,.07) 0 8px, transparent 8px 16px),
+        linear-gradient(270deg, var(--t2-dark) 0%, var(--t2) 72%);
+    }
+    .bar-l .fill::after,
+    .bar-r .fill::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 45%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
+      pointer-events: none;
+      opacity: 0;
+    }
+    .bar-l .fill::after {
+      left: -50%;
+      animation: bar-sheen-l 2.6s ease-in-out infinite;
+    }
+    .bar-r .fill::after {
+      right: -50%;
+      animation: bar-sheen-r 2.6s ease-in-out infinite;
+    }
+    @keyframes bar-sheen-l {
+      0%, 100% { transform: translateX(0); opacity: 0; }
+      15%, 55% { opacity: 0.85; }
+      100% { transform: translateX(280%); opacity: 0; }
+    }
+    @keyframes bar-sheen-r {
+      0%, 100% { transform: translateX(0); opacity: 0; }
+      15%, 55% { opacity: 0.85; }
+      100% { transform: translateX(-280%); opacity: 0; }
+    }
+
+    .bar-l .fill,
+    .bar-r .fill {
+      transition: filter 0.5s ease;
+    }
+    .bar-l.bar-hit-positive .fill,
+    .bar-r.bar-hit-positive .fill {
+      animation: bar-glow-positive 0.65s ease-in-out;
+    }
+    .bar-l.bar-hit-negative .fill,
+    .bar-r.bar-hit-negative .fill {
+      animation: bar-glow-negative 0.65s ease-in-out;
+    }
+    @keyframes bar-glow-positive {
+      0%, 100% { filter: brightness(1); }
+      45% { filter: brightness(1.12); }
+    }
+    @keyframes bar-glow-negative {
+      0%, 100% { filter: brightness(1); }
+      45% { filter: brightness(1.12); }
+    }
+
+    .half-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: row;
+      direction: ltr;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      padding: 0 16px;
+      gap: 10px;
+    }
+    /* فريق 1 يمين: الاسم على الطرف الخارجي (يمين)، الهدايا نحو الوسط */
+    .bar-l .half-inner { flex-direction: row-reverse; }
+
+    .team-name {
+      flex-shrink: 0;
+      font-size: 25px;
+      font-weight: 800;
+      white-space: nowrap;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .gifts-row {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+      padding: 7px 0;
+    }
+    /* فريق 2 (يسار): الهدايا تبدأ من جهة الوسط */
+    .bar-r .gifts-row { justify-content: flex-end; }
+    /* فريق 1 (يمين): الهدايا تبدأ من جهة الوسط (يسار النصف) */
+    .bar-l .gifts-row { justify-content: flex-start; }
+
+    .gift-chip {
+      position: relative;
+      display: inline-block;
+      flex-shrink: 0;
+      width: var(--gift-size);
+      height: var(--gift-size);
+      background: transparent;
+      border: none;
+      transform: scale(1);
+      filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.45));
+      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), filter 0.45s ease;
+    }
+    .gift-chip img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      object-fit: contain;
+      object-position: center;
+      position: relative;
+      z-index: 1;
+    }
+    .gift-chip .pts {
+      position: absolute;
+      left: 50%;
+      bottom: 1px;
+      transform: translateX(-50%);
+      z-index: 2;
+      font-family: "Tajawal", "Segoe UI", sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+      color: #fff;
+      pointer-events: none;
+      -webkit-text-stroke: 2px rgba(0, 0, 0, 0.95);
+      paint-order: stroke fill;
+      text-shadow:
+        0 0 4px rgba(0, 0, 0, 1),
+        0 2px 6px rgba(0, 0, 0, 0.9);
+      transition: color 0.45s ease, -webkit-text-stroke-color 0.45s ease;
+    }
+    .bar-l .gift-chip .pts {
+      color: #ffe8ec;
+      -webkit-text-stroke-color: #1a0508;
+    }
+    .bar-r .gift-chip .pts {
+      color: #e3f4ff;
+      -webkit-text-stroke-color: #051018;
+    }
+
+    .gift-chip.gift-hit-positive {
+      transform: scale(1.08);
+      filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.75)) drop-shadow(0 5px 10px rgba(0, 0, 0, 0.45));
+    }
+    .gift-chip.gift-hit-negative {
+      transform: scale(1.08);
+      filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.75)) drop-shadow(0 5px 10px rgba(0, 0, 0, 0.45));
+    }
+    .gift-chip.gift-hit-positive .pts {
+      color: #86efac !important;
+      -webkit-text-stroke-color: #052e16 !important;
+    }
+    .gift-chip.gift-hit-negative .pts {
+      color: #fca5a5 !important;
+      -webkit-text-stroke-color: #450a0a !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="board">
+    <div class="widget" id="vsWrap">
+      <div class="score-shell">
+        <div class="score-pair">
+          <div class="score-l" id="teamOnePanel">
+            <div class="score-box" id="scoreOneWrap">
+              <span class="score-num" id="scoreOne">0</span>
+            </div>
+          </div>
+          <div class="score-r" id="teamTwoPanel">
+            <div class="score-box" id="scoreTwoWrap">
+              <span class="score-num" id="scoreTwo">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="spine" aria-hidden="true">
+        <span class="spine-edge-l"></span>
+        <span class="spine-edge-r"></span>
+        <div class="bolt-wrap">
+          <svg class="bolt-sm" viewBox="0 0 24 40" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#fff" d="M14 0 L4 18h7L6 40l14-22h-7L14 0z"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="bar-shell">
+        <div class="bar-l" id="teamOneBar">
+          <div class="fill"></div>
+          <div class="half-inner">
+            <span class="team-name" id="teamOneName">فريق 1</span>
+            <div class="gifts-row" id="teamOneGifts"></div>
+          </div>
+        </div>
+        <div class="bar-r" id="teamTwoBar">
+          <div class="fill"></div>
+          <div class="half-inner">
+            <span class="team-name" id="teamTwoName">فريق 2</span>
+            <div class="gifts-row" id="teamTwoGifts"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/b/8c386c8dbec5a57f.js"></script>
+  <script src="/assets/b/28b98888f9aaae4a.js"></script>
+  <script src="/assets/b/aa9c4c6deef9b265.js"></script>
+  <script src="/assets/b/c7b6503f1ecf6480.js"></script>
+  <script src="/assets/b/92e7bea3403fba1f.js"></script>
+  <script src="/assets/b/bd0484b9a20aa23c.js"></script>
+</body>
+</html>

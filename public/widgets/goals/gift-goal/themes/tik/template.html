@@ -1,0 +1,63 @@
+<div id="gift-goal-theme-root" class="gift-goal-theme-panel is-active" data-theme="tik">
+  <div class="tik-scene">
+    <div class="tik-goal-wrap">
+      <div class="tik-heart-container">
+        <svg class="tik-liquid-svg" width="420" height="420" viewBox="0 0 420 420" aria-hidden="true">
+          <defs>
+            <mask id="giftTikLiquidMask">
+              <image
+                href="/widgets/goals/gift-goal/themes/tik/assets/tik_mask.png"
+                x="0"
+                y="0"
+                width="420"
+                height="420"
+                preserveAspectRatio="xMidYMid meet"
+              />
+            </mask>
+            <filter id="giftTikLiquidGlow" x="-75%" y="-75%" width="250%" height="250%">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="26" result="blur1"/>
+              <feFlood flood-color="var(--liquid-glow-1, #ffc400)" flood-opacity="0.5" result="color1"/>
+              <feComposite in="color1" in2="blur1" operator="in" result="glow1"/>
+              <feGaussianBlur in="SourceAlpha" stdDeviation="16" result="blur2"/>
+              <feFlood flood-color="var(--liquid-glow-2, #ffd700)" flood-opacity="0.68" result="color2"/>
+              <feComposite in="color2" in2="blur2" operator="in" result="glow2"/>
+              <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="blur3"/>
+              <feFlood flood-color="var(--liquid-glow-3, #ffe44d)" flood-opacity="0.88" result="color3"/>
+              <feComposite in="color3" in2="blur3" operator="in" result="glow3"/>
+              <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur4"/>
+              <feFlood flood-color="var(--liquid-glow-4, #fff5aa)" flood-opacity="1" result="color4"/>
+              <feComposite in="color4" in2="blur4" operator="in" result="glow4"/>
+              <feMerge>
+                <feMergeNode in="glow1"/>
+                <feMergeNode in="glow2"/>
+                <feMergeNode in="glow3"/>
+                <feMergeNode in="glow4"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <linearGradient id="giftTikWaveGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color: var(--wave-top, #4a3800);" />
+              <stop offset="40%" style="stop-color: var(--wave-mid, #d4a800);" />
+              <stop offset="100%" style="stop-color: var(--wave-bottom, #ffee00);" />
+            </linearGradient>
+            <linearGradient id="giftTikWaveGradientBack" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color: var(--wave-back-top, #3d2e00);" />
+              <stop offset="40%" style="stop-color: var(--wave-back-mid, #b89500);" />
+              <stop offset="100%" style="stop-color: var(--wave-back-bottom, #e6d400);" />
+            </linearGradient>
+          </defs>
+          <g filter="url(#giftTikLiquidGlow)">
+            <path id="giftTikWaveBack" fill="url(#giftTikWaveGradientBack)" opacity="0.65" mask="url(#giftTikLiquidMask)"></path>
+            <g id="giftTikBubbles" mask="url(#giftTikLiquidMask)"></g>
+            <path id="giftTikWaveFront" fill="url(#giftTikWaveGradient)" opacity="1" mask="url(#giftTikLiquidMask)"></path>
+          </g>
+          <path id="giftTikWaveSurfaceBack" fill="none" stroke="rgba(255,255,255,0.46)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" mask="url(#giftTikLiquidMask)"></path>
+          <path id="giftTikWaveSurface" fill="none" stroke="rgba(255,255,255,0.52)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" mask="url(#giftTikLiquidMask)"></path>
+        </svg>
+        <img src="/widgets/goals/gift-goal/themes/tik/assets/tik_shape.webp" alt="" class="tik-heart-shape" decoding="async" fetchpriority="high" width="900" height="900" />
+      </div>
+      <div class="tik-goal-label" id="giftTikGoalLabelText">Gift Goal</div>
+      <div class="tik-goal-value" id="giftTikGoalValueText">0 / 1000</div>
+    </div>
+  </div>
+</div>

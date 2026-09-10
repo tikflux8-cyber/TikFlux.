@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OBS Docks</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: transparent;
+      overflow: hidden;
+      height: 100vh;
+    }
+    .docks-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      height: 100vh;
+      padding: 8px;
+    }
+    .dock-panel {
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .dock-header {
+      padding: 8px 12px;
+      background: rgba(255, 0, 0, 0.15);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dock-header i {
+      color: #ff4444;
+      font-size: 14px;
+    }
+    .dock-header h3 {
+      font-size: 13px;
+      color: #fff;
+      font-weight: 600;
+    }
+    .dock-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+    .dock-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      margin-bottom: 4px;
+      transition: background 0.2s;
+    }
+    .dock-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .dock-item .rank {
+      width: 20px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #ff4444;
+    }
+    .dock-item .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #333;
+      overflow: hidden;
+    }
+    .dock-item .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .dock-item .info {
+      flex: 1;
+      min-width: 0;
+    }
+    .dock-item .name {
+      font-size: 12px;
+      color: #fff;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .dock-item .score {
+      font-size: 11px;
+      color: #aaa;
+    }
+    .dock-empty {
+      text-align: center;
+      color: #666;
+      font-size: 12px;
+      padding: 20px;
+    }
+    .stats-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 8px;
+      grid-column: span 2;
+    }
+    .stat-card {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .stat-card .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ff4444;
+    }
+    .stat-card .stat-label {
+      font-size: 11px;
+      color: #888;
+      margin-top: 2px;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div class="docks-container">
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-value" id="viewerCount">0</div>
+        <div class="stat-label">المشاهدون</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="likeCount">0</div>
+        <div class="stat-label">الإعجابات</div>
+      </div>
+    </div>
+
+    <div class="dock-panel">
+      <div class="dock-header">
+        <i class="fas fa-heart"></i>
+        <h3>أفضل الإعجابات</h3>
+      </div>
+      <div class="dock-body" id="topLikesList">
+        <div class="dock-empty">لا توجد بيانات بعد</div>
+      </div>
+    </div>
+
+    <div class="dock-panel">
+      <div class="dock-header">
+        <i class="fas fa-gift"></i>
+        <h3>أفضل المُهدين</h3>
+      </div>
+      <div class="dock-body" id="topGiftersList">
+        <div class="dock-empty">لا توجد بيانات بعد</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const uid = params.get('uid') || 'demo';
+    const mock = params.get('mock') === '1';
+    let topLikes = [];
+    let topGifters = [];
+    let totalLikes = 0;
+    let viewerCount = 0;
+
+    function renderList(containerId, items) {
+      const el = document.getElementById(containerId);
+      if (!items.length) {
+        el.innerHTML = '<div class="dock-empty">لا توجد بيانات بعد</div>';
+        return;
+      }
+      el.innerHTML = items.slice(0, 10).map((item, i) => `
+        <div class="dock-item">
+          <span class="rank">#${i + 1}</span>
+          <div class="avatar">
+            <img src="${item.avatar || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><circle cx="14" cy="14" r="14" fill="%23444"/><text x="14" y="18" text-anchor="middle" fill="%23888" font-size="11">${(item.name || '?')[0]}</text></svg>'}" alt="">
+          </div>
+          <div class="info">
+            <div class="name">${item.name || 'Anonymous'}</div>
+            <div class="score">${item.score || 0} ${item.type === 'gift' ? '💎' : '❤️'}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateStats() {
+      document.getElementById('viewerCount').textContent = viewerCount;
+      document.getElementById('likeCount').textContent = totalLikes;
+    }
+
+    if (mock) {
+      // Mock data
+      const mockNames = ['Ahmad', 'Sara', 'Mohammed', 'Fatima', 'Omar', 'Layla', 'Youssef', 'Nour'];
+      topLikes = mockNames.slice(0, 5).map(n => ({ name: n, score: Math.floor(Math.random() * 500) + 50, type: 'like' }));
+      topGifters = mockNames.slice(0, 3).map(n => ({ name: n, score: Math.floor(Math.random() * 1000) + 100, type: 'gift' }));
+      totalLikes = topLikes.reduce((s, i) => s + i.score, 0);
+      viewerCount = Math.floor(Math.random() * 500) + 50;
+      renderList('topLikesList', topLikes);
+      renderList('topGiftersList', topGifters);
+      updateStats();
+    } else {
+      // Connect to WebSocket
+      const wsUrl = `ws://${window.location.hostname}:3000/ws`;
+      try {
+        const ws = new WebSocket(wsUrl);
+        ws.onopen = () => {
+          ws.send(JSON.stringify({ type: 'subscribe', streamerId: uid }));
+        };
+        ws.onmessage = (event) => {
+          try {
+            const msg = JSON.parse(event.data);
+            if (msg.type === 'top_likes_update' && msg.data?.top10) {
+              topLikes = msg.data.top10.map(u => ({
+                name: u.nickname || u.uniqueId,
+                score: u.score,
+                avatar: u.avatar,
+                type: 'like'
+              }));
+              renderList('topLikesList', topLikes);
+            }
+            if (msg.type === 'top_gifters_update' && msg.data?.top50) {
+              topGifters = msg.data.top50.map(u => ({
+                name: u.nickname || u.uniqueId,
+                score: u.score,
+                avatar: u.avatar,
+                type: 'gift'
+              }));
+              renderList('topGiftersList', topGifters);
+            }
+            if (msg.type === 'like') {
+              totalLikes += (msg.data?.likeCount || 1);
+              updateStats();
+            }
+            if (msg.type === 'room_viewers_update' && msg.data?.total) {
+              viewerCount = msg.data.total;
+              updateStats();
+            }
+          } catch (e) {}
+        };
+      } catch (e) {}
+    }
+  </script>
+</body>
+</html>

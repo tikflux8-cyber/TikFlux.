@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikFlux Dashboard</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0a0a1a;color:#fff;min-height:100vh}
+.header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:15px 25px;display:flex;align-items:center;gap:15px;border-bottom:1px solid #333}
+.header h1{font-size:20px;background:linear-gradient(90deg,#00d4ff,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.status-dot{width:12px;height:12px;border-radius:50%;background:#ff4444;display:inline-block}
+.status-dot.connected{background:#44ff44;box-shadow:0 0 8px #44ff44}
+.connect-area{display:flex;gap:10px;align-items:center}
+.connect-area input{padding:8px 14px;border-radius:8px;border:1px solid #444;background:#1a1a2e;color:#fff;font-size:14px;width:200px}
+.connect-area button{padding:8px 20px;border-radius:8px;border:none;background:linear-gradient(135deg,#7b2ff7,#00d4ff);color:#fff;font-weight:bold;cursor:pointer;font-size:14px}
+.container{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;padding:20px;max-width:1400px;margin:0 auto}
+.card{background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:20px;border:1px solid #333}
+.card h2{font-size:16px;color:#00d4ff;margin-bottom:15px;display:flex;align-items:center;gap:8px}
+.leaderboard-list{list-style:none}
+.leaderboard-list li{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;margin-bottom:8px;background:rgba(255,255,255,0.05);transition:all .3s}
+.leaderboard-list li:hover{background:rgba(255,255,255,0.1)}
+.rank{font-weight:bold;font-size:18px;width:30px;text-align:center}
+.rank.gold{color:#ffd700}.rank.silver{color:#c0c0c0}.rank.bronze{color:#cd7f32}
+.avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid #333}
+.user-info{flex:1}
+.user-info .name{font-weight:600}
+.user-info .score{font-size:12px;color:#888}
+.event-list{list-style:none;max-height:400px;overflow-y:auto}
+.event-list li{padding:8px 12px;border-radius:8px;margin-bottom:6px;background:rgba(255,255,255,0.05);font-size:13px;display:flex;align-items:center;gap:8px;animation:slideIn .3s}
+@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+.event-type{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:bold}
+.event-type.like{background:#ff4444;color:#fff}
+.event-type.follow{background:#44aaff;color:#fff}
+.event-type.gift{background:#ffd700;color:#000}
+.event-type.chat{background:#44ff44;color:#000}
+.event-type.subscribe{background:#9b59b6;color:#fff}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat-box{background:rgba(255,255,255,0.05);border-radius:8px;padding:15px;text-align:center}
+.stat-box .value{font-size:28px;font-weight:bold;background:linear-gradient(90deg,#00d4ff,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-box .label{font-size:12px;color:#888;margin-top:5px}
+.span2{grid-column:span 2}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>TikFlux Dashboard</h1>
+  <div class="connect-area">
+    <span class="status-dot" id="statusDot"></span>
+    <span id="statusText">غير متصل</span>
+    <input type="text" id="usernameInput" placeholder="اسم TikTok..." value="tiktok">
+    <button onclick="doConnect()">اتصال</button>
+    <button onclick="doDisconnect()" style="background:linear-gradient(135deg,#ff4444,#cc0000)">قطع</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="card">
+    <h2>&#x1F3C6; Top Likes</h2>
+    <ul class="leaderboard-list" id="topLikes"></ul>
+  </div>
+  <div class="card">
+    <h2>&#x1F48E; Top Gifters</h2>
+    <ul class="leaderboard-list" id="topGifters"></ul>
+  </div>
+  <div class="card">
+    <h2>&#x2B50; Best Supporters</h2>
+    <ul class="leaderboard-list" id="supporters"></ul>
+  </div>
+  <div class="card">
+    <h2>&#x26A1; Statistics</h2>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="value" id="totalLikes">0</div><div class="label">Total Likes</div></div>
+      <div class="stat-box"><div class="value" id="totalGifts">0</div><div class="label">Total Gifts</div></div>
+      <div class="stat-box"><div class="value" id="totalFollows">0</div><div class="label">Follows</div></div>
+      <div class="stat-box"><div class="value" id="totalDiamonds">0</div><div class="label">Total Diamonds</div></div>
+    </div>
+  </div>
+  <div class="card span2">
+    <h2>&#x1F4AC; Latest Events</h2>
+    <ul class="event-list" id="eventList"></ul>
+  </div>
+</div>
+
+<script>
+var ws;
+var totalLikes=0,totalGifts=0,totalFollows=0,totalDiamonds=0;
+var events=[];
+var currentState='disconnected';
+
+function setStatus(state){
+  var dot=document.getElementById('statusDot');
+  var txt=document.getElementById('statusText');
+  currentState=state;
+  if(state==='connected'){
+    dot.className='status-dot connected';
+    txt.textContent='متصل - مباشر';
+    txt.style.color='#44ff44';
+  }else if(state==='connecting'){
+    dot.className='status-dot';
+    dot.style.background='#ffaa00';
+    txt.textContent='جاري الاتصال...';
+    txt.style.color='#ffaa00';
+  }else if(state==='offline'){
+    dot.className='status-dot';
+    dot.style.background='#ff8800';
+    txt.textContent='غير متصل - البث متوقف';
+    txt.style.color='#ff8800';
+  }else if(state==='error'){
+    dot.className='status-dot';
+    dot.style.background='#ff4444';
+    txt.textContent='خطأ في الاتصال';
+    txt.style.color='#ff4444';
+  }else{
+    dot.className='status-dot';
+    dot.style.background='#ff4444';
+    txt.textContent='غير متصل';
+    txt.style.color='#ff4444';
+  }
+}
+
+function updateProfile(profile){
+  if(!profile)return;
+  var el=document.getElementById('streamerInfo');
+  if(!el){
+    el=document.createElement('div');
+    el.id='streamerInfo';
+    el.style.cssText='display:flex;align-items:center;gap:10px;margin-left:15px;';
+    document.querySelector('.header').appendChild(el);
+  }
+  var avatarHtml=profile.avatar?'<img src="'+profile.avatar+'" style="width:32px;height:32px;border-radius:50%;border:2px solid #00d4ff" onerror="this.style.display=\'none\'">':'';
+  var viewerHtml=profile.viewerCount>0?'<span style="color:#ff4444;font-size:12px">🔴 '+profile.viewerCount+' viewers</span>':'<span style="color:#888;font-size:12px">Offline</span>';
+  el.innerHTML=avatarHtml+'<div><div style="font-weight:600;font-size:14px">'+(profile.nickname||profile.uniqueId)+'</div>'+viewerHtml+'</div>';
+}
+
+function doConnect(){
+  var u=document.getElementById('usernameInput').value.trim();
+  if(!u)return;
+  setStatus('connecting');
+  fetch('/stream/connect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uniqueId:u})})
+    .then(function(r){return r.json()}).then(function(d){
+      if(d.state) setStatus(d.state);
+    }).catch(function(){ setStatus('error'); });
+}
+
+function doDisconnect(){
+  fetch('/stream/disconnect',{method:'POST'}).then(function(){
+    setStatus('disconnected');
+    document.getElementById('streamerInfo')&&(document.getElementById('streamerInfo').innerHTML='');
+    totalLikes=0;totalGifts=0;totalFollows=0;totalDiamonds=0;
+    document.getElementById('totalLikes').textContent='0';
+    document.getElementById('totalGifts').textContent='0';
+    document.getElementById('totalFollows').textContent='0';
+    document.getElementById('totalDiamonds').textContent='0';
+    events=[];
+    renderEvents();
+  });
+}
+
+function addEvent(type,user,extra){
+  events.unshift({type:type,user:user,extra:extra});
+  if(events.length>50)events.pop();
+  renderEvents();
+}
+
+function renderEvents(){
+  var el=document.getElementById('eventList');
+  el.innerHTML='';
+  events.forEach(function(e){
+    var li=document.createElement('li');
+    var cls=e.type==='like'?'like':e.type==='follow'?'follow':e.type==='gift'?'gift':e.type==='subscribe'?'subscribe':'chat';
+    var lbl=e.type.toUpperCase();
+    var name=e.user?(e.user.nickname||e.user.uniqueId):'';
+    var text=name;
+    if(e.type==='like'&&e.extra)text+=' liked x'+e.extra;
+    if(e.type==='gift'&&e.extra)text+=' sent '+e.extra;
+    if(e.type==='chat'&&e.extra)text+=': '+e.extra;
+    var avatarHtml='';
+    if(e.user&&e.user.avatar)avatarHtml='<img class="avatar" src="'+e.user.avatar+'" onerror="this.style.display=\'none\'">';
+    li.innerHTML='<span class="event-type '+cls+'">'+lbl+'</span> '+avatarHtml+' '+text;
+    el.appendChild(li);
+  });
+}
+
+function renderLeaderboard(data,elId,showAvatar){
+  var el=document.getElementById(elId);
+  el.innerHTML='';
+  if(!data||!data.length){el.innerHTML='<li style="color:#666;text-align:center">No data yet</li>';return;}
+  data.forEach(function(item,i){
+    var li=document.createElement('li');
+    var rc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+    var avatarHtml=showAvatar&&item.avatar?'<img class="avatar" src="'+item.avatar+'" onerror="this.style.display=\'none\'">':'';
+    li.innerHTML='<span class="rank '+rc+'">'+(i+1)+'</span>'+avatarHtml+'<div class="user-info"><div class="name">'+(item.nickname||item.uniqueId)+'</div><div class="score">Score: '+(item.score||item.diamonds||0)+'</div></div>';
+    el.appendChild(li);
+  });
+}
+
+function connectWS(){
+  var url='ws://'+location.host+'/ws';
+  ws=new WebSocket(url);
+  ws.onopen=function(){
+    setStatus(true);
+    ws.send(JSON.stringify({type:'subscribe',streamerId:'550e8400-e29b-41d4-a716-446655440000',connectionName:'dashboard',clientType:'dashboard',dashboardSurface:'dashboard'}));
+  };
+  ws.onmessage=function(e){
+    try{handleEvent(JSON.parse(e.data))}catch(ex){}
+  };
+  ws.onclose=function(){setStatus(false);setTimeout(connectWS,3000)};
+}
+
+function handleEvent(msg){
+  var d=msg.data||msg;
+  if(msg.type==='like'){
+    totalLikes+=(d.likeCount||1);
+    document.getElementById('totalLikes').textContent=totalLikes;
+    addEvent('like',d.user,d.likeCount);
+  }else if(msg.type==='follow_overlay_update'){
+    totalFollows++;
+    document.getElementById('totalFollows').textContent=totalFollows;
+    addEvent('follow',d.user||d);
+  }else if(msg.type==='gift_overlay_update'){
+    totalGifts++;
+    totalDiamonds+=(d.gift?d.gift.diamondCount:0);
+    document.getElementById('totalGifts').textContent=totalGifts;
+    document.getElementById('totalDiamonds').textContent=totalDiamonds;
+    var g=d.gift||{};
+    addEvent('gift',d.user||d.sender,g.name+' x'+(g.count||1)+' ('+g.diamondCount+'💎)');
+  }else if(msg.type==='chat'){
+    addEvent('chat',d.user,d.comment);
+  }else if(msg.type==='subscribe_overlay_update'){
+    addEvent('subscribe',d.user||d);
+  }else if(msg.type==='top_likes_update'){
+    renderLeaderboard(d.top10||d.topLikes||[],'topLikes',true);
+  }else if(msg.type==='top_gifters_update'){
+    renderLeaderboard(d.top50||d.topGifts||[],'topGifters',true);
+  }else if(msg.type==='leaderboard_update'){
+    if(d.topLikes)renderLeaderboard(d.topLikes,'topLikes',true);
+    if(d.topGifts)renderLeaderboard(d.topGifts,'topGifters',true);
+    if(d.topCombined)renderLeaderboard(d.topCombined,'supporters',true);
+  }else if(msg.type==='supporters_update'){
+    renderLeaderboard(d.supporters||[],'supporters',true);
+  }else if(msg.type==='streamer_profile'){
+    updateProfile(d);
+  }else if(msg.type==='connection_status'){
+    setStatus(d.state||'disconnected');
+    if(d.profile)updateProfile(d.profile);
+  }else if(msg.type==='stream-state-updated'){
+    setStatus(d.state||'disconnected');
+  }
+}
+
+connectWS();
+
+// Load initial supporters
+fetch('/api/supporters-leaderboard').then(function(r){return r.json()}).then(function(d){
+  if(d.supporters)renderLeaderboard(d.supporters,'supporters',true);
+}).catch(function(){});
+</script>
+</body>
+</html>

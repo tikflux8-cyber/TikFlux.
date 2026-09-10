@@ -1,0 +1,298 @@
+/* Top Supporters list theme — matches /widgets/top-supporters/ */
+
+@font-face {
+  font-family: 'Foda';
+  src: url('/assets/fonts/Foda-Free-Font.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Roadster';
+  src: url('/assets/fonts/ROADSTER.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lemon';
+  src: url('/assets/fonts/LEMON.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.wrapper {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Cairo', Arial, sans-serif;
+  color: #fff;
+  direction: rtl;
+}
+
+#theme-wrapper[data-direction="ltr"] {
+  direction: ltr;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.ts-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  flex-shrink: 0;
+}
+
+.ts-row.is-hidden {
+  display: none !important;
+}
+
+.avatar-section {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.crown {
+  font-size: 0.95rem;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.crown.crown-gold { color: #ffd700; filter: drop-shadow(0 0 5px #ffd70099); }
+.crown.crown-silver { color: #d8d8d8; filter: drop-shadow(0 0 5px #d8d8d899); }
+.crown.crown-bronze { color: #e08040; filter: drop-shadow(0 0 5px #e0804099); }
+.crown-placeholder { height: 1.05rem; visibility: hidden; }
+
+.avatar-frame {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.12) 100%);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  background: rgba(60, 60, 70, 0.6);
+}
+
+.rank-badge {
+  position: absolute;
+  bottom: -3px;
+  inset-inline-start: -1px;
+  background: rgba(15, 15, 25, 0.88);
+  color: #fff;
+  font-family: 'Cairo', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 0.62rem;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  line-height: 1;
+}
+
+.rank-badge.rank-1 { background: #c89500; border-color: #ffd700; }
+.rank-badge.rank-2 { background: #757575; border-color: #d0d0d0; }
+.rank-badge.rank-3 { background: #7a3e10; border-color: #cd7f32; }
+
+.info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--name-score-gap, 10px);
+  height: 50px;
+  transform: translateY(10px);
+  text-align: start;
+}
+
+.name {
+  font-family: var(--name-font-family, 'Cairo', Arial, sans-serif);
+  font-size: 1.22rem;
+  font-weight: 700;
+  white-space: nowrap;
+  
+  text-overflow: ellipsis;
+  width: 100%;
+  color: var(--name-color, #ffffff);
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.6);
+  line-height: 1.3;
+}
+
+/* —— Name text effects (nameEffect: none | shine | glow | neon) —— */
+
+#theme-wrapper.name-effect-shine .name,
+#theme-wrapper.name-effect-glow .name,
+#theme-wrapper.name-effect-neon .name {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+/* لمعان — white band sweeps left, seamless loop */
+#theme-wrapper.name-effect-shine .name {
+  color: transparent !important;
+  text-shadow: none !important;
+  background-image: linear-gradient(
+    90deg,
+    var(--name-sweep-base, var(--name-color, #ffffff)) 0%,
+    var(--name-sweep-base, var(--name-color, #ffffff)) 28%,
+    color-mix(in srgb, var(--name-sweep-base, var(--name-color, #ffffff)) 50%, #ffffff) 40%,
+    #ffffff 50%,
+    color-mix(in srgb, var(--name-sweep-base, var(--name-color, #ffffff)) 50%, #ffffff) 60%,
+    var(--name-sweep-base, var(--name-color, #ffffff)) 72%,
+    var(--name-sweep-base, var(--name-color, #ffffff)) 100%
+  );
+  background-size: 50% 100%;
+  background-repeat: repeat-x;
+  background-position: 50% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: defaultNameSweep 2.4s linear infinite;
+  will-change: background-position;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 8px var(--name-glow-70, rgba(255, 255, 255, 0.45)));
+}
+
+@keyframes defaultNameSweep {
+  from { background-position: 50% 0; }
+  to { background-position: -50% 0; }
+}
+
+/* توهج — نفس أسلوب latest-events: لون + حواف + هالة + powerPulse */
+#theme-wrapper.name-effect-glow .name {
+  color: var(--name-glow-main, var(--name-color, #ffffff)) !important;
+  text-shadow:
+    -2px 0 var(--name-glow-light, #ffffff),
+    2px 0 var(--name-glow-dark, #333333),
+    0 0 5px var(--name-glow-90, rgba(255, 255, 255, 0.9)),
+    0 0 10px var(--name-glow-90, rgba(255, 255, 255, 0.9)),
+    0 0 20px var(--name-glow-80, rgba(255, 255, 255, 0.8)),
+    0 0 30px var(--name-glow-70, rgba(255, 255, 255, 0.7)),
+    0 0 50px var(--name-glow-60, rgba(255, 255, 255, 0.6)),
+    0 0 70px var(--name-glow-50, rgba(255, 255, 255, 0.5));
+  animation: defaultNamePowerPulse 1.5s ease-in-out infinite;
+}
+
+#theme-wrapper.name-effect-glow[data-direction="ltr"] .name {
+  text-shadow:
+    2px 0 var(--name-glow-light, #ffffff),
+    -2px 0 var(--name-glow-dark, #333333),
+    0 0 5px var(--name-glow-90, rgba(255, 255, 255, 0.9)),
+    0 0 10px var(--name-glow-90, rgba(255, 255, 255, 0.9)),
+    0 0 20px var(--name-glow-80, rgba(255, 255, 255, 0.8)),
+    0 0 30px var(--name-glow-70, rgba(255, 255, 255, 0.7)),
+    0 0 50px var(--name-glow-60, rgba(255, 255, 255, 0.6)),
+    0 0 70px var(--name-glow-50, rgba(255, 255, 255, 0.5));
+}
+
+@keyframes defaultNamePowerPulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.35); }
+}
+
+/* نيون — تدرج كهربائي مع هالة ملونة */
+#theme-wrapper.name-effect-neon .name {
+  color: transparent !important;
+  text-shadow: none !important;
+  background: linear-gradient(
+    105deg,
+    var(--name-color-2, #00eaff) 0%,
+    color-mix(in srgb, var(--name-color, #ffffff) 25%, #ffffff) 14%,
+    #ffffff 24%,
+    var(--name-color, #ffffff) 38%,
+    #ffffff 50%,
+    var(--name-color-2, #00eaff) 62%,
+    var(--name-color, #ffffff) 76%,
+    #ffffff 88%,
+    var(--name-color-2, #00eaff) 100%
+  );
+  background-size: 180% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: defaultNameNeonShimmer 2.4s linear infinite;
+  will-change: background-position;
+  filter:
+    drop-shadow(0 1px 3px rgba(0, 0, 0, 0.95))
+    drop-shadow(0 0 4px var(--name-neon-glow-a, rgba(255, 255, 255, 0.75)))
+    drop-shadow(0 0 12px var(--name-neon-glow-b, rgba(0, 234, 255, 0.55)))
+    drop-shadow(0 0 22px var(--name-neon-glow-c, rgba(0, 234, 255, 0.35)));
+}
+
+@keyframes defaultNameNeonShimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+.score {
+  font-family: var(--score-font-family, 'Rajdhani', 'Cairo', sans-serif);
+  font-weight: 700;
+  color: var(--score-color, #ffd166);
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.95);
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  width: 100%;
+}
+
+.score-num {
+  color: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.score .icon-coin {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.score .heart-ico.icon-heart {
+  color: #ff0000;
+  font-size: 0.95rem;
+  filter: drop-shadow(0 0 4px rgba(255, 0, 0, 0.7));
+}
+
+#theme-wrapper[data-widget-type="top_gifters"] .icon-heart {
+  display: none !important;
+}
+
+#theme-wrapper[data-widget-type="top_likes"] .icon-coin {
+  display: none !important;
+}

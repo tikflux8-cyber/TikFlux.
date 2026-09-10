@@ -1,0 +1,68 @@
+@font-face {
+  font-family: "Lemon";
+  src: url("/assets/fonts/LEMON.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Foda";
+  src: url("/assets/fonts/Foda-Free-Font.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+html {
+  overflow: hidden;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Lemon", "Foda", "Segoe UI", sans-serif;
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
+  background-color: transparent;
+  position: relative;
+}
+
+body.loaded {
+  opacity: 1;
+}
+
+.donation-goal-themes-stage {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+}
+
+#donation-goal-theme-mount {
+  position: absolute;
+  inset: 0;
+}
+
+.donation-goal-theme-panel {
+  position: absolute;
+  inset: 0;
+}
+
+html.donation-goal-theme-cozy-active,
+body.donation-goal-theme-cozy-active {
+  overflow: hidden !important;
+}
+
+html.donation-goal-theme-potion-active,
+body.donation-goal-theme-potion-active {
+  overflow: visible !important;
+}
+
+html.donation-goal-theme-potion3-active,
+body.donation-goal-theme-potion3-active {
+  overflow: hidden !important;
+}
+
+html.donation-goal-theme-potion5-active,
+body.donation-goal-theme-potion5-active {
+  overflow: hidden !important;
+}

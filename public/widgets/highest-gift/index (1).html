@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/assets/img/tikflux-mark.png?v=20260802" type="image/png">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Highest Gift Widget</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;900&family=Cairo:wght@700;800&family=Tajawal:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: 'Foda';
+    src: url('../../assets/fonts/Foda-Free-Font.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Roadster';
+    src: url('../../assets/fonts/ROADSTER.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Vito Bold';
+    src: url('../../assets/fonts/Vito Bold.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  /* إعدادات الصفحة الأساسية لتكون شفافة */
+  html {
+    overflow: hidden;
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  :root {
+    --hg-main: #ffd700;
+    --hg-dark: #ff8c00;
+    --hg-soft: #ffd014;
+    --hg-glow-80: rgba(255, 215, 0, 0.8);
+    --hg-glow-70: rgba(255, 215, 0, 0.7);
+    --hg-bg-glow: rgba(255, 208, 0, 0.774);
+    --hg-badge-bg: rgba(255, 208, 0, 0.322);
+    --hg-badge-border: rgb(255, 208, 0);
+    --hg-text-gradient: linear-gradient(180deg, #fff 20%, #ffd700 50%, #ff8c00 100%);
+    --hg-title-gradient: linear-gradient(180deg, #fff 0%, #ffd700 50%, #ff8c00 100%);
+  }
+
+  /* حاوية التمركز */
+  .stage {
+    width: 100%;
+    height: 100vh; /* نص الصفحة */
+    display: flex;
+    align-items: center; /* تمركز عمودي داخل النصف */
+    justify-content: center;
+  }
+
+  /* الحاوية الرئيسية للعنصر */
+  .gift-card {
+    position: relative;
+    width: 300px;
+    padding: 20px;
+    text-align: center;
+    background: transparent;
+    border-radius: 50%;
+    animation: float 4s ease-in-out infinite;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .gift-card.visible {
+    opacity: 1;
+  }
+
+  /* Two overlapping backgrounds that crossfade to simulate a smooth stop transition */
+  .gift-card::before,
+  .gift-card::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: -50px;
+    width: 360px;
+    height: 360px;
+    border-radius: 50%;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .gift-card::before {
+    background: radial-gradient(circle, var(--hg-bg-glow) 0%, rgba(0,0,0,0) 40%);
+    opacity: 1;
+    animation: bg-fade 4s ease-in-out infinite;
+  }
+
+  .gift-card::after {
+    background: radial-gradient(circle, var(--hg-bg-glow) 0%, rgba(0,0,0,0) 60%);
+    opacity: 0;
+    animation: bg-fade-rev 4s ease-in-out infinite;
+  }
+
+  /* صورة الهدية */
+  .gift-img {
+    width: 200px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+    transform-origin: bottom center;
+    animation: bounce 4s ease-in-out infinite;
+  }
+
+  /* منطقة النصوص */
+  .info-box {
+    margin-top: -30px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* قيمة الهدية (الرقم) */
+  .gift-value {
+    font-size: 42px;
+    font-weight: 900;
+    line-height: 1;
+    text-transform: uppercase;
+    background: var(--hg-text-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 4px 0px rgba(0,0,0,0.5));
+    text-shadow: 0 0 20px var(--hg-glow-80);
+  }
+
+  /* عنوان Top Gift */
+  .gift-title {
+    font-family: var(--hg-title-font, 'Foda', 'Poppins', sans-serif);
+    font-size: 20px;
+    font-weight: 900;
+    text-transform: uppercase;
+    background: var(--hg-title-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 3px 0px rgba(0,0,0,0.6));
+    text-shadow: 0 0 15px var(--hg-glow-80);
+    margin-bottom: 15px;
+    letter-spacing: 2px;
+  }
+
+  /* صورة الشخص (الأفاتار) */
+  .sender-avatar {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    border: 3px solid var(--hg-main);
+    box-shadow: 0 0 15px var(--hg-glow-80), inset 0 0 10px rgba(0,0,0,0.5);
+    overflow: visible;
+    z-index: 10;
+    animation: pulse-border 2s infinite;
+  }
+
+  .avatar-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+  
+  .avatar-inner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .sender-avatar .username {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Foda', 'Poppins', sans-serif;
+    font-size: 18px;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+    font-weight: 600;
+    letter-spacing: 1px;
+    background: var(--hg-badge-bg);
+    padding: 0px 10px;
+    border-radius: 12px;
+    display: inline-block;
+    border: 1px solid var(--hg-badge-border);
+    white-space: nowrap;
+    z-index: 20;
+  }
+
+  /* --- Animations --- */
+
+  /* حركة طفو ناعمة للكل */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+  }
+
+  /* حركة للصورة لتبدو حية */
+  @keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  /* نبض للإطار حول الصورة */
+  @keyframes pulse-border {
+    0% { box-shadow: 0 0 0 0 var(--hg-glow-70); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+  }
+
+  @keyframes bg-fade {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes bg-fade-rev {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* TikTok Coin SVG Icon */
+  .tiktok-coin {
+    width: 0.9em;
+    height: 0.8em;
+    vertical-align: -0.25em;
+    margin-left: 0.05em;
+    transform: translateY(-0.25em);
+  }
+
+  /* معاينة داخل مودال الإعدادات — تصغير المحتوى */
+  body[data-settings-preview='1'] .stage {
+    height: 100%;
+    min-height: 0;
+    transform: scale(0.52);
+    transform-origin: center center;
+  }
+
+  body[data-settings-preview='1'] .gift-card,
+  body[data-settings-preview='1'] .gift-img,
+  body[data-settings-preview='1'] .gift-card::before,
+  body[data-settings-preview='1'] .gift-card::after {
+    animation: none !important;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="gift-card visible" id="giftCard">
+    
+    <!-- الأفاتار في الزاوية -->
+    <div class="sender-avatar">
+      <div class="avatar-inner">
+        <img id="avatarImg" src="/assets/img/avatar1.png" alt="User">
+      </div>
+      <div class="username" id="username">user</div>
+    </div>
+
+    <!-- عنوان الودجت -->
+    <div class="gift-title" id="giftTitle">Top Gift</div>
+
+    <!-- صورة الهدية -->
+    <img id="giftImg" src="https://p16-webcast.tiktokcdn.com/img/maliva/webcast-va/resource/gift/5655_thumbnail.png~tplv-obj.image" class="gift-img" alt="Gift" onerror="this.src='./lion_6369.webp'">
+    
+    <!-- النصوص -->
+    <div class="info-box">
+      <div class="gift-value">
+        <span id="giftValue">50000</span>
+        <svg class="tiktok-coin icon-coin" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <defs><clipPath id="coin-clip-dynamic"><circle cx="24" cy="24" r="24" /></clipPath></defs>
+          <g clip-path="url(#coin-clip-dynamic)">
+            <path d="M48 24a24 24 0 1 1-48 0 24 24 0 0 1 48 0Z" fill="#FFB84D"/>
+            <path d="M47 24a23 23 0 1 1-46 0 23 23 0 0 1 46 0Z" fill="#FFDE55"/>
+            <path d="M42 24a18 18 0 1 1-36 0 18 18 0 0 1 36 0Z" fill="#F7A300"/>
+            <path d="M42 24a18 18 0 1 1-36 0 18 18 0 0 1 36 0Z" fill="#F7A80F"/>
+            <path d="M41.94 25.5a18 18 0 1 0-35.88 0 18 18 0 0 1 35.88 0Z" fill="#E88B00"/>
+            <path d="M41.94 25.5a18 18 0 1 0-35.88 0 18 18 0 0 1 35.88 0Z" fill="#F09207"/>
+            <path d="M34.74 17.77v5.86c-2.06 0-4.05-.44-5.81-1.55v7.2a7.79 7.79 0 0 1-7.84 7.75a7.79 7.79 0 0 1-7.8-8.35a7.79 7.79 0 0 1 9.19-8.24v6c-.47-.13-.9-.26-1.39-.26a3.14 3.14 0 0 0-3.09 2.5a3.14 3.14 0 0 0 3.1 2.5c1.74 0 3.14-1.4 3.14-3.11V12.03h4.69a5.6 5.6 0 0 0 5.81 5.74Z" fill="#F09207"/>
+            <path d="M34.34 18.18a5.78 5.78 0 0 1-5.82-5.74h-3.87v15.63c0 1.94-1.6 3.5-3.56 3.5a3.53 3.53 0 0 1-3.55-3.5a3.53 3.53 0 0 1 4.52-3.38v-3.9a7.38 7.38 0 0 0-8.4 7.28a7.38 7.38 0 0 0 7.43 7.34c4.1 0 7.43-3.29 7.43-7.34v-7.98a9.73 9.73 0 0 0 5.82 1.92v-3.83Z" fill="#fff"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Socket.IO -->
+<script src="/assets/b/8c386c8dbec5a57f.js"></script>
+<script src="/assets/b/dc013fc4b67f581b.js"></script>
+<script src="/assets/b/28b98888f9aaae4a.js"></script>
+    <!-- Main Widget Script -->
+<script type="text/javascript">
+  /**
+   * Highest Gift Widget
+   * Displays the highest single gift received in the current session
+   */
+
+  // Auto-detect environment
+  const hostname = window.location.hostname;
+  const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+  const API_URL = window.ENV_CONFIG?.API_URL || (isLocal ? 'http://localhost:3000' : 'https://api.tikflux.live');
+        const EDGE_WS_URL = window.ENV_CONFIG?.EDGE_WS_URL || (isLocal ? 'ws://localhost:3000/ws' : 'wss://edge.tikflux.live/ws');
+  
+  // Get parameters
+  const params = new URLSearchParams(window.location.search);
+  const userId = params.get('uid');
+  const isMock = !userId || params.get('mock') === '1';
+  const isSettingsPreview = params.get('settings_preview') === '1';
+  if (isSettingsPreview) {
+    document.body.dataset.settingsPreview = '1';
+  }
+  const uuidV4LikeRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const hasInvalidUid = !isMock && !uuidV4LikeRegex.test(String(userId || '').trim());
+
+  let socket = null;
+
+  // DOM Elements
+  const giftCard = document.getElementById('giftCard');
+  const giftValue = document.getElementById('giftValue');
+  const giftImg = document.getElementById('giftImg');
+  const avatarImg = document.getElementById('avatarImg');
+  const username = document.getElementById('username');
+  const giftTitleEl = document.getElementById('giftTitle');
+
+  const DEFAULT_TITLE = 'Top Gift';
+  const DEFAULT_ACCENT = '#ffd700';
+  const DEFAULT_TITLE_FONT = 'foda';
+
+  const TITLE_FONT_STACKS = {
+    foda: "'Foda', 'Poppins', sans-serif",
+    poppins: "'Poppins', sans-serif",
+    roadster: "'Roadster', 'Poppins', sans-serif",
+    vito: "'Vito Bold', 'Poppins', sans-serif",
+    cairo: "'Cairo', 'Tajawal', sans-serif",
+    tajawal: "'Tajawal', 'Cairo', sans-serif",
+  };
+
+  function normalizeTitleFont(value) {
+    const key = String(value || '').trim().toLowerCase();
+    return Object.prototype.hasOwnProperty.call(TITLE_FONT_STACKS, key) ? key : DEFAULT_TITLE_FONT;
+  }
+
+  function applyTitleFont(titleFont) {
+    const key = normalizeTitleFont(titleFont);
+    const stack = TITLE_FONT_STACKS[key] || TITLE_FONT_STACKS[DEFAULT_TITLE_FONT];
+    document.documentElement.style.setProperty('--hg-title-font', stack);
+  }
+
+  function applyWidgetSettings(settings) {
+    const accent = settings?.accentColor || DEFAULT_ACCENT;
+    const title = (settings?.title || DEFAULT_TITLE).trim() || DEFAULT_TITLE;
+    const titleFont = normalizeTitleFont(settings?.titleFont);
+    if (typeof window.applyHighestGiftTheme === 'function') {
+      window.applyHighestGiftTheme(accent);
+    }
+    applyTitleFont(titleFont);
+    if (giftTitleEl) giftTitleEl.textContent = title;
+  }
+
+  async function loadWidgetSettings() {
+    if (!userId) {
+      applyWidgetSettings({ accentColor: DEFAULT_ACCENT, title: DEFAULT_TITLE, titleFont: DEFAULT_TITLE_FONT });
+      return;
+    }
+    try {
+      const res = await fetch(`${API_URL}/api/widget/highest-gift/settings?uid=${encodeURIComponent(userId)}`, {
+        cache: 'no-store',
+      });
+      if (!res.ok) {
+        applyWidgetSettings({ accentColor: DEFAULT_ACCENT, title: DEFAULT_TITLE, titleFont: DEFAULT_TITLE_FONT });
+        return;
+      }
+      const json = await res.json();
+      applyWidgetSettings(json?.settings || json);
+    } catch {
+      applyWidgetSettings({ accentColor: DEFAULT_ACCENT, title: DEFAULT_TITLE, titleFont: DEFAULT_TITLE_FONT });
+    }
+  }
+
+  window.addEventListener('message', (ev) => {
+    const msg = ev?.data;
+    if (!msg || msg.type !== 'highest_gift_settings_update') return;
+    const settings = msg.data?.settings || msg.data || {};
+    applyWidgetSettings(settings);
+  });
+
+  console.log('🎁 [HighestGift] Starting with userId:', userId, '| Mock:', isMock);
+
+  function showInvalidLinkError() {
+    document.body.innerHTML =
+      '<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;"><div style="display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;font-family:Cairo,Arial,sans-serif;font-size:1.35rem;font-weight:800;"><img src="/assets/img/tikflux-mark.png" alt="TikFlux" style="width:170px;max-width:60vw;" /><div style="color:#ff0000;">الرابط خطأ<br/>تاكد من نسخ الرابط بشكل صحيح</div></div></div>';
+  }
+
+  /**
+   * Update Display
+   */
+  function updateDisplay(data) {
+    if (!data) {
+      // Hide widget if no data
+      giftCard.classList.remove('visible');
+      return;
+    }
+
+    // Update value
+    giftValue.textContent = data.diamondCount.toLocaleString('en-US');
+
+    // Update username
+    username.textContent = data.nickname || data.uniqueId || '---';
+
+    // Update avatar
+    if (data.profilePictureUrl) {
+      avatarImg.src = data.profilePictureUrl;
+    } else {
+      avatarImg.src = '/assets/img/avatar1.png'; // Default avatar
+    }
+
+    // Update gift image
+    if (data.giftImageUrl) {
+      // Use direct image URL from TikTok
+      giftImg.src = data.giftImageUrl;
+      
+      console.log('🖼️ [HighestGift] Loading gift image from URL:', {
+        giftId: data.giftId,
+        giftName: data.giftName,
+        imageUrl: data.giftImageUrl
+      });
+      
+      // Fallback to placeholder if image fails to load
+      giftImg.onerror = function() {
+        console.warn('⚠️ [HighestGift] Gift image failed to load, using lion_6369.webp');
+        this.src = './lion_6369.webp';
+        this.onerror = null;
+      };
+    } else if (data.giftId) {
+      // Fallback: Build URL from giftId (old method)
+      const giftImageUrl = `https://p16-webcast.tiktokcdn.com/img/maliva/webcast-va/resource/gift/${data.giftId}_thumbnail.png~tplv-obj.image`;
+      giftImg.src = giftImageUrl;
+      
+      console.log('🖼️ [HighestGift] Loading gift image from giftId:', {
+        giftId: data.giftId,
+        giftName: data.giftName,
+        imageUrl: giftImageUrl
+      });
+      
+      giftImg.onerror = function() {
+        console.warn('⚠️ [HighestGift] Gift image failed to load, using lion_6369.webp');
+        this.src = './lion_6369.webp';
+        this.onerror = null;
+      };
+    } else {
+      console.warn('⚠️ [HighestGift] No giftImageUrl or giftId in data, using lion_6369.webp');
+      giftImg.src = '/widgets/highest-gift/lion_6369.webp';
+    }
+
+    // Show widget
+    giftCard.classList.add('visible');
+
+    console.log('✅ [HighestGift] Display updated:', {
+      diamondCount: data.diamondCount,
+      giftImageUrl: data.giftImageUrl,
+      giftId: data.giftId,
+      giftName: data.giftName,
+      username: data.nickname || data.uniqueId
+    });
+  }
+
+  /**
+   * Load Initial Data
+   */
+  async function loadInitialData() {
+    if (!userId) {
+      console.log('⚠️ [HighestGift] No userId, showing mock data');
+      showMockData();
+      return;
+    }
+
+    try {
+      console.log('📊 [HighestGift] Loading weekly_highest_gift data...');
+      
+      const response = await fetch(`${API_URL}/api/widget/initial-data/${userId}/highest_gift`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        console.warn('⚠️ [HighestGift] Failed to load initial data:', response.status);
+        showMockData();
+        return;
+      }
+      
+      const result = await response.json();
+      
+      // Debug: Log the full response
+      console.log('📦 [HighestGift] Full server response:', result);
+      console.log('📦 [HighestGift] Response structure:', {
+        hasSuccess: 'success' in result,
+        successValue: result.success,
+        hasData: 'data' in result,
+        dataValue: result.data,
+        dataType: typeof result.data
+      });
+      
+      // Check if we have valid data
+      if (result && result.data && result.data.diamondCount !== undefined) {
+        console.log('✅ [HighestGift] weekly_highest_gift found:', result.data);
+        console.log('🔍 [HighestGift] Data details:', {
+          hasGiftImageUrl: !!result.data.giftImageUrl,
+          hasGiftId: !!result.data.giftId,
+          giftImageUrl: result.data.giftImageUrl,
+          giftId: result.data.giftId,
+          diamondCount: result.data.diamondCount,
+          giftName: result.data.giftName
+        });
+        updateDisplay(result.data);
+      } else {
+        console.log('ℹ️ [HighestGift] No weekly_highest_gift stored, showing mock data');
+        console.log('ℹ️ [HighestGift] Reason: result.data is', result.data);
+        showMockData();
+      }
+      
+    } catch (error) {
+      console.error('❌ [HighestGift] Error loading initial data:', error);
+      showMockData();
+    }
+  }
+
+  function connectSocket() {
+    if (!userId || typeof createEdgeWsClient !== 'function') return;
+    console.log('🔌 [HighestGift] Connecting to Edge WS...');
+    socket = createEdgeWsClient({
+      streamerId: userId,
+      url: EDGE_WS_URL,
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+    });
+
+    socket.on('connect', () => {
+      console.log('✅ [HighestGift] Edge WS connected');
+    });
+
+    socket.on('connected', () => {
+      console.log('✅ [HighestGift] Subscribed on Edge');
+      loadInitialData();
+    });
+
+    socket.on('disconnect', (reason) => {
+      console.log('❌ [HighestGift] Disconnected:', reason);
+    });
+
+    // Listen for highest gift updates
+    socket.on('highest_gift_update', (data) => {
+      console.log('📢 [HighestGift] Update received:', data);
+      console.log('🔍 [HighestGift] Data details:', {
+        hasGiftImageUrl: !!data.giftImageUrl,
+        hasGiftId: !!data.giftId,
+        giftImageUrl: data.giftImageUrl,
+        giftId: data.giftId,
+        diamondCount: data.diamondCount,
+        giftName: data.giftName
+      });
+      updateDisplay(data);
+    });
+
+    // Listen for reset events
+    socket.on('highest_gift_reset', (data) => {
+      console.log('🔄 [HighestGift] Reset received:', data);
+      // Show mock data after reset
+      showMockData();
+    });
+
+    socket.on('highest_gift_settings_update', (payload) => {
+      const data = payload?.data || payload || {};
+      const settings = data.settings || data;
+      applyWidgetSettings(settings);
+    });
+
+    // Fallback: Listen via 'event' channel
+    socket.on('event', (eventData) => {
+      if (eventData.type === 'highest_gift_update' && eventData.data) {
+        console.log('📢 [HighestGift] Update received via event:', eventData.data);
+        console.log('🔍 [HighestGift] Event data details:', {
+          hasGiftImageUrl: !!eventData.data.giftImageUrl,
+          hasGiftId: !!eventData.data.giftId,
+          giftImageUrl: eventData.data.giftImageUrl,
+          giftId: eventData.data.giftId,
+          diamondCount: eventData.data.diamondCount,
+          giftName: eventData.data.giftName
+        });
+        updateDisplay(eventData.data);
+      }
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('❌ [HighestGift] Connection error:', error);
+    });
+
+    socket.on('error', (error) => {
+      console.error('❌ [HighestGift] Socket error:', error);
+    });
+  }
+
+  /**
+   * Show Mock Data (fallback when no weekly_highest_gift exists)
+   */
+  function showMockData() {
+    console.log('🎭 [HighestGift] Showing Mock Data (no weekly_highest_gift found)');
+    
+    const mockData = {
+      diamondCount: 0,
+      giftImageUrl: './lion_6369.webp',
+      giftId: 6369,
+      giftName: 'Lion',
+      uniqueId: 'testuser',
+      nickname: 'user',
+      profilePictureUrl: '/assets/img/avatar2.png'
+    };
+    
+    updateDisplay(mockData);
+  }
+
+  /**
+   * Initialize
+   */
+  if (hasInvalidUid) {
+    showInvalidLinkError();
+  } else {
+    void loadWidgetSettings();
+    // Always try to load initial data first
+    loadInitialData();
+    
+    // Connect to socket if userId exists (for real-time updates)
+    if (userId && !isMock) {
+      connectSocket();
+    }
+  }
+
+</script>
+
+</body>
+</html>

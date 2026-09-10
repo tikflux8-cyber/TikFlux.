@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="/assets/img/tikflux-mark.png?v=20260802" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikFlux - Fireworks Widget</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; background: transparent; overflow: hidden; }
+    #fw-canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <canvas id="fw-canvas"></canvas>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="/assets/b/8c386c8dbec5a57f.js"></script>
+    <script src="/assets/b/28b98888f9aaae4a.js"></script>
+    <script src="/assets/b/98d38911f98bb30e.js"></script>
+
+  <script>
+(function () {
+  'use strict';
+
+  const hostname = window.location.hostname;
+  const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+  const API_URL = window.ENV_CONFIG?.API_URL || (isLocal ? 'http://localhost:3000' : 'https://api.tikflux.live');
+        const EDGE_WS_URL = window.ENV_CONFIG?.EDGE_WS_URL || (isLocal ? 'ws://localhost:3000/ws' : 'wss://edge.tikflux.live/ws');
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const userId = urlParams.get('uid');
+  const isMock = urlParams.get('mock') === '1';
+  const isPreview = urlParams.get('preview') === '1';
+  const uuidV4LikeRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const hasInvalidUid = !isMock && !!userId && !uuidV4LikeRegex.test(String(userId).trim());
+
+  let soundEnabledForInteractive = false;
+  /** مستوى الصوت من الإعدادات (0–100) — التصميم الجديد */
+  let fireworkVolumeSetting = 50;
+  /** الحد الأدنى لقيمة الهدية (عملات) — يُطبَّق في الويدجت فقط */
+  let fireworkMinGiftCoinsSetting = 1;
+  window.isPreviewMode = isPreview;
+  window.soundEnabledForInteractive = false;
+  window.isMockMode = isMock;
+
+  function showInvalidLinkError() {
+    document.body.innerHTML =
+      '<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;"><div style="display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;font-family:Cairo,Arial,sans-serif;font-size:1.35rem;font-weight:800;"><img src="/assets/img/tikflux-mark.png" alt="TikFlux" style="width:170px;max-width:60vw;" /><div style="color:#ff0000;">الرابط خطأ<br/>تاكد من نسخ الرابط بشكل صحيح</div></div></div>';
+  }
+
+  if (hasInvalidUid) {
+    showInvalidLinkError();
+    return;
+  }
+
+  const MAX_GIFT_CREDITS = 100;
+  let giftsQueue = [];
+  let giftDrainTimer = null;
+  let mockTimer = null;
+  const RHYTHM_BEAT_MS = 150;
+
+  function parseFireworkMinGiftCoins(raw) {
+    if (typeof raw === 'number' && !isNaN(raw)) {
+      return Math.max(1, Math.floor(raw));
+    }
+    if (typeof raw === 'string' && String(raw).trim() !== '') {
+      var n = parseInt(String(raw), 10);
+      if (!isNaN(n)) return Math.max(1, n);
+    }
+    return 1;
+  }
+
+  function giftMeetsMinCoins(giftCoins, meta) {
+    if (meta && meta.isTestEvent === true) return true;
+    var coins = typeof giftCoins === 'number' && !isNaN(giftCoins) ? giftCoins : 0;
+    return coins >= fireworkMinGiftCoinsSetting;
+  }
+
+  function getNextBeatMs() {
+    return RHYTHM_BEAT_MS + Math.random() * 100;
+  }
+
+  function clearGiftDrainTimer() {
+    if (giftDrainTimer !== null) {
+      clearTimeout(giftDrainTimer);
+      giftDrainTimer = null;
+    }
+  }
+
+  function processGiftBeat() {
+    giftDrainTimer = null;
+    if (document.hidden) {
+      if (giftsQueue.length > 0) {
+        giftDrainTimer = setTimeout(processGiftBeat, 400);
+      }
+      return;
+    }
+    const engine = window.__giftEngine;
+    if (!engine) {
+      if (giftsQueue.length > 0) {
+        giftDrainTimer = setTimeout(processGiftBeat, 200);
+      }
+      return;
+    }
+    if (giftsQueue.length === 0) return;
+
+    const current = giftsQueue[0];
+    if (current.remaining <= 0) {
+      giftsQueue.shift();
+      if (giftsQueue.length > 0) {
+        giftDrainTimer = setTimeout(processGiftBeat, getNextBeatMs());
+      }
+      return;
+    }
+
+    current.remaining--;
+    const vs = typeof window.fireworkViewportSize === 'function'
+      ? window.fireworkViewportSize()
+      : { w: engine._settings.screenWidth, h: engine._settings.screenHeight };
+    const w = vs.w;
+    const h = vs.h;
+    const targetX = (0.12 + Math.random() * 0.76) * w;
+    const targetY = (0.2 + Math.random() * 0.65) * h;
+    const giftUrl = current.giftUrl || (typeof window.pickRandomGiftImage === 'function' ? window.pickRandomGiftImage() : 'gift.png');
+    const profileUrl = current.profileUrl || undefined;
+    const senderName = (current.meta && current.meta.senderName) ? current.meta.senderName : 'Anonymous';
+    const meta = current.meta || {};
+    var wantTestPreviewSound = isPreview && meta.isTestEvent === true && soundEnabledForInteractive;
+
+    if (wantTestPreviewSound) {
+      engine.updateSettings({ enableSound: true, volume: fireworkVolumeSetting });
+    }
+
+    engine.spawnRocket({
+      targetX: targetX,
+      targetY: targetY,
+      profilePictureUrl: profileUrl,
+      giftImageUrl: giftUrl,
+      gifterName: senderName
+    });
+
+    if (wantTestPreviewSound) {
+      setTimeout(mutePreviewEngineAfterTest, 5500);
+    }
+
+    if (current.remaining <= 0) {
+      giftsQueue.shift();
+    }
+    if (giftsQueue.length > 0) {
+      giftDrainTimer = setTimeout(processGiftBeat, getNextBeatMs());
+    }
+  }
+
+  function addGiftToQueue(count, giftImageUrl, avatarUrl, meta, giftCoins) {
+    if (!window.__giftEngine) {
+      console.error('❌ [Firework] Engine not ready');
+      return;
+    }
+    meta = meta || {};
+    if (!giftMeetsMinCoins(giftCoins, meta)) {
+      console.log('⚠️ [Firework] Gift below minimum value, skipped', {
+        giftCoins: giftCoins,
+        minGiftCoins: fireworkMinGiftCoinsSetting
+      });
+      return;
+    }
+    const totalInQueue = giftsQueue.reduce(function (sum, g) { return sum + g.remaining; }, 0);
+    let availableSlots = MAX_GIFT_CREDITS - totalInQueue;
+    if (availableSlots <= 0) {
+      while (giftsQueue.length > 0 && availableSlots <= 0) {
+        const dropped = giftsQueue.shift();
+        availableSlots += dropped.remaining;
+      }
+    }
+    const actualCount = Math.min(count, availableSlots);
+    if (actualCount <= 0) {
+      console.warn('⚠️ [Firework] All credits dropped (queue full)');
+      return;
+    }
+    const giftUrl = giftImageUrl || (typeof window.pickRandomGiftImage === 'function' ? window.pickRandomGiftImage() : 'gift.png');
+    giftsQueue.push({
+      remaining: actualCount,
+      giftUrl: giftUrl,
+      profileUrl: avatarUrl || null,
+      meta: meta || {}
+    });
+    if (!giftDrainTimer) {
+      giftDrainTimer = setTimeout(processGiftBeat, 100);
+    }
+  }
+
+  function applyFireworkRemoteSettings(settings) {
+    if (!settings || typeof settings !== 'object') return;
+    const engine = window.__giftEngine;
+    var volRaw = settings.volume;
+    var vol =
+      typeof volRaw === 'number' && !isNaN(volRaw)
+        ? Math.min(100, Math.max(0, Math.round(volRaw)))
+        : 50;
+    fireworkVolumeSetting = vol;
+    fireworkMinGiftCoinsSetting = parseFireworkMinGiftCoins(settings.minGiftCoins);
+
+    soundEnabledForInteractive = !!settings.soundEnabled;
+    window.soundEnabledForInteractive = soundEnabledForInteractive;
+
+    var enableSound = isPreview ? false : soundEnabledForInteractive;
+
+    if (engine) {
+      engine.updateSettings({
+        enableSound: enableSound,
+        volume: enableSound ? vol : 0
+      });
+    }
+  }
+
+  /** بعد انتهاء صوت تجربة المعاينة — إعادة كتم الصوت في iframe المعاينة */
+  function mutePreviewEngineAfterTest() {
+    if (!isPreview) return;
+    var eng = window.__giftEngine;
+    if (!eng) return;
+    eng.updateSettings({ enableSound: false, volume: 0 });
+  }
+
+  async function waitForFireworkInit() {
+    let attempts = 0;
+    while (!window.fireworkInitComplete && attempts < 80) {
+      await new Promise(function (r) { setTimeout(r, 50); });
+      attempts++;
+    }
+    return !!window.fireworkInitComplete;
+  }
+
+  async function loadFireworkSettingsFromApi() {
+    if (!userId || isMock) return;
+    try {
+      const response = await fetch(
+        API_URL + '/api/widget/firework/settings?uid=' + encodeURIComponent(userId),
+        { credentials: 'omit' }
+      );
+      if (!response.ok) {
+        console.warn('⚠️ [Firework] API settings HTTP', response.status);
+        return;
+      }
+      const data = await response.json();
+      const settings = data && data.success && data.settings ? data.settings : data;
+      if (!settings || typeof settings !== 'object') return;
+      if (!(await waitForFireworkInit())) {
+        console.warn('⚠️ [Firework] Engine not ready — applying settings anyway');
+      }
+      applyFireworkRemoteSettings(settings);
+      console.log('✅ [Firework] Settings loaded from API', {
+        soundEnabled: !!settings.soundEnabled,
+        volume: fireworkVolumeSetting,
+        minGiftCoins: fireworkMinGiftCoinsSetting
+      });
+    } catch (error) {
+      console.error('❌ [Firework] Failed to load settings from API:', error);
+    }
+  }
+
+  function startWidget() {
+    if (typeof window.bootstrapGiftFireworkWidget !== 'function') {
+      console.error('❌ [Firework] bootstrapGiftFireworkWidget missing');
+      return;
+    }
+    window.bootstrapGiftFireworkWidget();
+    console.log('🎆 [Firework] Widget initialized', { userId: userId, isMock: isMock, isPreview: isPreview });
+
+    if (isMock) {
+      console.log('🎭 [Firework] MOCK mode — periodic demo rockets');
+      setTimeout(function () {
+        var eng = window.__giftEngine;
+        if (eng) {
+          eng.updateSettings({ enableSound: true, volume: fireworkVolumeSetting });
+        }
+      }, 600);
+      mockTimer = setInterval(function () {
+        if (document.hidden) return;
+        var eng = window.__giftEngine;
+        if (!eng || typeof window.pickRandomGiftImage !== 'function') return;
+        var vs = typeof window.fireworkViewportSize === 'function'
+          ? window.fireworkViewportSize()
+          : { w: eng._settings.screenWidth, h: eng._settings.screenHeight };
+        eng.spawnRocket({
+          targetX: (0.12 + Math.random() * 0.76) * vs.w,
+          targetY: (0.2 + Math.random() * 0.65) * vs.h,
+          profilePictureUrl: 'profile.png',
+          giftImageUrl: window.pickRandomGiftImage(),
+          gifterName: 'Mock'
+        });
+      }, 4500);
+    }
+  }
+
+  startWidget();
+  void loadFireworkSettingsFromApi();
+
+  window.addEventListener('message', async function (event) {
+    const d = event.data;
+    if (!d || typeof d !== 'object') return;
+
+    if (d.type === 'firework_preview_gift') {
+      if (!(await waitForFireworkInit())) {
+        console.error('❌ [Firework] Cannot apply preview gift — widget not initialized');
+        return;
+      }
+      var count = typeof d.giftCount === 'number' && d.giftCount > 0 ? Math.min(Math.floor(d.giftCount), 50) : 1;
+      var giftImageUrl = d.giftImageUrl;
+      var avatarUrl = d.avatarUrl;
+      var senderName = d.senderName || 'Test User';
+      var giftName = d.giftName || 'Gift';
+      addGiftToQueue(count, giftImageUrl, avatarUrl, {
+        giftName: giftName,
+        senderName: senderName,
+        isTestEvent: true
+      }, null);
+      return;
+    }
+
+    if (d.type === 'firework_preview_settings' && d.settings) {
+      if (!(await waitForFireworkInit())) {
+        console.error('❌ [Firework] Cannot apply preview settings — widget not initialized');
+        return;
+      }
+      applyFireworkRemoteSettings(d.settings);
+    }
+  });
+
+  let socket = null;
+
+  if (userId && !isMock) {
+    console.log('🔌 [Firework] Connecting to socket...', EDGE_WS_URL);
+    socket = createEdgeWsClient({
+      streamerId: userId,
+      url: EDGE_WS_URL,
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: Infinity,
+    });
+
+    socket.on('connected', function (data) {
+      console.log('✅ [Firework] Server confirmed connection:', data);
+    });
+
+    socket.on('disconnect', function (reason) {
+      console.log('❌ [Firework] Disconnected:', reason);
+    });
+
+    socket.on('reconnect', function (attemptNumber) {
+      console.log('✅ [Firework] Reconnected after', attemptNumber, 'attempts');
+    });
+
+    socket.on('connect', function () {
+      console.log('✅ [Firework] Connected to socket:', socket.id);
+    });
+
+    socket.on('firework_settings_changed', async function (settings) {
+      console.log('🎆 [Firework] Settings changed:', settings);
+      if (!(await waitForFireworkInit())) {
+        console.error('❌ [Firework] Cannot apply settings — widget not initialized');
+        return;
+      }
+      applyFireworkRemoteSettings(settings);
+    });
+
+    socket.on('firework_gift', function (data) {
+      console.log('🎁 [Firework] Gift received:', data);
+      if (document.hidden) {
+        console.log('⚠️ [Firework] Page hidden, dropping gift');
+        return;
+      }
+      const giftCount = data.giftCount || 1;
+      const giftName = data.giftName || 'Gift';
+      const senderName = (data.sender && (data.sender.nickname || data.sender.uniqueId)) || 'Anonymous';
+      const giftImageUrl = data.giftImageUrl;
+      const avatarUrl = data.sender && data.sender.avatar;
+      const giftCoins = typeof data.giftCoins === 'number' ? data.giftCoins : 0;
+
+      addGiftToQueue(giftCount, giftImageUrl, avatarUrl, {
+        giftName: giftName,
+        senderName: senderName,
+        isTestEvent: data.isTestEvent === true
+      }, giftCoins);
+    });
+
+    socket.on('connect_error', function (error) {
+      console.error('❌ [Firework] Connection error:', error);
+    });
+
+    socket.on('error', function (error) {
+      console.error('❌ [Firework] Socket error:', error);
+    });
+  } else if (!userId && !isMock) {
+    console.warn('⚠️ [Firework] No userId and not in mock mode');
+  }
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      console.log('👁️ [Firework] Page hidden — clearing queue');
+      giftsQueue.length = 0;
+      clearGiftDrainTimer();
+      if (window.__giftEngine && typeof window.__giftEngine.clearAll === 'function') {
+        window.__giftEngine.clearAll();
+      }
+    } else {
+      console.log('👁️ [Firework] Page visible again');
+    }
+  });
+})();
+  </script>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/assets/img/tikoverlay-mark.png?v=20260802" type="image/png">
+  <title>Subathon</title>
+  <style>
+    :root {
+      --line: rgba(255, 255, 255, 0.26);
+      --glass: rgba(8, 8, 10, 0.52);
+      --text: #f5f5f5;
+      --warn: #facc15;
+      --danger: #dc2626;
+      --timer-bg: #121212;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: transparent;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .dial {
+      position: relative;
+      width: 380px;
+      height: 380px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 35% 20%, rgba(255, 255, 255, 0.08), transparent 54%),
+        radial-gradient(circle at 80% 85%, rgba(127, 29, 29, 0.22), transparent 58%),
+        var(--glass);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow:
+        0 16px 44px rgba(0, 0, 0, 0.55),
+        0 0 34px rgba(127, 29, 29, 0.22),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+      overflow: hidden;
+    }
+    .dial::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border-radius: 50%;
+      background: repeating-conic-gradient(
+        from 0deg,
+        rgba(255, 255, 255, 0.26) 0deg 1deg,
+        transparent 1deg 6deg
+      );
+      -webkit-mask: radial-gradient(circle, transparent 0 161px, #000 161px 170px, transparent 170px 100%);
+      mask: radial-gradient(circle, transparent 0 161px, #000 161px 170px, transparent 170px 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .dial::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+        inset 0 0 26px rgba(127, 29, 29, 0.25);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .ring {
+      position: absolute;
+      inset: 14px;
+      width: calc(100% - 28px);
+      height: calc(100% - 28px);
+      transform: rotate(-90deg);
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.18));
+      z-index: 2;
+    }
+    .ring-track {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.16);
+      stroke-width: 10;
+    }
+    .ring-progress {
+      fill: none;
+      stroke: url(#ringGradient);
+      stroke-width: 10;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 180ms linear, stroke 180ms linear;
+    }
+    .hand {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 4px;
+      border-radius: 999px;
+      transform-origin: 50% calc(100% - 16px);
+      transform: translate(-50%, -100%) rotate(0deg);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
+      z-index: 4;
+    }
+    .hand.hour { height: 94px; background: #f3f4f6; margin-top: 16px; }
+    .hand.minute { height: 130px; background: #d1d5db; margin-top: 16px; }
+    .hand.second { height: 150px; background: #991b1b; width: 2px; margin-top: 16px; }
+    .hub {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #f8fafc;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 12px rgba(248, 250, 252, 0.65);
+      z-index: 5;
+    }
+    .dial-number {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      color: rgba(248, 251, 255, 0.86);
+      font-size: 20px;
+      font-weight: 800;
+      text-shadow: 0 0 8px rgba(0, 0, 0, 0.45);
+      transform-origin: center center;
+      z-index: 5;
+      user-select: none;
+      pointer-events: none;
+    }
+    .timer-wrap {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 6;
+    }
+    .timer {
+      min-width: 190px;
+      text-align: center;
+      color: var(--text);
+      text-shadow: 0 0 18px rgba(255, 255, 255, 0.22);
+      font-size: 54px;
+      font-weight: 900;
+      line-height: 1;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      background: var(--timer-bg);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      letter-spacing: 0.6px;
+      opacity: 1;
+      box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.45),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    }
+    .timer.warning { color: #fde68a; }
+    .timer.danger {
+      color: #fecaca;
+      animation: danger-text-glow 0.75s ease-in-out infinite;
+    }
+    .dial.warning .ring-progress {
+      stroke: var(--warn);
+      filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.48));
+    }
+    .dial.danger .ring-progress {
+      stroke: var(--danger);
+      filter: drop-shadow(0 0 12px rgba(220, 38, 38, 0.65));
+    }
+    .dial.danger {
+      box-shadow:
+        0 16px 44px rgba(0, 0, 0, 0.62),
+        0 0 38px rgba(127, 29, 29, 0.5),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+      animation: dial-danger-pulse 1s ease-in-out infinite;
+    }
+    @keyframes danger-text-glow {
+      0%, 100% {
+        text-shadow: 0 0 8px rgba(220, 38, 38, 0.35);
+      }
+      50% {
+        text-shadow: 0 0 20px rgba(220, 38, 38, 0.95);
+      }
+    }
+    @keyframes dial-danger-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.01); }
+    }
+  </style>
+</head>
+<body>
+  <div class="dial" id="dial">
+    <div class="dial-number" style="transform: translate(-50%, -50%) rotate(0deg) translateY(-147px) rotate(0deg);">12</div>
+    <div class="dial-number" style="transform: translate(-50%, -50%) rotate(30deg) translateY(-147px) rotate(-30deg);">1</div>
+    <div class="dial-number" style="transform: translate(-50%, -50%) rotate(60deg) translateY(-147px) rotate(-60deg);">2</div>
+    <div class="dial-number" style="transform: translate(-50%, -50%) rotate(90deg) translateY(-147px) rotate(-90deg);">3</div>
+    <div class="dial-number" style="transform: translate(-50%, -50%) rotate(120deg) translateY(-147px) rotate(-120deg);">4</div>
+    <div class="dial-number" style="transform: translate(-50%, -50%) rotate(150deg) translateY(-147px) rotate(-150deg);">5</div>
+    <div class="dial-number" style="transform: translate(-50%, -50%) rotate(180deg) translateY(-147px) rotate(-180deg);">6</div>
+    <div class="dial-number" style="transform: translate(-50%, -50%) rotate(210deg) translateY(-147px) rotate(-210deg);">7</div>
+    <div class="dial-number" style="transform: translate(-50%, -50%) rotate(240deg) translateY(-147px) rotate(-240deg);">8</div>
+    <div class="dial-number" style="transform: translate(-50%, -50%) rotate(270deg) translateY(-147px) rotate(-270deg);">9</div>
+    <div class="dial-number" style="transform: translate(-50%, -50%) rotate(300deg) translateY(-147px) rotate(-300deg);">10</div>
+    <div class="dial-number" style="transform: translate(-50%, -50%) rotate(330deg) translateY(-147px) rotate(-330deg);">11</div>
+
+    <svg class="ring" viewBox="0 0 340 340" aria-hidden="true">
+      <defs>
+        <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#f5f5f5" />
+          <stop offset="55%" stop-color="#9ca3af" />
+          <stop offset="100%" stop-color="#6b7280" />
+        </linearGradient>
+      </defs>
+      <circle class="ring-track" cx="170" cy="170" r="152"></circle>
+      <circle id="ringProgress" class="ring-progress" cx="170" cy="170" r="152"></circle>
+    </svg>
+
+    <div id="handHour" class="hand hour"></div>
+    <div id="handMinute" class="hand minute"></div>
+    <div id="handSecond" class="hand second"></div>
+    <div class="hub"></div>
+
+    <div class="timer-wrap">
+      <div id="timer" class="timer">00:00</div>
+    </div>
+  </div>
+
+  <script src="/assets/b/8c386c8dbec5a57f.js"></script>
+  <script src="/assets/b/28b98888f9aaae4a.js"></script>
+  <script src="/assets/b/6f5933a62c8dcf6b.js"></script>
+</body>
+</html>

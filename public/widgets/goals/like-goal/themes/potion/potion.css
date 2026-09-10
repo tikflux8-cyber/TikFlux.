@@ -1,0 +1,528 @@
+/* Potion theme — clean layout + preserved liquid/particle FX */
+@font-face {
+  font-family: 'Vito Bold';
+  src: url("/assets/fonts/Vito%20Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+html.like-goal-theme-potion-active,
+body.like-goal-theme-potion-active {
+  overflow: visible !important;
+}
+
+#like-goal-theme-root.like-goal-theme-panel {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+#like-goal-theme-root {
+  --pill-arrow-color: #be63a0;
+  --bubble-rise: 0px;
+  --pill-grad-right: linear-gradient(90deg, #be63a0 0%, #bf79ce 100%);
+  --pill-grad-left: linear-gradient(270deg, #be63a0 0%, #bf79ce 100%);
+  --pill-grad-bottom: linear-gradient(180deg, #be63a0 0%, #bf79ce 100%);
+  --particle-progress: 0;
+  --particle-base: #fde0fe;
+  --particle-star: #fffeff;
+  --particle-spark: #fefd70;
+  --particle-dot: #fffefe;
+  --potion-bottle-w: 200px;
+  --potion-bottle-h: 180px;
+  --potion-glow-soft: rgba(190, 103, 238, 0.73);
+  --potion-label-glow: #8D72AA;
+  --potion-heart-fill: #f3cdf5;
+  --potion-heart-glow: #f3cdf5;
+  --potion-bow-hue: 0deg;
+  --potion-bow-saturate: 1.65;
+  --potion-bow-brightness: 1;
+  --potion-bow-shadow: rgba(74, 32, 96, 0.62);
+  --potion-bow-shadow-soft: rgba(74, 32, 96, 0.38);
+  --potion-bow-shadow-opacity: 0.72;
+  --potion-bottle-hue: 0deg;
+  --potion-bottle-saturate: 1.15;
+  --potion-bottle-brightness: 1;
+}
+
+#like-goal-theme-root .potion-scene {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+/*
+ * Same anchor as Potion Bottle reference preview (.stage):
+ * top/left 50% then nudge so bottle + label visual center lands on viewport center.
+ * translateX accounts for bottle art bleeding left of #potion-container box.
+ */
+#like-goal-theme-root .potion-compose {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: inline-block;
+  transform: translate3d(-151px, 49px, 0) scale(0.72);
+  transform-origin: top left;
+}
+
+/* Bottle box — same zoom as original .container (85%) so liquid/mask align with glass */
+#potion-container {
+  position: relative;
+  width: var(--potion-bottle-w);
+  height: var(--potion-bottle-h);
+  overflow: visible;
+  zoom: 0.85;
+}
+
+/*
+ * Pill anchored on the right (arrow side): longer text grows left, not right.
+ * left + translateX(-100%) pins the right edge at (bottle end + gap).
+ */
+#like-goal-theme-root .potion-label.textGlowing {
+  position: absolute;
+  top: -120%;
+  left: calc(100% + 24px);
+  display: inline-flex;
+  flex-direction: row;
+  direction: rtl;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  max-width: none;
+  margin: 0;
+  transform: translate(-100%, calc(-50% - 22px));
+  padding: 8px 20px 8px 16px;
+  border-radius: 999px;
+  background: var(--pill-grad-left, var(--pill-grad-right));
+  color: #fff;
+  font-family: 'Cherry Swash', 'Lemon', 'Foda', serif;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.2;
+  white-space: nowrap;
+  z-index: 5;
+  text-shadow:
+    0 0 6px var(--potion-label-glow),
+    0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+#like-goal-theme-root.potion-perf-lite .potion-label.textGlowing {
+  filter: none;
+}
+
+#like-goal-theme-root .potion-label.textGlowing::before {
+  content: "";
+  position: absolute;
+  right: -0.45em;
+  left: auto;
+  top: 50%;
+  transform: translateY(-50%) scaleX(-1) rotate(7deg);
+  width: 1.5em;
+  height: 1.5em;
+  background: var(--pill-arrow-color, #be63a0);
+  clip-path: polygon(
+    51.184% 0.744%, 16.021% 82.159%, 15.015% 85.082%,
+    14.499% 87.952%, 14.802% 93.231%, 16.663% 97.397%,
+    21.791% 100%, 100% 80.099%
+  );
+  z-index: -1;
+}
+
+#like-goal-theme-root .potion-label.textGlowing .potion-goal-title,
+#like-goal-theme-root .potion-label.textGlowing .potion-goal-counter {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
+#like-goal-theme-root .potion-label.textGlowing .potion-goal-counter {
+  font-family: 'Vito Bold', 'Lemon', 'Foda', sans-serif;
+  font-weight: 700;
+}
+
+#like-goal-theme-root .potion-label.textGlowing .potion-goal-title {
+  font-weight: 900;
+  letter-spacing: 2px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+#like-goal-theme-root * {
+  box-sizing: border-box;
+}
+
+
+#potion-container .front {
+  position: absolute;
+  zoom: 400%;
+  width: 200px;
+  height: auto;
+  object-fit: contain;
+  bottom: -33px;
+  left: -38px;
+  z-index: 3;
+  opacity: 1;
+  filter:
+    hue-rotate(var(--potion-bottle-hue))
+    saturate(var(--potion-bottle-saturate))
+    brightness(var(--potion-bottle-brightness));
+  pointer-events: none;
+}
+
+#potion-container .bow-wrap {
+  position: absolute;
+  zoom: 340%;
+  width: 216px;
+  height: 201.5px;
+  bottom: -29px;
+  left: -33.5px;
+  z-index: 3;
+  pointer-events: none;
+  transform: translateZ(0);
+  filter:
+    hue-rotate(var(--potion-bow-hue))
+    saturate(var(--potion-bow-saturate))
+    brightness(var(--potion-bow-brightness))
+    drop-shadow(2px 4px 2px var(--potion-bow-shadow));
+}
+
+#like-goal-theme-root.potion-perf-lite #potion-container .bow-wrap {
+  filter:
+    hue-rotate(var(--potion-bow-hue))
+    saturate(var(--potion-bow-saturate))
+    brightness(var(--potion-bow-brightness));
+}
+
+#potion-container .bow-wrap img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+#potion-container .liquid {
+  transform: translateZ(0);
+  zoom: 214%;
+  bottom: 15px;
+  left: 11px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  filter:
+    saturate(1.1)
+    brightness(1.1)
+    contrast(1.1)
+    drop-shadow(0 0 4px var(--potion-glow-soft))
+    drop-shadow(0 0 16px var(--potion-glow-soft));
+}
+
+#potion-container .back {
+  zoom: 225%;
+  position: absolute;
+  width: 200px;
+  height: 209px;
+  bottom: -6px;
+  z-index: -1;
+  left: 11px;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+#potion-container .back svg {
+  bottom: -20px;
+  position: absolute;
+}
+
+#potion-container .mask {
+  position: absolute;
+  width: 200px;
+  height: 195px;
+  margin: 0px;
+  bottom: -27px;
+  padding: 0px;
+  left: -3px;
+  clip-path: url(#liquidmask);
+  margin-left: 3px;
+  overflow: hidden;
+}
+
+#potion-container * {
+  overflow: visible;
+}
+
+#potion-container .shadowon {
+  animation: fadeIn 1s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 0.6;}
+}
+
+#potion-container .heartcont {
+  zoom: 60%;
+  width: 200px;
+  left: 80px;
+  position: absolute;
+  height: 100%;
+  bottom: -7px;
+}
+
+#potion-container .heartcompletion {
+  zoom: 130%;
+  bottom: 300px;
+  width: 70px;
+  left: 155px;
+}
+
+#potion-container .heartcompletion2 {
+  bottom: 200px;
+  left: 80px;
+  width: 70px;
+}
+
+/* NEW LIQUID SVG SYSTEM */
+#potion-container .liquid-rect-wrap,
+.liquid-stroke-wrap,
+.liquid-rect-wrap-back {
+  position: absolute;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+#potion-container .liquid-rect-wrap-back {
+  z-index: 0;
+}
+
+#potion-container .liquid-rect-wrap {
+  z-index: 1;
+}
+
+#potion-container .liquid-stroke-wrap {
+  z-index: 3;
+}
+
+#potion-container #svg-element,
+#svg-element-back,
+#svg-element-stroke {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: block;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 0 5px var(--potion-glow-soft)) drop-shadow(0 0 7px var(--potion-glow-soft));
+}
+
+#potion-container #svg-element-back {
+  opacity: 0.72;
+}
+
+#potion-container #liquid-path,
+#liquid-path-back,
+#liquid-path-stroke {
+  vector-effect: non-scaling-stroke;
+}
+
+/* ===== PARTICLES (CSS dots — no SVG) ===== */
+#potion-container .particle-layer{
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity 400ms ease, visibility 400ms ease, transform 450ms ease;
+}
+
+#potion-container .particle-layer.is-active{
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+#potion-container .particle{
+  position: absolute;
+  left: var(--x);
+  top: var(--startY);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  display: block;
+  pointer-events: none;
+  opacity: 0;
+  background: var(--particle-base);
+  transform: translate(-50%, -50%) translate3d(0, 10px, 0) scale(calc(var(--scale) * 0.85));
+  animation: particleRise var(--duration) linear infinite;
+  animation-delay: var(--delay);
+}
+
+#potion-container .particle.is-star{
+  background: var(--particle-star);
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.85);
+}
+
+#potion-container .particle.is-spark{
+  background: var(--particle-spark);
+}
+
+#potion-container .particle.is-dot{
+  background: var(--particle-dot);
+  opacity: 0.7;
+}
+
+#potion-container .particle-layer.is-active .particle{
+  opacity: var(--alpha, 0.65);
+}
+
+#potion-container .particle-layer.is-full .particle.is-star,
+#potion-container .particle-layer.is-full .particle.is-spark{
+  animation:
+    particleRise var(--duration) linear infinite,
+    particleHue 5s linear infinite;
+  animation-delay: var(--delay), var(--delay);
+}
+
+@keyframes particleHue{
+  0%{ background-color: #fcb3b3; }
+  20%{ background-color: #fff4bd; }
+  40%{ background-color: #bdfdd9; }
+  60%{ background-color: #e7eeff; }
+  80%{ background-color: #e0b9ff; }
+  100%{ background-color: #fcb3b3; }
+}
+
+@keyframes particleRise{
+  0%{
+    opacity: 0;
+    transform:
+      translate(-50%, -50%)
+      translateX(0px)
+      translateY(0px)
+      scale(calc(var(--scale) * 0.75));
+  }
+
+  12%{
+    opacity: calc(var(--alpha) * 0.5);
+  }
+
+  40%{
+    opacity: calc(var(--alpha) * 0.85);
+    transform:
+      translate(-50%, -50%)
+      translateX(calc(var(--driftX) * 0.4))
+      translateY(calc(var(--travelY) * -0.4))
+      scale(var(--scale));
+  }
+
+  100%{
+    opacity: 0;
+    transform:
+      translate(-50%, -50%)
+      translateX(calc(var(--driftX) * 1.1))
+      translateY(calc(var(--travelY) * -1))
+      scale(calc(var(--scale) * 1.05));
+  }
+}
+
+/* ===== Performance: pause invisible / background FX ===== */
+#potion-container .particle-layer:not(.is-active) .particle {
+  animation-play-state: paused !important;
+}
+
+#like-goal-theme-root:not(.hearts-active) #potion-container .heart {
+  animation-play-state: paused;
+}
+
+#like-goal-theme-root.potion-fx-paused #potion-container .particle,
+#like-goal-theme-root.potion-fx-paused #potion-container .heart {
+  animation-play-state: paused !important;
+}
+
+/* ===== Completion hearts (original widget coords) ===== */
+#potion-container .heart-wrap {
+  position: absolute;
+  zoom: 50%;
+  left: 532px;
+  top: -666px;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -5;
+}
+
+#potion-container .heart {
+  width: 5px;
+  height: 5px;
+  position: absolute;
+  display: none;
+  top: 200px;
+  pointer-events: none;
+}
+
+#like-goal-theme-root.hearts-active .heart {
+  display: block;
+}
+
+#potion-container .heart svg {
+  width: 15px;
+  height: 15px;
+  background: none;
+  fill: var(--potion-heart-fill);
+}
+
+#like-goal-theme-root.potion-perf-lite #potion-container .heart svg {
+  filter: none;
+}
+
+#potion-container .h1 {
+  transform: scale(0.9);
+  opacity: 0.6;
+  left: 8%;
+  animation: heartRise 3s linear infinite;
+}
+
+#potion-container .h2 {
+  transform: scale(0.65);
+  opacity: 0.85;
+  left: 24%;
+  animation: heartRise 2.5s linear infinite 0.6s;
+}
+
+#potion-container .h3 {
+  transform: scale(0.55);
+  opacity: 0.75;
+  left: 40%;
+  animation: heartRise 3.2s linear infinite 1.1s;
+}
+
+#potion-container .h4 {
+  transform: scale(0.75);
+  left: 56%;
+  opacity: 0.9;
+  animation: heartRise 2.8s linear infinite 0.3s;
+}
+
+#potion-container .h5 {
+  transform: scale(0.5);
+  left: 72%;
+  opacity: 0.5;
+  animation: heartRise 3.5s linear infinite 1.8s;
+}
+
+@keyframes heartRise {
+  0% { top: 200px; opacity: 0; transform: translateX(0) scale(0.6); }
+  12% { opacity: 1; }
+  100% { top: -180px; opacity: 0; transform: translateX(24px) scale(1.1); }
+}
+

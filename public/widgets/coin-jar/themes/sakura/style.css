@@ -1,0 +1,298 @@
+.stage[data-theme="sakura"] {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  --jar-w: min(420px, 72vw);
+  --cj-accent: #fe70d3;
+  --cj-accent-light: #fe85e5;
+  --cj-accent-dark: #d3228c;
+  --cj-jar-hue: 305deg;
+  font-family: Quicksand, "Segoe UI", system-ui, sans-serif;
+}
+
+.stage[data-theme="sakura"] .jar-unit {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--jar-w);
+  aspect-ratio: 1 / 1;
+  pointer-events: none;
+}
+
+.stage[data-theme="sakura"] .jar-back { z-index: 1; }
+.stage[data-theme="sakura"] .jar-front { z-index: 3; }
+
+.stage[data-theme="sakura"] .jar-layer-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+  filter: hue-rotate(var(--cj-jar-hue)) saturate(1.21) brightness(1.13);
+}
+
+.stage[data-theme="sakura"] .partial-anim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 4;
+  object-fit: contain;
+  pointer-events: none;
+  display: none;
+  transform: scale(0.9);
+  transform-origin: center center;
+  filter: hue-rotate(var(--cj-jar-hue)) saturate(1.21) brightness(1.13);
+}
+
+.stage[data-theme="sakura"] .world-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 2;
+  display: block;
+  pointer-events: none;
+}
+
+.stage[data-theme="sakura"] .coin-counter {
+  position: absolute;
+  left: 50%;
+  top: calc(48% + var(--jar-w) * 0.42 + 36px);
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px 8px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--cj-accent-light) 0%, var(--cj-accent) 45%, var(--cj-accent-dark) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 6px 18px color-mix(in srgb, var(--cj-accent-dark) 45%, transparent),
+    0 0 14px color-mix(in srgb, var(--cj-accent) 40%, transparent);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.stage[data-theme="sakura"] .coin-counter::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -10px;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-bottom: 10px solid var(--cj-accent-light);
+  filter: drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.22));
+}
+
+.stage[data-theme="sakura"] .coin-counter .tiktok-coin {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px color-mix(in srgb, var(--cj-accent-dark) 45%, transparent));
+}
+
+.stage[data-theme="sakura"] .coin-counter #coinCount {
+  font-weight: 900;
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: -0.4px;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  text-shadow: 0 1px 3px color-mix(in srgb, var(--cj-accent-dark) 65%, transparent);
+}
+
+.stage[data-theme="sakura"] .gift-toast-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Sized and offset proportionally to --jar-w so the tag stays pinned to the
+   jar lid at any viewport size (matches the old 420px layout exactly). */
+.stage[data-theme="sakura"] .paper-tag {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  width: calc(var(--jar-w) * 0.242);
+  aspect-ratio: 242 / 393;
+  z-index: 30;
+  overflow: visible;
+  pointer-events: none;
+  transform: translate(calc(var(--jar-w) * 0.1136), calc(var(--jar-w) * -0.233));
+  transform-origin: 30% 2%;
+}
+
+.stage[data-theme="sakura"] .paper-tag svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 29.7% 1.59%;
+  animation: sakuraTagWave 2.8s ease-in-out infinite alternate;
+}
+
+@keyframes sakuraTagWave {
+  from { transform: rotate(6deg); }
+  to   { transform: rotate(-6deg); }
+}
+
+.stage[data-theme="sakura"] #Tag_Background,
+.stage[data-theme="sakura"] #Obj_1,
+.stage[data-theme="sakura"] #Name_Background,
+.stage[data-theme="sakura"] #Obj_2,
+.stage[data-theme="sakura"] #Tag_Rope {
+  filter: hue-rotate(var(--cj-jar-hue)) saturate(1.21) brightness(1.13);
+}
+
+.stage[data-theme="sakura"] #tag-avatar {
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+
+.stage[data-theme="sakura"] #tag-nameplate {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.stage[data-theme="sakura"] #tag-nameplate.tag-show { opacity: 1; }
+
+.stage[data-theme="sakura"] #Event_name,
+.stage[data-theme="sakura"] #Obj_2 {
+  display: none !important;
+}
+
+.stage[data-theme="sakura"] #Obj_1 {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sakuraTagWiggle 2.4s ease-in-out infinite;
+}
+
+@keyframes sakuraTagWiggle {
+  0%, 100% { transform: rotate(-2.5deg); }
+  50%      { transform: rotate(2.5deg); }
+}
+
+/* Reuse classic bubble styles inside sakura stage */
+.stage[data-theme="sakura"] .gift-bubble {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 5px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--cj-accent-light) 0%, var(--cj-accent) 45%, var(--cj-accent-dark) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 6px 18px color-mix(in srgb, var(--cj-accent-dark) 45%, transparent),
+    0 0 12px color-mix(in srgb, var(--cj-accent) 35%, transparent);
+  opacity: 0;
+  white-space: nowrap;
+}
+
+.stage[data-theme="sakura"] .gift-bubble--left {
+  transform: translate(-100%, -50%);
+  animation: giftBubbleInLeft 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.stage[data-theme="sakura"] .gift-bubble--right {
+  transform: translateY(-50%);
+  animation: giftBubbleInRight 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.stage[data-theme="sakura"] .gift-bubble--left.is-leaving {
+  animation: giftBubbleOutLeft 0.4s ease forwards;
+}
+
+.stage[data-theme="sakura"] .gift-bubble--right.is-leaving {
+  animation: giftBubbleOutRight 0.4s ease forwards;
+}
+
+.stage[data-theme="sakura"] .gift-bubble__avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+}
+
+.stage[data-theme="sakura"] .gift-bubble__name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  max-width: 76px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(120, 20, 80, 0.55);
+}
+
+.stage[data-theme="sakura"] .gift-bubble__gift {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.stage[data-theme="sakura"] .gift-bubble__value {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px rgba(120, 20, 80, 0.55);
+}
+
+.stage[data-theme="sakura"] .gift-bubble__value .tiktok-coin {
+  width: 15px;
+  height: 15px;
+}
+
+.stage[data-theme="sakura"] .gift-bubble__tail {
+  position: absolute;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  transform: translateY(-50%);
+}
+
+.stage[data-theme="sakura"] .gift-bubble--left .gift-bubble__tail {
+  right: -9px;
+  border-left-color: var(--cj-accent-dark);
+}
+
+.stage[data-theme="sakura"] .gift-bubble--right .gift-bubble__tail {
+  left: -9px;
+  border-right-color: var(--cj-accent-light);
+}
+
+@keyframes giftBubbleInLeft {
+  from { opacity: 0; transform: translate(-100%, -50%) scale(0.9) translateX(-8px); }
+  to { opacity: 1; transform: translate(-100%, -50%) scale(1); }
+}
+@keyframes giftBubbleInRight {
+  from { opacity: 0; transform: translateY(-50%) scale(0.9) translateX(8px); }
+  to { opacity: 1; transform: translateY(-50%) scale(1); }
+}
+@keyframes giftBubbleOutLeft {
+  from { opacity: 1; transform: translate(-100%, -50%) scale(1); }
+  to { opacity: 0; transform: translate(-100%, calc(-50% - 10px)) scale(0.94); }
+}
+@keyframes giftBubbleOutRight {
+  from { opacity: 1; transform: translateY(-50%) scale(1); }
+  to { opacity: 0; transform: translateY(calc(-50% - 10px)) scale(0.94); }
+}

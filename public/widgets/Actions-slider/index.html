@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="/assets/img/tikoverlay-mark.png?v=20260802" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery Slider</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cairo:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      font-family: 'Cinzel', serif;
+    }
+
+    :root {
+      --actions-slider-text-color: rgba(255, 255, 255, 0.90);
+      --actions-slider-text-color-active: #ffffff;
+      /* Text glow must NOT follow glowColor (kept matching original design) */
+      --actions-slider-glow-1: rgba(255, 60, 60, 0.3);
+      --actions-slider-glow-2: rgba(200, 30, 30, 0.1);
+      /* Active image shadow follows glowColor */
+      --actions-slider-image-shadow-active: 0 22px 55px rgba(255,40,40,0.80);
+    }
+
+    /* ── Main wrapper ────────────────────────────────── */
+    main {
+      position: relative; z-index: 10;
+      display: flex; flex-direction: column; align-items: center;
+      animation: appear 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(26px); }
+      to   { opacity: 1; transform: translateY(0);    }
+    }
+
+    /* ── Stage (3-D perspective container) ──────────── */
+    .stage {
+      position: relative;
+      width: 100vw;
+      height: 470px;
+      perspective: 1100px;
+    }
+
+    /* ── Each slide ──────────────────────────────────── */
+    .slide {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 230px; height: 345px;
+      margin-left: -115px; margin-top: -172px;
+      will-change: transform, opacity;
+      transition:
+        transform 1.25s cubic-bezier(0.34, 1.18, 0.64, 1),
+        opacity   1.25s ease;
+    }
+
+    /* Ambient glow ring behind active slide */
+    .slide-glow {
+      position: absolute;
+      top: -28%; left: -28%;
+      width: 156%; height: 156%;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center,
+        var(--actions-slider-glow-1) 0%,
+        var(--actions-slider-glow-2) 45%,
+        transparent 68%
+      );
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1.25s ease;
+      z-index: -1;
+    }
+
+    .slide.is-center .slide-glow {
+      opacity: 1;
+      /* soft pulsing: subtle scale + opacity + blur changes for smooth on/off */
+      animation: ring-pulse 3.8s ease-in-out infinite;
+    }
+
+    @keyframes ring-pulse {
+      0% {
+        transform: scale(1.00);
+        opacity: 0.50;
+        filter: blur(0px);
+      }
+      40% {
+        transform: scale(1.08);
+        opacity: 0.92;
+        filter: blur(1.6px);
+      }
+      70% {
+        transform: scale(1.12);
+        opacity: 1.00;
+        filter: blur(2.4px);
+      }
+      100% {
+        transform: scale(1.00);
+        opacity: 0.50;
+        filter: blur(0px);
+      }
+    }
+
+    /* Image – no card background, pure transparent rendering */
+    .slide img {
+      width: 100%; height: 100%;
+      object-fit: contain;
+      display: block;
+      transition: filter 1.25s ease;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    /* Label beneath each image */
+    .slide-label {
+      position: absolute;
+      bottom: 10px; left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Cairo', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: normal;
+      text-transform: uppercase;
+      white-space: nowrap;
+      color: var(--actions-slider-text-color);
+      text-shadow:
+        0 0 8px  rgba(255, 255, 255, 0.70),
+        0 0 20px rgba(200, 150, 255, 0.55),
+        0 2px 6px rgba(0, 0, 0, 0.98);
+      transition: opacity 1.25s ease, text-shadow 1.25s ease, font-size 1.25s ease, bottom 1.25s ease;
+    }
+
+    .slide-action-name{
+      display: block;
+      margin-top: 6px;
+      font-size: 0.90rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: none;
+      color: rgba(255, 255, 255, 0.78);
+      text-shadow:
+        0 0 6px rgba(255, 255, 255, 0.25),
+        0 1px 3px rgba(0, 0, 0, 0.9);
+    }
+
+    /* Active label glows */
+    .slide.is-center .slide-label {
+      bottom: 100px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: normal;
+      color: var(--actions-slider-text-color-active);
+    text-shadow:
+        0 0 4px rgba(0, 0, 0, 1),
+        0 0 8px rgba(0, 0, 0, 0.9),
+        0 1px 2px rgba(0, 0, 0, 1),
+        1px 1px 0 rgba(0, 0, 0, 1),
+        -1px -1px 0 rgba(0, 0, 0, 0.8);
+        
+    }
+
+    .slide.is-center .slide-action-name{
+      font-size: 1.10rem;
+      color: rgba(255, 255, 255, 0.96);
+    }
+
+    /* Floating animation on center image */
+    @keyframes float-center {
+      0%, 100% { transform: translateY(0px);    }
+      50%       { transform: translateY(-11px);  }
+    }
+
+    .slide.is-center img {
+      animation: float-center 4s ease-in-out infinite;
+    }
+
+    .widget-error {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      font-family: 'Cairo', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #ff0000;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+      z-index: 9999;
+    }
+
+    .widget-error.is-visible {
+      display: flex;
+    }
+
+  </style>
+</head>
+<body>
+
+<main>
+  <div class="stage" id="stage"></div>
+</main>
+<div id="widgetError" class="widget-error"></div>
+
+<script src="/assets/b/8c386c8dbec5a57f.js"></script>
+    <script src="/assets/b/28b98888f9aaae4a.js"></script>
+    <script>
+/* ── Slider + Actions specific_gift data ───────────────────────────────────── */
+const stage = document.getElementById('stage');
+
+/*
+  Position config per relative index [-2, -1, 0, +1, +2]
+  x   : translateX px
+  z   : translateZ px  (negative = deeper = smaller by perspective)
+  s   : scale
+  o   : opacity
+  lop : label opacity
+  br  : brightness
+  ds  : drop-shadow shorthand
+*/
+const POS = [
+  { x:-370, z:-130, s:0.50, o:0.57, lop:0.30, br:0.50, ds:'0 7px  20px rgba(0,0,0,0.55)' }, // -2
+  { x:-210, z: -65, s:0.76, o:0.82, lop:0.64, br:0.78, ds:'0 13px 34px rgba(0,0,0,0.65)' }, // -1
+  { x:   0, z:   0, s:1.00, o:1.00, lop:1.00, br:1.02, ds:'var(--actions-slider-image-shadow-active, 0 22px 55px rgba(255,40,40,0.80))' }, //  0 ← active
+  { x: 210, z: -65, s:0.76, o:0.82, lop:0.64, br:0.78, ds:'0 13px 34px rgba(0,0,0,0.65)' }, // +1
+  { x: 370, z:-130, s:0.50, o:0.57, lop:0.30, br:0.50, ds:'0 7px  20px rgba(0,0,0,0.55)' }, // +2
+];
+
+const slideEls = [];
+let cur = 0;
+let N = 0;
+
+// action_id -> normalized action item
+let actionsById = new Map();
+let currentSignature = '';
+let advanceTimer = null;
+
+function getActionKey(action) {
+  const id = action?.id ?? action?.action_id;
+  if (id != null) return String(id);
+  // Fallback (should be rare): stable-ish composite key
+  const giftId = action?.gift_id ?? action?.giftId ?? '';
+  const name = action?.action_name ?? action?.actionName ?? '';
+  const createdAt = action?.created_at ?? action?.createdAt ?? '';
+  return `fallback:${giftId}:${name}:${createdAt}`;
+}
+
+function giftImageFromId(giftId) {
+  if (!giftId) return '';
+  // Same fallback pattern used in other widgets
+  return `https://p16-webcast.tiktokcdn.com/img/maliva/webcast-va/resource/gift/${giftId}_thumbnail.png~tplv-obj.image`;
+}
+
+function normalizeActionToItem(action) {
+  const giftId = action?.gift_id ?? action?.giftId;
+  return {
+    action_id: getActionKey(action),
+    gift_id: giftId != null ? String(giftId) : '',
+    gift_image: action?.gift_image ?? action?.giftImage ?? null,
+    action_name: action?.action_name ?? action?.actionName ?? '',
+    gift_coins: action?.gift_coins ?? action?.giftCoins ?? 0,
+    created_at: action?.created_at ?? action?.createdAt ?? null
+  };
+}
+
+function toDateMs(v) {
+  if (!v) return 0;
+  const d = new Date(v);
+  return Number.isNaN(d.getTime()) ? 0 : d.getTime();
+}
+
+function computeSignature(items) {
+  // Stable signature to avoid re-render if nothing changed
+  return items
+    .map(it => `${it.action_id}|${it.gift_id}|${it.gift_image ?? ''}|${it.action_name ?? ''}|${it.gift_coins ?? ''}`)
+    .join('~');
+}
+
+function rebuildFromState() {
+  const itemsSorted = getItemsSorted();
+  const itemsFiltered = getFilteredItems(itemsSorted);
+
+  const nextSignature = computeSignature(itemsFiltered);
+  if (nextSignature === currentSignature) return;
+
+  currentSignature = nextSignature;
+  rebuildSlides(itemsFiltered);
+  render();
+  ensureAutoplay();
+}
+
+function rebuildSlides(itemsSorted) {
+  stage.innerHTML = '';
+  slideEls.length = 0;
+
+  N = itemsSorted.length;
+  cur = N > 0 ? (cur % N) : 0;
+
+  itemsSorted.forEach((item, idx) => {
+    const el = document.createElement('div');
+    el.className = 'slide';
+
+    const glow = document.createElement('div');
+    glow.className = 'slide-glow';
+
+    const img = document.createElement('img');
+    const imgSrc = item.gift_image || giftImageFromId(item.gift_id) || '';
+    img.src = imgSrc;
+    img.alt = item.action_name || 'gift';
+    img.loading = idx < 5 ? 'eager' : 'lazy';
+    img.onerror = function () {
+      if (item.gift_id) this.src = giftImageFromId(item.gift_id);
+    };
+
+    const lbl = document.createElement('span');
+    lbl.className = 'slide-label';
+    // Design: show action name only (هو اسم الاجراء المطلوب)
+    lbl.textContent = item.action_name || '';
+
+    el.append(glow, img, lbl);
+    stage.appendChild(el);
+    slideEls.push(el);
+  });
+}
+
+/* Apply layout based on current active index */
+function render() {
+  if (N <= 0) return;
+
+  slideEls.forEach((el, i) => {
+    let diff = ((i - cur) % N + N) % N;
+    if (diff > N / 2) diff -= N;
+
+    const img = el.querySelector('img');
+    const lbl = el.querySelector('.slide-label');
+
+    el.classList.toggle('is-center', diff === 0);
+
+    if (Math.abs(diff) > 2) {
+      /* Hidden – push fully off-screen in the correct direction */
+      el.style.opacity = '0';
+      el.style.zIndex = '1';
+      el.style.pointerEvents = 'none';
+      el.style.transform = `translateX(${diff > 0 ? 580 : -580}px) translateZ(-180px) scale(0.28)`;
+      lbl.style.opacity = '0';
+      img.style.filter = '';
+      return;
+    }
+
+    const p = POS[diff + 2];
+    el.style.opacity = p.o;
+    el.style.zIndex = String(5 - Math.abs(diff));
+    el.style.pointerEvents = 'auto';
+    el.style.transform = `translateX(${p.x}px) translateZ(${p.z}px) scale(${p.s})`;
+    lbl.style.opacity = p.lop;
+    img.style.filter = `brightness(${p.br}) drop-shadow(${p.ds})`;
+  });
+}
+
+/* Auto-advance */
+function advance() {
+  if (N <= 1) return;
+  cur = (cur + 1) % N;
+  render();
+}
+
+function ensureAutoplay() {
+  if (advanceTimer) return;
+  advanceTimer = setInterval(advance, 4500);
+}
+
+// -----------------------------------------------------------------------------
+// Data loading: mock + real + realtime updates
+// -----------------------------------------------------------------------------
+const urlParams = new URLSearchParams(window.location.search);
+const userId = (urlParams.get('uid') || '').trim();
+const mockMode = urlParams.get('mock') === '1' || urlParams.get('mock') === 'true';
+const uuidV4LikeRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_URL = window.ENV_CONFIG?.API_URL || (isLocal ? 'http://localhost:3000' : 'https://api.tikoverlay.live');
+        const EDGE_WS_URL = window.ENV_CONFIG?.EDGE_WS_URL || (isLocal ? 'ws://localhost:3000/ws' : 'wss://edge.tikoverlay.live/ws');
+
+// -----------------------------------------------------------------------------
+// Actions Slider Styling Settings (DB + real-time + postMessage fallback)
+// -----------------------------------------------------------------------------
+const DEFAULT_ACTIONS_SLIDER_SETTINGS = {
+  textColor: '#ffffff',
+  glowColor: '#ff3c3c'
+};
+
+function showWidgetError(message) {
+  const el = document.getElementById('widgetError');
+  if (!el) return;
+  el.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:14px;max-width:680px;">
+    <img src="/assets/img/tikoverlay-mark.png" alt="TikOverlay" style="width:170px;max-width:60vw;" />
+    <div style="color:#ff0000;">${message}</div>
+  </div>`;
+  el.classList.add('is-visible');
+}
+
+function isValidUid(uid) {
+  return uuidV4LikeRegex.test(String(uid || '').trim());
+}
+
+function safeParseJson(str) {
+  try { return JSON.parse(str); } catch { return null; }
+}
+
+function hexToRgb(hex) {
+  if (!hex) return null;
+  const cleaned = String(hex).trim().replace('#', '');
+  if (cleaned.length !== 6) return null;
+  const r = parseInt(cleaned.slice(0, 2), 16);
+  const g = parseInt(cleaned.slice(2, 4), 16);
+  const b = parseInt(cleaned.slice(4, 6), 16);
+  if ([r, g, b].some(n => Number.isNaN(n))) return null;
+  return { r, g, b };
+}
+
+function rgbaFromHex(hex, alpha) {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return null;
+  return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+}
+
+function applyActionsSliderSettings(settings) {
+  if (!settings) return;
+
+  const textColor = settings.textColor || DEFAULT_ACTIONS_SLIDER_SETTINGS.textColor;
+  const glowColor = settings.glowColor || DEFAULT_ACTIONS_SLIDER_SETTINGS.glowColor;
+
+  const textRgba = rgbaFromHex(textColor, 0.90) || 'rgba(255, 255, 255, 0.90)';
+  const textActive = rgbaFromHex(textColor, 1) || '#ffffff';
+  const glowRgba_30 = rgbaFromHex(glowColor, 0.30) || 'rgba(255, 60, 60, 0.3)';
+  const glowRgba_10 = rgbaFromHex(glowColor, 0.10) || 'rgba(200, 30, 30, 0.1)';
+  document.documentElement.style.setProperty('--actions-slider-text-color', textRgba);
+  document.documentElement.style.setProperty('--actions-slider-text-color-active', textActive);
+  document.documentElement.style.setProperty('--actions-slider-glow-1', glowRgba_30);
+  document.documentElement.style.setProperty('--actions-slider-glow-2', glowRgba_10);
+  // Image shadow (active slide only)
+  const shadowAlpha = 0.80;
+  document.documentElement.style.setProperty(
+    '--actions-slider-image-shadow-active',
+    `0 22px 55px ${rgbaFromHex(glowColor, shadowAlpha) || 'rgba(255,40,40,0.80)'}`
+  );
+}
+
+// Runtime state (DB-driven, no localStorage)
+let disabledActionIds = new Set();
+
+// Apply defaults before we fetch DB settings
+applyActionsSliderSettings(DEFAULT_ACTIONS_SLIDER_SETTINGS);
+
+async function fetchActionsSliderSettings() {
+  if (!userId) return null;
+  try {
+    const response = await fetch(`${API_URL}/api/widget/actions-slider/settings?uid=${encodeURIComponent(userId)}`, {
+      method: 'GET'
+    });
+    if (!response.ok) return null;
+    const result = await response.json();
+    if (!result || typeof result !== 'object') return null;
+    const raw = result.settings && typeof result.settings === 'object' ? result.settings : result;
+    const textColor = raw.textColor ?? raw.text_color ?? DEFAULT_ACTIONS_SLIDER_SETTINGS.textColor;
+    const glowColor = raw.glowColor ?? raw.glow_color ?? DEFAULT_ACTIONS_SLIDER_SETTINGS.glowColor;
+    const disabledRaw = raw.disabledActionIds ?? raw.disabled_action_ids;
+    return {
+      textColor,
+      glowColor,
+      disabledActionIds: Array.isArray(disabledRaw) ? disabledRaw.map(String) : [],
+    };
+  } catch {
+    return null;
+  }
+}
+
+function getItemsSorted() {
+  return Array.from(actionsById.values()).sort((a, b) => {
+    const coinsDiff = (b.gift_coins || 0) - (a.gift_coins || 0);
+    if (coinsDiff !== 0) return coinsDiff;
+    return toDateMs(b.created_at) - toDateMs(a.created_at);
+  });
+}
+
+function getFilteredItems(itemsSorted) {
+  return itemsSorted.filter(it => !disabledActionIds.has(String(it.action_id)));
+}
+
+// Receive settings updates from parent (Overlays View)
+window.addEventListener('message', (event) => {
+  const msg = event?.data;
+  if (!msg) return;
+
+  if (msg.type === 'actions_slider_settings') {
+    const settings = msg.settings || {};
+    applyActionsSliderSettings(settings);
+    return;
+  }
+
+  if (msg.type === 'actions_slider_display_overrides') {
+    const list = Array.isArray(msg.disabledActionIds) ? msg.disabledActionIds : [];
+    disabledActionIds = new Set(list.map(String));
+    rebuildFromState();
+    return;
+  }
+});
+
+function setMockData() {
+  actionsById = new Map();
+
+  const mockActions = [
+    { id: 'mock_1', gift_id: '15764', gift_image: 'img/backing_monkey_15764.webp', action_name: 'إجراء 1', gift_coins: 1000 },
+    { id: 'mock_2', gift_id: '11068', gift_image: 'img/falcon_11068.webp', action_name: 'إجراء 2', gift_coins: 900 },
+    { id: 'mock_3', gift_id: '13231', gift_image: 'img/fame_stairs_13231.webp', action_name: 'إجراء 3', gift_coins: 800 },
+    { id: 'mock_4', gift_id: '9092', gift_image: 'img/fire_phoenix_9092.webp', action_name: 'إجراء 4', gift_coins: 700 },
+    { id: 'mock_5', gift_id: '9500', gift_image: 'img/flying_jets_9500.webp', action_name: 'إجراء 5', gift_coins: 600 },
+    { id: 'mock_6', gift_id: '7823', gift_image: 'img/leon_and_lion_7823.webp', action_name: 'إجراء 6', gift_coins: 500 },
+    { id: 'mock_7', gift_id: '6646', gift_image: 'img/leon_the_kitten_6646.webp', action_name: 'إجراء 7', gift_coins: 400 },
+    { id: 'mock_8', gift_id: '6369', gift_image: 'img/lion_6369.webp', action_name: 'إجراء 8', gift_coins: 300 }
+  ];
+
+  for (const a of mockActions) {
+    const item = normalizeActionToItem(a);
+    actionsById.set(item.action_id, item);
+  }
+
+  rebuildFromState();
+}
+
+function updateFromActionsList(actionsList) {
+  actionsById = new Map();
+
+  for (const raw of (actionsList || [])) {
+    const item = normalizeActionToItem(raw);
+    if (!item.action_id) continue;
+    actionsById.set(item.action_id, item);
+  }
+
+  rebuildFromState();
+}
+
+async function loadInitialData() {
+  if (!userId || mockMode) {
+    setMockData();
+    return;
+  }
+
+  try {
+    const settings = await fetchActionsSliderSettings().catch(() => null);
+    if (settings) {
+      applyActionsSliderSettings(settings);
+      disabledActionIds = new Set((settings.disabledActionIds || []).map(String));
+    }
+
+    const response = await fetch(`${API_URL}/api/widget/initial-data/${encodeURIComponent(userId)}/actions_slider`, {
+      method: 'GET'
+    });
+
+    if (!response.ok) {
+      console.warn('[ActionsSlider] initial-data failed:', response.status);
+      setMockData();
+      return;
+    }
+
+    const result = await response.json();
+    if (!result || !result.data) {
+      setMockData();
+      return;
+    }
+
+    updateFromActionsList(result.data);
+  } catch (err) {
+    console.warn('[ActionsSlider] initial-data error:', err);
+    setMockData();
+  }
+}
+
+function connectSocket() {
+  if (!userId || mockMode || typeof createEdgeWsClient !== 'function') return;
+
+  const socket = createEdgeWsClient({
+    streamerId: userId,
+    url: EDGE_WS_URL,
+    reconnection: true,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
+    reconnectionAttempts: Infinity,
+  });
+
+  socket.on('connect', () => {
+    loadInitialData();
+  });
+
+  // Global broadcast: { userId, type: 'create'|'update'|'delete', action }
+  socket.on('action:changed', (payload) => {
+    const eventUserId = payload?.userId;
+    if (!eventUserId || String(eventUserId) !== String(userId)) return;
+
+    const changeType = payload?.type;
+    const action = payload?.action;
+    if (!action) return;
+
+    if (action.type !== 'specific_gift') return;
+
+    const actionKey = getActionKey(action);
+    if (!actionKey) return;
+
+    if (changeType === 'delete') {
+      if (!actionsById.has(actionKey)) return;
+      actionsById.delete(actionKey);
+    } else {
+      const enabled = action.is_enabled !== false;
+      if (!enabled) {
+        actionsById.delete(actionKey);
+      } else {
+        const item = normalizeActionToItem(action);
+        actionsById.set(actionKey, item);
+      }
+    }
+
+    rebuildFromState();
+  });
+
+  socket.on('actions-slider-settings-update', (payload) => {
+    const settings = payload?.settings;
+    if (!settings) return;
+    applyActionsSliderSettings(settings);
+    disabledActionIds = new Set((settings.disabledActionIds || []).map(String));
+    rebuildFromState();
+  });
+}
+
+ensureAutoplay();
+if (!mockMode && !isValidUid(userId)) {
+  showWidgetError('الرابط خطأ: تاكد من نسخ الرابط بشكل صحيح');
+} else if (mockMode || !userId) {
+  setMockData();
+} else {
+  loadInitialData().finally(() => connectSocket());
+}
+</script>
+
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a33f5f461b11ffed',t:'MTc4ODIxNDI5OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

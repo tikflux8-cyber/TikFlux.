@@ -1,0 +1,80 @@
+(()=>{(function(){let B=window.location.hostname,N=B==="localhost"||B==="127.0.0.1",A=window.ENV_CONFIG?.API_URL||(N?"http://localhost:3000":"https://api.tikoverlay.live"),H=window.ENV_CONFIG?.EDGE_WS_URL||(N?"ws://localhost:3000/ws":"wss://edge.tikoverlay.live/ws");window.DEBUG&&console.log("\u{1F30D} [FollowGoal] Environment:",{hostname:B,isLocal:N,EDGE_WS_URL:H,API_URL:A});let no=new Set(["bar","bottle","potion","potion3","potion5","cozy","heart","moon","star","sun"]),a="bar",K="Follow Goal",R="thmanyah_sans";function x(){return document.getElementById("follow-goal-theme-root")}function z(){return window.FollowGoalThemeLoader?.getEngine?.()??null}function lo(o){let e=typeof o=="string"?o.trim():"bar";return no.has(e)?e:"bar"}async function _(o){a=lo(o),await window.FollowGoalThemeLoader.switchTheme(a),E(p),k(K),T(R),F()}let y=100,m=0,C="session",w=0,d=null,O=!1,u=null,p="#0011ff",ao=null,h=!1,D=0,S=null,v=null;function U(o){document.body.classList.toggle("goal-demo-fill-active",!!o)}function ro(){h=!1,S!==null&&(cancelAnimationFrame(S),S=null),v!==null&&(clearTimeout(v),v=null),U(!1)}function io(){if(h)return;h=!0,D=m;let o=y,e=2800,n=performance.now();U(!0),i(0);function t(r){if(!h)return;let l=Math.max(0,r-n),f=Math.min(1,l/e),b=1-(1-f)*(1-f),g=Math.min(o,Math.max(0,b*o));i(g),f<1?S=requestAnimationFrame(t):(S=null,i(o),v=setTimeout(()=>{v=null,h=!1,U(!1),i(D)},400))}S=requestAnimationFrame(t)}let j=new URLSearchParams(window.location.search),s=j.get("uid"),P=!s||j.get("mock")==="1",so=!P&&!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(s||"").trim());window.DEBUG&&console.log("\u{1F465} [FollowGoal] Starting with userId:",s,"| Mock:",P);function co(){document.body.classList.add("loaded"),document.body.style.opacity="1",document.body.style.visibility="visible",document.body.innerHTML=`
+      <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;max-width:680px;">
+          <img src="/assets/img/tikoverlay-mark.png" alt="TikOverlay" style="width:170px;max-width:60vw;filter:drop-shadow(0 4px 14px rgba(0,0,0,0.45));" />
+          <div style="font-family:Cairo,Arial,sans-serif;font-size:1.95rem;font-weight:900;line-height:1.4;color:#ff0000;text-shadow:0 2px 10px rgba(0,0,0,0.7);">
+            \u0627\u0644\u0631\u0627\u0628\u0637 \u062E\u0637\u0623<br/>\u062A\u0627\u0643\u062F \u0645\u0646 \u0646\u0633\u062E \u0627\u0644\u0631\u0627\u0628\u0637 \u0628\u0634\u0643\u0644 \u0635\u062D\u064A\u062D
+          </div>
+        </div>
+      </div>`}let uo=50,fo=20,mo=600,go=2600,V="Follow Goal";function k(o){let e=typeof o=="string"&&o.trim()?o.trim().slice(0,160):V;K=e;let n=x();if(n){if(a==="bar"){let t=n.querySelector(".title");t&&(t.textContent=e)}else if(a==="bottle"){let t=n.querySelector("#followBottleGoalLabel");t&&(t.textContent=e)}else if(a==="potion"||a==="potion3"||a==="potion5"||a==="cozy"||a==="heart"||a==="moon"||a==="star"||a==="sun"){let t=z();t?.setTitle&&t.setTitle(e)}E(p)}}function T(o){R=o||"thmanyah_sans";let e=window.GoalFontStacks,n=e?e.cssStack(e.normalize(R)):'"Thmanyah Sans", "Segoe UI", sans-serif',t=x();if(!t)return;t.querySelectorAll("#counter, #fg-bottle-percent, #fg-bottle-counter, .potion-goal-counter, .text1, .cozy-leftNum, .cozy-rightNum, .hg-text1, .mg-text1, .sg-text1, .su-text1").forEach(l=>{l.style.removeProperty("font-family")});let r=a==="bar"?".title":a==="bottle"?"#followBottleGoalLabel":a==="potion3"||a==="potion5"?".textbottom .title":a==="cozy"?".cozy-goal-title":a==="heart"?".hg-title":a==="moon"?".mg-title":a==="star"?".sg-title":a==="sun"?".su-title":".potion-goal-title";t.querySelectorAll(r).forEach(l=>{l.style.fontFamily=n}),a==="cozy"&&t.querySelectorAll(".cozy-leftNum, .cozy-rightNum, .cozy-dataCounts").forEach(l=>{l.style.fontFamily=n}),a==="heart"&&t.querySelectorAll(".hg-text1, .hg-textbottom").forEach(l=>{l.style.fontFamily=n}),a==="moon"&&t.querySelectorAll(".mg-text1, .mg-textbottom").forEach(l=>{l.style.fontFamily=n}),a==="star"&&t.querySelectorAll(".sg-text1, .sg-textbottom").forEach(l=>{l.style.fontFamily=n}),a==="sun"&&t.querySelectorAll(".su-text1, .su-textbottom").forEach(l=>{l.style.fontFamily=n})}function M(){O||(O=!0,document.body.classList.add("loaded"))}function X(o){let e=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(o);return e?{r:parseInt(e[1],16),g:parseInt(e[2],16),b:parseInt(e[3],16)}:null}function E(o){p=o;let e=X(o);if(!e)return;if(a==="bar"){let t=x(),r=t?.querySelector(".title"),l=t?.querySelector(".user-icon"),f=t?.querySelector(".bar-wrapper .bar")||t?.querySelector(".bar"),b=t?.querySelector("#fill"),g=t?.querySelector("#counter");if(r&&(r.style.color=o,r.style.textShadow=`
+          0 0 6px rgba(${e.r}, ${e.g}, ${e.b}, 0.6),
+          0 0 14px rgba(${e.r}, ${e.g}, ${e.b}, 0.4)
+        `),l){let c=l.querySelector("svg");c&&(c.style.fill=o,c.style.filter=`
+            drop-shadow(0 0 12px rgb(${e.r}, ${e.g}, ${e.b}))
+            drop-shadow(0 0 20px rgba(${e.r}, ${e.g}, ${e.b}, 0.9))
+          `)}if(f&&(f.style.background=`linear-gradient(to bottom, rgba(${e.r}, ${e.g}, ${e.b}, 0.356), transparent)`,f.style.borderColor=o,f.style.boxShadow=`
+          0 0 12px rgb(${e.r}, ${e.g}, ${e.b}),
+          0 0 30px rgba(${e.r}, ${e.g}, ${e.b}, 0.9),
+          0 0 50px rgba(${e.r}, ${e.g}, ${e.b}, 0.6)
+        `),b){let c={r:Math.floor(e.r*.3),g:Math.floor(e.g*.3),b:Math.floor(e.b*.3)};b.style.background=`linear-gradient(to right, rgb(${c.r}, ${c.g}, ${c.b}), rgb(${e.r}, ${e.g}, ${e.b}))`,b.style.boxShadow=`0 0 22px rgb(${e.r}, ${e.g}, ${e.b})`}g&&(g.style.color=o,g.style.textShadow=`
+          0 1px 0 rgba(0,0,0,0.88),
+          0 2px 4px rgba(0,0,0,0.55),
+          0 0 2px rgba(0,0,0,0.85),
+          0 0 8px rgba(${e.r}, ${e.g}, ${e.b}, 0.75),
+          0 0 16px rgba(${e.r}, ${e.g}, ${e.b}, 0.5)
+        `),(t?.querySelectorAll(".spark svg")??[]).forEach(c=>{c.style.fill=o,c.style.filter=`
+          drop-shadow(0 0 16px rgb(${e.r}, ${e.g}, ${e.b}))
+          drop-shadow(0 0 40px rgba(${e.r}, ${e.g}, ${e.b}, 0.9))
+          drop-shadow(0 0 70px rgba(${e.r}, ${e.g}, ${e.b}, 0.6))
+        `}),wo(e)}let n=z();n?.applyColor&&n.applyColor(o)}function wo(o){let e=document.createElement("style");e.id="dynamic-goal-complete-style";let n=document.getElementById("dynamic-goal-complete-style");n&&n.remove(),e.textContent=`
+      #follow-goal-theme-root .fill.goal-complete {
+        box-shadow:
+          0 0 12px rgb(${o.r}, ${o.g}, ${o.b}),
+          0 0 30px rgba(${o.r}, ${o.g}, ${o.b}, 0.9),
+          0 0 50px rgba(${o.r}, ${o.g}, ${o.b}, 0.6) !important;
+      }
+
+      #follow-goal-theme-root .fill.goal-complete::after {
+        background: rgba(${o.r}, ${o.g}, ${o.b}, 0.85) !important;
+        box-shadow:
+          0 0 12px rgb(${o.r}, ${o.g}, ${o.b}),
+          0 0 30px rgba(${o.r}, ${o.g}, ${o.b}, 0.9),
+          0 0 50px rgba(${o.r}, ${o.g}, ${o.b}, 0.6) !important;
+      }
+
+      @keyframes barGlowPulse {
+        0% {
+          box-shadow:
+            0 0 12px rgba(${o.r}, ${o.g}, ${o.b}, 0.6),
+            0 0 30px rgba(${o.r}, ${o.g}, ${o.b}, 0.4),
+            0 0 50px rgba(${o.r}, ${o.g}, ${o.b}, 0.3);
+        }
+        50% {
+          box-shadow:
+            0 0 18px rgb(${o.r}, ${o.g}, ${o.b}),
+            0 0 45px rgba(${o.r}, ${o.g}, ${o.b}, 0.9),
+            0 0 80px rgba(${o.r}, ${o.g}, ${o.b}, 0.8);
+        }
+        100% {
+          box-shadow:
+            0 0 12px rgba(${o.r}, ${o.g}, ${o.b}, 0.6),
+            0 0 30px rgba(${o.r}, ${o.g}, ${o.b}, 0.4),
+            0 0 50px rgba(${o.r}, ${o.g}, ${o.b}, 0.3);
+        }
+      }
+    `,document.head.appendChild(e)}function po(){return document.body.classList.contains("goal-demo-fill-active")}function Y(){let o=m-w;if(Math.abs(o)<.02){w=m,F(),d=null;return}w+=o*.2,F(),d=requestAnimationFrame(Y)}function F(){let o=Math.min(w/y*100,100),e=x();if(a==="bar"&&e){let t=e.querySelector("#fill"),r=e.querySelector("#counter"),l=e.querySelector(".bar-wrapper .bar")||e.querySelector(".bar");t&&(t.style.transition="none",t.style.width=o+"%"),r&&(r.innerText=`${Math.round(w)} / ${y}`),t&&l&&(m>=y?(t.classList.add("goal-complete"),l.classList.add("goal-complete")):(t.classList.remove("goal-complete"),l.classList.remove("goal-complete")))}let n=z();n?.setState&&n.setState(w,y)}function i(o,e){if(typeof o!="number"||isNaN(o))return;let n=m;if(m=Math.max(0,o),window.DEBUG&&console.log(`\u{1F4CA} [FollowGoal] currentValue updated: ${n} \u2192 ${m}`),e===!0||po()){d!==null&&(cancelAnimationFrame(d),d=null),w=m,F();return}d===null&&(d=requestAnimationFrame(Y))}function J(o){typeof o=="number"&&!isNaN(o)&&o>0&&(y=o,F())}function yo(o){return o==="total"?"total":"session"}function $(){return C==="total"}async function W(){if(s)try{let o=await fetch(`${A}/api/widget/total-follow/snapshot?uid=${encodeURIComponent(s)}`,{method:"GET",headers:{Accept:"application/json"}});if(!o.ok)return;let e=await o.json(),n=Number(e?.data?.totalFollowers);Number.isFinite(n)&&i(n,!0)}catch(o){window.DEBUG&&console.warn("[FollowGoal] total-follow snapshot failed",o)}}function Q(o){if(!$()||!o)return;let e=Number(o.totalFollowers);Number.isFinite(e)&&(h?D=Math.max(0,Math.floor(e)):i(e))}async function ho(){if(!(!s||$()))try{let o=await fetch(`${A}/api/widget/follow-goal/${s}/settings`);if(!o.ok)return;let e=await o.json();typeof e.current_value=="number"&&!isNaN(e.current_value)&&i(e.current_value,!0)}catch(o){window.DEBUG&&console.warn("[FollowGoal] session progress reload failed",o)}}async function Z(o,e){let n=yo(o),t=n!==C;C=n,t&&$()?await W():t&&C==="session"?await ho():e&&$()&&await W()}function $o(o="socket"){if($()){window.DEBUG&&console.log(`\u{1F504} [FollowGoal] Reset ignored in total count mode (source: ${o})`),W();return}window.DEBUG&&console.log(`\u{1F504} [FollowGoal] Goal reset (source: ${o})`),ro(),d!==null&&(cancelAnimationFrame(d),d=null),m=0,w=0,F()}async function bo(){if(s)try{window.DEBUG&&console.log("\u2699\uFE0F [FollowGoal] Loading settings from REST API...");let o=await fetch(`${A}/api/widget/follow-goal/${s}/settings`);if(o.ok){let e=await o.json();window.DEBUG&&console.log("\u2705 [FollowGoal] Settings loaded from REST:",{goal_value:e.goal_value,goal_color:e.goal_color,theme_key:e.theme_key,roomId:e.roomId,current_value:e.current_value}),e.roomId&&(ao=e.roomId),e.goal_value!==void 0&&J(parseInt(e.goal_value,10)),e.goal_color&&E(e.goal_color),e.theme_key!==void 0&&e.theme_key!==null&&await _(String(e.theme_key)),e.goal_title!==void 0&&e.goal_title!==null&&k(String(e.goal_title)),e.goal_font!==void 0&&e.goal_font!==null&&T(String(e.goal_font)),e.count_mode!==void 0&&e.count_mode!==null&&await Z(String(e.count_mode),!0),!$()&&typeof e.current_value=="number"&&!isNaN(e.current_value)&&i(e.current_value,!0),setTimeout(()=>M(),50)}else window.DEBUG&&console.warn("\u26A0\uFE0F [FollowGoal] GET .../follow-goal/:userId/settings returned non-OK:",o.status),setTimeout(()=>M(),500)}catch(o){window.DEBUG&&console.warn("\u26A0\uFE0F [FollowGoal] Failed to load settings from REST:",o),setTimeout(()=>M(),500)}}async function oo(o){o&&(o.theme_key!==void 0&&o.theme_key!==null&&await _(String(o.theme_key)),o.goal_value!==void 0&&J(parseInt(o.goal_value,10)),o.goal_color&&E(o.goal_color),o.goal_title!==void 0&&o.goal_title!==null&&k(String(o.goal_title)),o.goal_font!==void 0&&o.goal_font!==null&&T(String(o.goal_font)),o.count_mode!==void 0&&o.count_mode!==null&&await Z(String(o.count_mode),!0))}window.addEventListener("message",o=>{let e=o.data;!e||e.source!=="tikoverlay-goals-dashboard"&&e.source!=="tikscale-goals-dashboard"||e.type!=="goal_setup"||e.event==="follow_goal_settings"&&oo(e.data)});function xo(){if(window.DEBUG&&console.log("\u{1F50C} [FollowGoal] connectSocket() called"),!s){console.error("\u274C [FollowGoal] Cannot connect - userId is missing!");return}if(typeof createEdgeWsClient!="function"){console.error("\u274C [FollowGoal] Cannot connect - edge-ws-client not loaded!");return}u=createEdgeWsClient({streamerId:s,url:H,reconnection:!0,reconnectionDelay:1e3,reconnectionDelayMax:5e3,reconnectionAttempts:1/0}),u.on("connect",()=>{window.DEBUG&&console.log("\u2705 [FollowGoal] Edge transport open:",u.id)}),u.on("connected",()=>{window.DEBUG&&console.log("\u2705 [FollowGoal] Subscribed on Edge")}),u.on("disconnect",o=>{window.DEBUG&&console.log("\u26A0\uFE0F [FollowGoal] Edge disconnected. Reason:",o)}),u.on("error",o=>{console.error("\u274C [FollowGoal] Socket error:",o)}),u.on("total_follow_update",o=>{Q(o)}),u.on("total_follow_bootstrap",o=>{Q(o)}),u.on("follow_goal_update",o=>{if(o){if(o.mode==="demo"){io();return}if(!$()&&(window.DEBUG&&console.log("\u{1F4CA} [FollowGoal] Progress update received:",{...o,timestamp:new Date().toISOString()}),o.current_value!==void 0)){let e=parseInt(o.current_value,10);h?D=Math.max(0,e):i(e)}}}),u.on("follow_goal_settings",o=>{window.DEBUG&&console.log("\u2699\uFE0F [FollowGoal] Settings update received:",o),oo(o)}),u.on("follow_goal_reset",o=>{window.DEBUG&&console.log("\u{1F504} [FollowGoal] Reset received:",o),$o("socket")})}function q(o,e){return Math.random()*(e-o)+o}function _o(){let o=x()?.querySelector(".sparkles-layer");if(!o)return;let e=document.createElement("div");e.className="spark",e.innerHTML=`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="spark-star">
+        <path d="M247.355,106.9C222.705,82.241,205.833,39.18,197.46,0
+          c-8.386,39.188-25.24,82.258-49.899,106.917
+          c-24.65,24.642-67.724,41.514-106.896,49.904
+          c39.188,8.373,82.254,25.235,106.904,49.895
+          c24.65,24.65,41.522,67.72,49.908,106.9
+          c8.373-39.188,25.24-82.258,49.886-106.917
+          c24.65-24.65,67.724-41.514,106.896-49.904
+          C315.08,148.422,272.014,131.551,247.355,106.9z"/>
+      </svg>
+    `;let n=e.querySelector("svg");if(n&&p){let l=X(p);l&&(n.style.fill=p,n.style.filter=`
+          drop-shadow(0 0 16px rgb(${l.r}, ${l.g}, ${l.b}))
+          drop-shadow(0 0 40px rgba(${l.r}, ${l.g}, ${l.b}, 0.9))
+          drop-shadow(0 0 70px rgba(${l.r}, ${l.g}, ${l.b}, 0.6))
+        `)}let t=q(5.2,17.2);e.style.width=`${t}px`,e.style.height=`${t}px`,e.style.left=`${q(0,o.clientWidth)}px`,e.style.top=`${q(0,o.clientHeight)}px`,o.appendChild(e);let r=q(mo,go);e.animate([{transform:"translateX(0px)",opacity:0},{opacity:1},{transform:`translateX(${fo}px)`,opacity:0}],{duration:r,easing:"ease-out"}),setTimeout(()=>e.remove(),r)}setInterval(()=>{if(a!=="bar")return;let o=x()?.querySelector(".sparkles-layer");o&&o.children.length<uo&&_o()},100);let I=["bar","bottle","potion","potion3","potion5","cozy","heart","moon","star","sun"],So=900,Eo=3800,G=null,L=null;function Fo(){G!==null&&(cancelAnimationFrame(G),G=null),L!==null&&(clearTimeout(L),L=null)}async function Go(){window.DEBUG&&console.log("\u{1F3AD} [FollowGoal] Starting Mock Mode"),Fo();let o=I.indexOf(a);o<0&&(o=0),await _(I[o]);function e(){U(!0),i(0);let n=y,t=Eo,r=performance.now();function l(f){let b=Math.max(0,f-r),g=Math.min(1,b/t),to=1-(1-g)*(1-g),c=Math.min(n,Math.max(0,to*n));i(c),g<1?G=requestAnimationFrame(l):(G=null,i(n),L=setTimeout(()=>{L=null,o=(o+1)%I.length,(async()=>(await _(I[o]),i(0),e()))()},So))}G=requestAnimationFrame(l)}e(),M()}async function eo(){if(so){co();return}let o=document.getElementById("follow-goal-theme-mount");if(!o||!window.FollowGoalThemeLoader){console.error("\u274C [FollowGoal] Theme mount or loader missing");return}FollowGoalThemeLoader.init(o),P?(await _(I[0]),E(p),k(V),T("thmanyah_sans"),Go()):s?(await _("bar"),E(p),k(V),T("thmanyah_sans"),(async()=>(await bo(),xo(),setTimeout(()=>{O||(window.DEBUG&&console.warn("\u26A0\uFE0F [FollowGoal] Timeout \u2014 showing widget"),M())},2e3)))()):window.DEBUG&&console.warn("\u26A0\uFE0F [FollowGoal] No userId \u2014 widget idle")}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",eo):eo()})();})();

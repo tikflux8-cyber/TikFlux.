@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/assets/img/tikoverlay-mark.png?v=20260802" type="image/png">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>TikOverlay Top Gifters</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/vendor/fontawesome/css/all.min.css">
+    
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            overflow: hidden;
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Cairo', Arial, sans-serif;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: transparent;
+        }
+
+        #theme-container {
+            width: 100%;
+            height: 100%;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        /* Loading Indicator */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-size: 1.5rem;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Container - سيتم ملؤه ديناميكياً -->
+    <div id="theme-container">
+        <div class="loading">Loading...</div>
+    </div>
+
+    <!-- Socket.IO -->
+    <script src="/assets/b/8c386c8dbec5a57f.js"></script>
+    <script src="/assets/b/28b98888f9aaae4a.js"></script>
+    <!-- Debug Configuration -->
+    <script src="/assets/b/aa9c4c6deef9b265.js"></script>
+    
+    <!-- Unified Theme System -->
+    <script src="/assets/b/3e676369681a88e4.js"></script>
+    <script src="/assets/b/c45fba52a88d8c5b.js"></script>
+<script src="/assets/b/f3e7e65150411c22.js"></script>
+    
+    <!-- Main Widget Script -->
+    <script type="text/javascript" charset="UTF-8">
+        /**
+         * TikOverlay Top Gifters Widget
+         */
+
+        // Auto-detect environment
+        const hostname = window.location.hostname;
+        const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+        const API_URL = window.ENV_CONFIG?.API_URL || (isLocal ? 'http://localhost:3000' : 'https://api.tikoverlay.live');
+        const EDGE_WS_URL = window.ENV_CONFIG?.EDGE_WS_URL || (isLocal ? 'ws://localhost:3000/ws' : 'wss://edge.tikoverlay.live/ws');
+        
+        // Get parameters
+        const params = new URLSearchParams(window.location.search);
+        const userId = params.get('uid');
+        const isMock = !userId || params.get('mock') === '1';
+        const isSettingsPreview = params.get('settings_preview') === '1';
+        const uuidV4LikeRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        const hasInvalidUid = !isMock && !uuidV4LikeRegex.test(String(userId || '').trim());
+
+        let socket = null;
+        let isInitialized = false;
+        let latestData = []; // 🔥 Store latest data to persist through theme changes
+
+        function isDashboardPreviewFrame() {
+            try { return window.parent !== window; } catch { return false; }
+        }
+
+        function getPreviewRankCap() {
+            const theme =
+                window.ThemeLoader?.getCurrentTheme?.() ||
+                window.ThemeLoader?.getFetchedSettings?.()?.theme ||
+                'classic';
+            if (window.ThemeLoader?.getThemeMaxVisibleRanks) {
+                return window.ThemeLoader.getThemeMaxVisibleRanks(theme);
+            }
+            return theme === 'default' ? 20 : 10;
+        }
+
+        function getPreviewPlaceholderUsers(count) {
+            const cap = getPreviewRankCap();
+            const max = Math.max(1, Math.min(cap, Number(count) || cap));
+            const avatars = ['avatar1.png', 'avatar2.png', 'avatar3.png'];
+            return Array.from({ length: max }, (_, i) => ({
+                placeholder: true,
+                uniqueId: `__preview_${i + 1}`,
+                nickname: '---',
+                score: 0,
+                avatar: `/assets/img/${avatars[i % avatars.length]}`,
+            }));
+        }
+
+        function renderPreviewPlaceholdersIfNeeded(visibleRanks) {
+            if (!isInitialized) return;
+            if (latestData && latestData.length > 0) return;
+            const cap = getPreviewRankCap();
+            const ranks =
+                visibleRanks ||
+                window.ThemeLoader?.getFetchedSettings?.()?.visibleRanks ||
+                cap;
+            window.ThemeLoader.update(getPreviewPlaceholderUsers(ranks));
+        }
+
+        console.log('🎨 [TopGifters] Starting with userId:', userId, '| Mock:', isMock);
+
+        function showInvalidLinkError() {
+            document.getElementById('theme-container').innerHTML =
+                '<div class="loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-size:1.35rem;font-weight:800;text-align:center;padding:24px;"><img src="/assets/img/tikoverlay-mark.png" alt="TikOverlay" style="width:170px;max-width:60vw;" /><div style="color:#ff0000;">الرابط خطأ<br/>تاكد من نسخ الرابط بشكل صحيح</div></div>';
+        }
+
+        /**
+         * Initialize Theme System
+         */
+        async function initializeThemeSystem() {
+            if (hasInvalidUid) {
+                showInvalidLinkError();
+                return;
+            }
+            try {
+                const container = document.getElementById('theme-container');
+                
+                // Initialize theme loader with widget type
+                await window.ThemeLoader.initialize(userId, container, 'top_gifters');
+                
+                console.log('✅ [TopGifters] Theme system initialized');
+                isInitialized = true;
+
+                if (!isMock) {
+                    await loadInitialData();
+                    connectSocket();
+                } else {
+                    // Mock mode - show demo data
+                    console.log('🎭 [TopGifters] Running in Mock Mode');
+                    startMockMode();
+                }
+            } catch (error) {
+                console.error('❌ [TopGifters] Failed to initialize theme system:', error);
+                document.getElementById('theme-container').innerHTML = 
+                    '<div class="loading">Error loading theme</div>';
+            }
+        }
+
+        /**
+         * Load initial snapshot from API (Redis room_data hash via /api/widget/initial-data).
+         */
+        async function loadInitialData() {
+            try {
+                if (!userId) {
+                    console.warn('⚠️ [TopGifters] No userId available for initial data load');
+                    return;
+                }
+                
+                console.log('📊 [TopGifters] Loading initial data from server...');
+                
+                const response = await fetch(`${API_URL}/api/widget/initial-data/${userId}/top_gifters`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    console.warn('⚠️ [TopGifters] Failed to load initial data:', response.status, response.statusText);
+                    renderPreviewPlaceholdersIfNeeded();
+                    return;
+                }
+                
+                const result = await response.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    console.log('✅ [TopGifters] Initial data loaded:', result.data.length, 'users');
+                    
+                    // Update display immediately with current data
+                    updateTopGifters(result.data);
+                    
+                    console.log('🎯 [TopGifters] Widget now showing current data immediately!');
+                } else if (result.success && result.data && result.data.length === 0 && result.hasActiveSession) {
+                    console.log('ℹ️ [TopGifters] Active session but no data yet (new stream or reset)');
+                    renderPreviewPlaceholdersIfNeeded();
+                } else {
+                    console.log('ℹ️ [TopGifters] No active session or data available');
+                    renderPreviewPlaceholdersIfNeeded();
+                }
+                
+            } catch (error) {
+                console.error('❌ [TopGifters] Error loading initial data:', error);
+                renderPreviewPlaceholdersIfNeeded();
+            }
+        }
+
+        /** Live updates via Edge WebSocket (ingest → EdgePubSubPublisher). */
+        function connectSocket() {
+            if (!userId || typeof createEdgeWsClient !== 'function') return;
+            console.log('🔌 [TopGifters] Connecting to Edge WS...');
+            socket = createEdgeWsClient({
+                streamerId: userId,
+                url: EDGE_WS_URL,
+                reconnection: true,
+                reconnectionDelay: 1000,
+                reconnectionDelayMax: 5000,
+            });
+
+            socket.on('connected', () => {
+                console.log('✅ [TopGifters] Subscribed on Edge');
+            });
+
+            // استقبال Top Gifters
+            socket.on('top_gifters_update', (data) => {
+                if (data && data.top50) {
+                    console.log('📊 [TopGifters] Received Top 50:', data.top50.length, 'users');
+                    
+                    // Handle reset flag (empty state after reset)
+                    if (data.reset && data.top50.length === 0) {
+                        console.log('🔄 [TopGifters] Reset detected in update (empty state)');
+                    }
+                    
+                    updateTopGifters(data.top50);
+                }
+            });
+
+            // Fallback: استقبال عبر 'event' channel
+            socket.on('event', (eventData) => {
+                if (eventData.type === 'top_gifters_update' && eventData.data && eventData.data.top50) {
+                    console.log('📊 [TopGifters] Received Top 50 via event:', eventData.data.top50.length, 'users');
+                    
+                    // Handle reset flag
+                    if (eventData.data.reset && eventData.data.top50.length === 0) {
+                        console.log('🔄 [TopGifters] Reset detected in event (empty state)');
+                    }
+                    
+                    updateTopGifters(eventData.data.top50);
+                }
+            });
+
+            // استقبال تغيير الثيم
+            socket.on('top_gifters_theme_changed', async (data) => {
+                console.log('🎨 [TopGifters] Theme changed event received:', data);
+                if (data.theme) {
+                    const visibleRanks = data.visibleRanks || 10;
+                    const direction = data.direction || 'rtl';
+                    console.log('🔄 [TopGifters] Switching to theme:', data.theme, 'with visibleRanks:', visibleRanks, 'direction:', direction);
+                    const palette =
+                        Object.prototype.hasOwnProperty.call(data, 'classicColors') ? data.classicColors ?? null : undefined;
+                    const cyberPal =
+                        Object.prototype.hasOwnProperty.call(data, 'cyberColors') ? data.cyberColors ?? null : undefined;
+                    const trPal =
+                        Object.prototype.hasOwnProperty.call(data, 'topRankersColors')
+                            ? data.topRankersColors ?? null
+                            : undefined;
+                    const nsPal =
+                        Object.prototype.hasOwnProperty.call(data, 'neonShardsColors')
+                            ? data.neonShardsColors ?? null
+                            : undefined;
+                    const defaultPal =
+                        Object.prototype.hasOwnProperty.call(data, 'defaultColors')
+                            ? data.defaultColors ?? null
+                            : undefined;
+                    const rcPal =
+                        Object.prototype.hasOwnProperty.call(data, 'rainbowCloudsColors')
+                            ? data.rainbowCloudsColors ?? null
+                            : undefined;
+                    const faPal =
+                        Object.prototype.hasOwnProperty.call(data, 'farashatColors')
+                            ? data.farashatColors ?? null
+                            : undefined;
+                    await window.ThemeLoader.switchTheme(data.theme, visibleRanks, direction, palette, cyberPal, trPal, nsPal, defaultPal, rcPal, faPal);
+                    
+                    // 🔥 Re-render latest data after theme switch
+                    if (latestData && latestData.length > 0) {
+                        console.log('♻️ [TopGifters] Re-rendering data after theme change:', latestData.length, 'gifters');
+                        window.ThemeLoader.update(latestData);
+                    } else {
+                        renderPreviewPlaceholdersIfNeeded(visibleRanks);
+                    }
+                }
+            });
+
+            // استقبال حدث إعادة تعيين المراكز
+            socket.on('top_gifters_reset', (data) => {
+                console.log('🔄 [TopGifters] Reset event received:', data);
+                
+                // 🔥 Clear stored data
+                latestData = [];
+                
+                // تصفير العرض - إرسال مصفوفة فارغة
+                if (window.ThemeLoader && window.ThemeLoader.update) {
+                    const emptyData = [];
+                    window.ThemeLoader.update(emptyData);
+                    console.log('✅ [TopGifters] Display reset to empty state');
+                }
+            });
+
+            socket.on('disconnect', (reason) => {
+                console.log('❌ [TopGifters] Disconnected:', reason);
+            });
+
+            socket.on('reconnect', (attemptNumber) => {
+                console.log('✅ [TopGifters] Reconnected after', attemptNumber, 'attempts');
+                
+                // 🔥 CRITICAL FIX: Load initial data after reconnection too
+                loadInitialData();
+            });
+
+            socket.on('error', (error) => {
+                console.error('❌ [TopGifters] Socket error:', error);
+            });
+        }
+
+        /**
+         * Update Top Gifters Display
+         */
+        function updateTopGifters(gifters) {
+            if (!isInitialized) {
+                console.warn('⚠️ [TopGifters] Theme system not initialized yet');
+                return;
+            }
+
+            if (!Array.isArray(gifters)) {
+                console.warn('⚠️ [TopGifters] Invalid gifters data:', gifters);
+                return;
+            }
+
+            // 🔥 Store latest data for theme changes
+            latestData = gifters;
+
+            // Update theme renderer
+            window.ThemeLoader.update(gifters);
+        }
+
+        function buildSettingsPreviewMockUsers(count) {
+            const base = [
+                { nickname: 'أحمد محمد', score: 15420 },
+                { nickname: 'فاطمة علي', score: 12350 },
+                { nickname: 'محمد سالم', score: 10200 },
+                { nickname: 'نورا حسن', score: 8750 },
+                { nickname: 'خالد يوسف', score: 7300 },
+                { nickname: 'سارة أحمد', score: 6200 },
+                { nickname: 'عمر كريم', score: 5100 },
+                { nickname: 'ليلى سعيد', score: 4200 },
+                { nickname: 'يوسف محمود', score: 3500 },
+                { nickname: 'مريم عثمان', score: 2800 },
+                { nickname: 'راشد ناصر', score: 2340 },
+                { nickname: 'هند سالم', score: 1980 },
+                { nickname: 'طارق فهد', score: 1650 },
+                { nickname: 'ريم عبدالله', score: 1320 },
+                { nickname: 'بدر سلطان', score: 1080 },
+                { nickname: 'دانة وليد', score: 860 },
+                { nickname: 'فيصل حمد', score: 640 },
+                { nickname: 'لمى زياد', score: 480 },
+                { nickname: 'سعد ماجد', score: 350 },
+                { nickname: 'جنى عادل', score: 220 },
+            ];
+            const avatars = ['avatar1.png', 'avatar2.png', 'avatar3.png'];
+            const max = Math.max(1, Math.min(20, Number(count) || 10));
+            return Array.from({ length: max }, (_, i) => {
+                const seed = base[i] || { nickname: `داعم ${i + 1}`, score: Math.max(50, 200 - i * 10) };
+                return {
+                    nickname: seed.nickname,
+                    score: seed.score,
+                    avatar: `/assets/img/${avatars[i % avatars.length]}`,
+                };
+            });
+        }
+
+        function ensureSettingsPreviewMockUsers(visibleRanks) {
+            const cap = getPreviewRankCap();
+            const ranks = Math.max(1, Math.min(cap, Number(visibleRanks) || cap));
+            if (!latestData || latestData.length !== ranks) {
+                latestData = buildSettingsPreviewMockUsers(ranks);
+            }
+            return latestData;
+        }
+
+        function startSettingsPreviewMockMode() {
+            const cap = getPreviewRankCap();
+            latestData = buildSettingsPreviewMockUsers(cap);
+            updateTopGifters(latestData);
+            console.log('🎭 [TopGifters] Settings preview mock (static theme + demo data)');
+        }
+
+        /**
+         * Mock Mode - Demo Data مع التبديل التلقائي بين الثيمات
+         */
+        function startMockMode() {
+            if (isSettingsPreview) {
+                startSettingsPreviewMockMode();
+                return;
+            }
+
+            const mockData = [
+                { nickname: 'أحمد محمد', avatar: '', score: 15420 },
+                { nickname: 'فاطمة علي', avatar: '', score: 12350 },
+                { nickname: 'محمد سالم', avatar: '', score: 10200 },
+                { nickname: 'نورا حسن', avatar: '', score: 8750 },
+                { nickname: 'خالد يوسف', avatar: '', score: 7300 },
+                { nickname: 'سارة أحمد', avatar: '', score: 6200 },
+                { nickname: 'عمر كريم', avatar: '', score: 5100 },
+                { nickname: 'ليلى سعيد', avatar: '', score: 4200 },
+                { nickname: 'يوسف محمود', avatar: '', score: 3500 },
+                { nickname: 'مريم عثمان', avatar: '', score: 2800 }
+            ];
+
+            console.log('🎭 [TopGifters] Loading mock data...');
+            
+            setTimeout(() => {
+                updateTopGifters(mockData);
+                
+                // 🎨 تفعيل نظام التبديل التلقائي بين الثيمات
+                const themes = ['taif', 'classic', 'cyber-blade', 'top-rankers', 'fawanis', 'rose', 'rose-podium', 'rainbow-clouds', 'skulls', 'farashat', 'neon-shards'];
+                let currentThemeIndex = 0;
+                
+                console.log('🎭 [TopGifters] Auto theme rotation enabled - switching every 4 seconds (mock)');
+
+                // التبديل بين الثيمات كل 10 ثواني مع fade effect
+                setInterval(async () => {
+                    currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+                    const nextTheme = themes[currentThemeIndex];
+                    
+                    console.log(`🔄 [TopGifters] Auto switching to theme: ${nextTheme} (${currentThemeIndex + 1}/${themes.length})`);
+                    
+                    // تطبيق fade out
+                    const container = document.getElementById('theme-container');
+                    if (container) {
+                        container.style.transition = 'opacity 0.5s ease-in-out';
+                        container.style.opacity = '0';
+                        
+                        // الانتظار حتى ينتهي التأثير
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    }
+                    
+                    // تبديل الثيم
+                    const visibleRanks =
+                        (nextTheme === 'rose-podium' || nextTheme === 'rainbow-clouds') ? 5 :
+                        (nextTheme === 'top-rankers' || nextTheme === 'fawanis' || nextTheme === 'rose' || nextTheme === 'skulls' || nextTheme === 'farashat' || nextTheme === 'taif') ? 5 : 10;
+                    await window.ThemeLoader.switchTheme(nextTheme, visibleRanks, 'rtl');
+                    
+                    // إعادة رسم البيانات
+                    updateTopGifters(mockData);
+                    
+                    // تطبيق fade in
+                    if (container) {
+                        container.style.opacity = '1';
+                    }
+                }, 4000); // وضع mock: تبديل أسرع للمعاينة
+                
+                // Update scores every 3 seconds for demo
+                setInterval(() => {
+                    mockData.forEach(user => {
+                        user.score += Math.floor(Math.random() * 100);
+                    });
+                    
+                    // Re-sort by score
+                    mockData.sort((a, b) => b.score - a.score);
+                    
+                    updateTopGifters(mockData);
+                }, 3000);
+            }, 1000);
+        }
+
+        // Start when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeThemeSystem);
+        } else {
+            initializeThemeSystem();
+        }
+
+        /**
+         * استقبال رسائل preview من Dashboard
+         */
+        window.addEventListener('message', (event) => {
+            const d = event.data;
+            if (!d || !d.type) return;
+
+            if (d.type === 'preview_visible_ranks') {
+                const previewRanks = d.visibleRanks;
+                if (previewRanks >= 1 && previewRanks <= 50) {
+                    if (window.ThemeLoader && window.ThemeLoader.setVisibleRanks) {
+                        window.ThemeLoader.setVisibleRanks(previewRanks);
+                    }
+                }
+                return;
+            }
+
+            if (d.type === 'preview_theme_settings' && d.theme) {
+                (async () => {
+                    try {
+                        const ranks = Number(d.visibleRanks) || 10;
+                        const dir = d.direction === 'ltr' ? 'ltr' : 'rtl';
+                        const palette =
+                            Object.prototype.hasOwnProperty.call(d, 'classicColors')
+                                ? d.classicColors ?? null
+                                : undefined;
+                        const cyberPal =
+                            Object.prototype.hasOwnProperty.call(d, 'cyberColors')
+                                ? d.cyberColors ?? null
+                                : undefined;
+                        const trPal =
+                            Object.prototype.hasOwnProperty.call(d, 'topRankersColors')
+                                ? d.topRankersColors ?? null
+                                : undefined;
+                        const nsPal =
+                            Object.prototype.hasOwnProperty.call(d, 'neonShardsColors')
+                                ? d.neonShardsColors ?? null
+                                : undefined;
+                        const defaultPal =
+                            Object.prototype.hasOwnProperty.call(d, 'defaultColors')
+                                ? d.defaultColors ?? null
+                                : undefined;
+                        const rcPal =
+                            Object.prototype.hasOwnProperty.call(d, 'rainbowCloudsColors')
+                                ? d.rainbowCloudsColors ?? null
+                                : undefined;
+                        const faPal =
+                            Object.prototype.hasOwnProperty.call(d, 'farashatColors')
+                                ? d.farashatColors ?? null
+                                : undefined;
+                        await window.ThemeLoader.switchTheme(d.theme, ranks, dir, palette, cyberPal, trPal, nsPal, defaultPal, rcPal, faPal);
+                        if (isSettingsPreview) {
+                            const users = ensureSettingsPreviewMockUsers(ranks);
+                            window.ThemeLoader.update(users);
+                        } else if (latestData && latestData.length > 0) {
+                            window.ThemeLoader.update(latestData);
+                        } else {
+                            renderPreviewPlaceholdersIfNeeded(ranks);
+                        }
+                    } catch (e) {
+                        console.warn('[TopGifters] preview_theme_settings failed:', e);
+                    }
+                })();
+            }
+        });
+    </script>
+</body>
+</html>

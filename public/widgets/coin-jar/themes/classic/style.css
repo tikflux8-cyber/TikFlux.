@@ -1,0 +1,202 @@
+.stage[data-theme="classic"] {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  --jar-w: 540px;
+}
+
+.stage[data-theme="classic"] .jar-unit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--jar-w);
+  aspect-ratio: 1 / 1;
+  pointer-events: none;
+}
+
+.stage[data-theme="classic"] .jar-back { z-index: 1; }
+.stage[data-theme="classic"] .jar-front { z-index: 3; }
+
+.stage[data-theme="classic"] .jar-layer-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.stage[data-theme="classic"] .world-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 2;
+  display: block;
+  pointer-events: none;
+}
+
+.stage[data-theme="classic"] .coin-counter {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + var(--jar-w) * 0.38);
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.stage[data-theme="classic"] .coin-counter .tiktok-coin {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
+}
+
+.stage[data-theme="classic"] .coin-counter #coinCount {
+  font-weight: 800;
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+  color: #FFD54F;
+  text-shadow:
+    0 0 12px rgba(255, 193, 7, 0.55),
+    0 2px 4px rgba(0, 0, 0, 0.85),
+    0 0 1px rgba(0, 0, 0, 0.9);
+}
+
+.stage[data-theme="classic"] .gift-toast-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.stage[data-theme="classic"] .gift-bubble {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 5px;
+  border-radius: 999px;
+  background: rgba(18, 18, 24, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.42);
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+  opacity: 0;
+  white-space: nowrap;
+}
+
+.stage[data-theme="classic"] .gift-bubble--left {
+  transform: translate(-100%, -50%);
+  transform-origin: right center;
+  animation: giftBubbleInLeft 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.stage[data-theme="classic"] .gift-bubble--right {
+  transform: translateY(-50%);
+  transform-origin: left center;
+  animation: giftBubbleInRight 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.stage[data-theme="classic"] .gift-bubble--left.is-leaving {
+  animation: giftBubbleOutLeft 0.4s ease forwards;
+}
+
+.stage[data-theme="classic"] .gift-bubble--right.is-leaving {
+  animation: giftBubbleOutRight 0.4s ease forwards;
+}
+
+.stage[data-theme="classic"] .gift-bubble__avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.stage[data-theme="classic"] .gift-bubble__name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  max-width: 76px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 1;
+}
+
+.stage[data-theme="classic"] .gift-bubble__gift {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.stage[data-theme="classic"] .gift-bubble__value {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #FFD54F;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.stage[data-theme="classic"] .gift-bubble__value .tiktok-coin {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.stage[data-theme="classic"] .gift-bubble__tail {
+  position: absolute;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  transform: translateY(-50%);
+}
+
+.stage[data-theme="classic"] .gift-bubble--left .gift-bubble__tail {
+  right: -9px;
+  border-left-color: rgba(18, 18, 24, 0.88);
+}
+
+.stage[data-theme="classic"] .gift-bubble--right .gift-bubble__tail {
+  left: -9px;
+  border-right-color: rgba(18, 18, 24, 0.88);
+}
+
+@keyframes giftBubbleInLeft {
+  from { opacity: 0; transform: translate(-100%, -50%) scale(0.9) translateX(-8px); }
+  to { opacity: 1; transform: translate(-100%, -50%) scale(1); }
+}
+
+@keyframes giftBubbleInRight {
+  from { opacity: 0; transform: translateY(-50%) scale(0.9) translateX(8px); }
+  to { opacity: 1; transform: translateY(-50%) scale(1); }
+}
+
+@keyframes giftBubbleOutLeft {
+  from { opacity: 1; transform: translate(-100%, -50%) scale(1); }
+  to { opacity: 0; transform: translate(-100%, calc(-50% - 10px)) scale(0.94); }
+}
+
+@keyframes giftBubbleOutRight {
+  from { opacity: 1; transform: translateY(-50%) scale(1); }
+  to { opacity: 0; transform: translateY(calc(-50% - 10px)) scale(0.94); }
+}

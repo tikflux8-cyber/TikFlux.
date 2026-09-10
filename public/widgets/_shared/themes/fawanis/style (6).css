@@ -1,0 +1,1245 @@
+        @import url('https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;700&family=Changa:wght@400;700&family=Amiri:wght@700&display=swap');
+
+        :root {
+            --gold-light: #fffacd;
+            --gold-base: #ffd700;
+            --gold-shadow: #b8860b;
+            --glass-bg: rgba(15, 10, 5, 0.25);
+            --neon-glow: 0 0 25px rgba(255, 215, 0, 0.5);
+        }
+
+        body {
+
+
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'El Messiri', sans-serif;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        .stage {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 10px;
+            padding-top: 20px;
+        }
+
+        /* ترتيب الفوانيس: 4-2 / 1 / 3-5 */
+        .fourth-rank { order: 1; }
+        .silver-rank { order: 2; }
+        .gold-rank { order: 3; }
+        .bronze-rank { order: 4; }
+        .fifth-rank { order: 5; }
+
+        /* --- تصميم هيكل الفانوس --- */
+        .fanoos-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 140px;
+            transform-origin: top center;
+            animation: sway 4s infinite ease-in-out alternate;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.8));
+        }
+
+        .rope {
+            width: 2.5px;
+            height: 150px;
+            background: linear-gradient(to bottom, 
+                transparent, 
+                rgba(139, 117, 19, 0.3) 10%,
+                rgba(139, 117, 19, 0.6) 50%,
+                #8b8913);
+            margin-bottom: -5px;
+            z-index: 1;
+            box-shadow: 
+                1px 0 2px rgba(0, 0, 0, 0.5),
+                inset 1px 0 1px rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+        }
+
+        /* رأس الفانوس */
+        .fanoos-top {
+            width: 65px;
+            height: 35px;
+            background: 
+                linear-gradient(180deg, 
+                    #d4af37 0%, 
+                    #f4d03f 20%, 
+                    #ffd700 40%,
+                    #daa520 80%, 
+                    #8b6914 100%);
+            border-radius: 50% 50% 0 0;
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.5),
+                0 5px 25px rgba(255, 215, 0, 0.4),
+                inset 0 -5px 10px rgba(0, 0, 0, 0.3),
+                inset 0 15px 20px rgba(255, 255, 255, 0.5),
+                inset -2px 0 3px rgba(139, 101, 8, 0.6),
+                inset 2px 0 3px rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: visible;
+        }
+
+        /* نقوش معدنية على القبة */
+        .fanoos-top::after {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border-radius: 50% 50% 0 0;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 4px,
+                rgba(139, 101, 8, 0.15) 4px,
+                rgba(139, 101, 8, 0.15) 5px
+            );
+            pointer-events: none;
+        }
+        
+        /* حلقة التعليق */
+        .fanoos-top::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            width: 12px;
+            height: 12px;
+            border: 2.5px solid #ffd700;
+            border-radius: 50%;
+            background: 
+                radial-gradient(circle at 30% 30%, 
+                    rgba(255, 255, 255, 0.4), 
+                    transparent 50%),
+                linear-gradient(135deg, #b8860b, #ffd700);
+            box-shadow: 
+                0 0 15px rgba(255, 215, 0, 0.6),
+                0 3px 10px rgba(0, 0, 0, 0.5),
+                inset -2px -2px 5px rgba(0, 0, 0, 0.3),
+                inset 2px 2px 5px rgba(255, 255, 255, 0.5);
+        }
+
+        /* جسم الفانوس (البطاقة) - شكل سداسي زجاجي واقعي */
+        .fanoos-body {
+            width: 110px;
+        
+            background: 
+                linear-gradient(135deg, 
+                    rgba(255, 248, 220, 0.08) 0%,
+                    rgba(255, 235, 180, 0.12) 25%,
+                    rgba(10, 5, 0, 0.4) 50%,
+                    rgba(255, 235, 180, 0.12) 75%,
+                    rgba(255, 248, 220, 0.08) 100%);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            /* شكل سداسي ممدود بزوايا منحنية ناعمة */
+            clip-path: polygon(
+                25% 0%,    /* أعلى يسار */
+                75% 0%,    /* أعلى يمين */
+                85% 5%,    /* بداية المنحنى */
+                92% 10%,   /* نقطة منحنى */
+                93% 13%,   /* نقطة منحنى */
+                100% 15%,  /* زاوية يمنى علوية */
+                100% 85%,  /* زاوية يمنى سفلية */
+                94% 87%,   /* نقطة منحنى */
+                92% 90%,   /* نقطة منحنى */
+                85% 95%,   /* نهاية المنحنى */
+                75% 100%, /* أسفل يمين */
+                25% 100%, /* أسفل يسار */
+                15% 95%,   /* بداية المنحنى */
+                8% 90%,    /* نقطة منحنى */
+                6% 87%,    /* نقطة منحنى */
+                0% 85%,   /* زاوية يسرى سفلية */
+                0% 15%,   /* زاوية يسرى علوية */
+                6% 13%,    /* نقطة منحنى */
+                8% 10%,    /* نقطة منحنى */
+                15% 5%     /* نهاية المنحنى */
+            );
+            border: none;
+            overflow: visible;
+            padding: 20px 10px 30px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            /* ظلال واقعية متعددة الطبقات */
+            box-shadow: 
+                /* ظل خارجي ناعم */
+                0 15px 50px rgba(0, 0, 0, 0.7),
+                0 8px 25px rgba(0, 0, 0, 0.5),
+                /* انعكاسات داخلية للزجاج */
+                inset 8px 0 20px rgba(255, 235, 180, 0.12),
+                inset -8px 0 20px rgba(255, 235, 180, 0.12),
+                inset 0 8px 25px rgba(255, 215, 0, 0.1),
+                inset 0 -15px 35px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* حواف معدنية للأضلاع الستة */
+        .fanoos-body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            clip-path: polygon(
+                25% 0%,
+                75% 0%,
+                85% 5%,
+                92% 10%,
+                96% 13%,
+                100% 15%,
+                100% 85%,
+                96% 87%,
+                92% 90%,
+                85% 95%,
+                75% 100%,
+                25% 100%,
+                15% 95%,
+                8% 90%,
+                4% 87%,
+                0% 85%,
+                0% 15%,
+                4% 13%,
+                8% 10%,
+                15% 5%
+            );
+            background: 
+                linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(255, 0, 0, 0.4) 2%,
+                    transparent 4%,
+                    transparent 24%,
+                    rgba(255, 0, 0, 0.45) 25%,
+                    transparent 26%,
+                    transparent 49%,
+                    rgba(255, 0, 0, 0.5) 50%,
+                    transparent 51%,
+                    transparent 74%,
+                    rgba(255, 0, 0, 0.45) 75%,
+                    transparent 76%,
+                    transparent 96%,
+                    rgba(255, 0, 0, 0.4) 98%,
+                    transparent 100%);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+
+
+        /* قاعدة الفانوس */
+        .fanoos-base {
+            width: 85px;
+            height: 20px;
+            background: 
+                linear-gradient(180deg, 
+                    #f4d03f 0%, 
+                    #ffd700 15%,
+                    #daa520 50%, 
+                    #b8860b 85%,
+                    #8b6914 100%);
+            border-radius: 0 0 12.5px 12.5px;
+            margin-top: -4px;
+            box-shadow: 
+                0 8px 20px rgba(0, 0, 0, 0.7),
+                0 15px 40px rgba(0, 0, 0, 0.5),
+                inset 0 3px 8px rgba(255, 255, 255, 0.4),
+                inset 0 -5px 15px rgba(0, 0, 0, 0.4),
+                inset 2px 0 4px rgba(139, 101, 8, 0.5),
+                inset -2px 0 4px rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* نقوش على القاعدة */
+        .fanoos-base::before {
+            content: '';
+            position: absolute;
+            inset: 5px 7.5px;
+            border-radius: 0 0 7.5px 7.5px;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 3px,
+                rgba(139, 101, 8, 0.2) 3px,
+                rgba(139, 101, 8, 0.2) 4px
+            );
+        }
+
+        /* حافة معدنية */
+        .fanoos-base::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 5px;
+            right: 5px;
+            height: 1.5px;
+            background: linear-gradient(90deg, 
+                transparent,
+                #ffffff 20%,
+                #ffffff 80%,
+                transparent);
+            border-radius: 1px;
+            box-shadow: 0 1px 2.5px rgba(0, 0, 0, 0.8);
+        }
+
+        /* --- محتوى البطاقة --- */
+        .avatar-glow-ring {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            padding: 2px;
+            background: 
+                conic-gradient(from 0deg, 
+                    transparent 0deg,
+                    rgba(255, 215, 0, 0.4) 60deg,
+                    #ffd700 120deg,
+                    rgba(255, 215, 0, 0.6) 180deg,
+                    #ffd700 240deg,
+                    rgba(255, 215, 0, 0.4) 300deg,
+                    transparent 360deg);
+            animation: none;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+            z-index: 5;
+        }
+
+        .avatar-glow-ring::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            background: 
+                radial-gradient(circle at 50% 50%,
+                    rgba(255, 215, 0, 0.3),
+                    transparent 70%);
+            filter: blur(10px);
+            z-index: -1;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1.5px solid rgba(255, 255, 255, 0.9);
+            background: #000;
+            z-index: 2;
+            position: relative;
+            box-shadow: 
+                0 0 20px rgba(255, 215, 0, 0.5),
+                inset 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .info {
+            text-align: center;
+            color: #fff;
+            z-index: 5;
+            position: relative;
+        }
+
+        .name {
+            font-size: 1.0rem;
+            font-weight: 800;
+            margin: 4px 0;
+            text-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.8),
+                0 0 20px rgba(255, 215, 0, 0.3);
+            letter-spacing: 0.5px;
+            /* منع تجاوز الاسم لأكثر من سطر */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .score-pill {
+            background: 
+                linear-gradient(90deg, 
+                    rgba(0, 0, 0, 0.6), 
+                    rgba(255, 215, 0, 0.2) 30%,
+                    rgba(255, 215, 0, 0.3) 50%, 
+                    rgba(255, 215, 0, 0.2) 70%,
+                    rgba(0, 0, 0, 0.6));
+            padding: 0px 6px;
+            border-radius: 10px;
+            font-family: 'Changa', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 
+                0 0 20px rgba(255, 215, 0, 1),
+                0 0 10px rgba(255, 215, 0, 0.8),
+                0 1.5px 4px rgba(0, 0, 0, 1),
+                0 0.5px 0 rgba(0, 0, 0, 0.9);
+            border: 1.5px solid rgba(255, 215, 0, 0.6);
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.7),
+                inset 0 2px 8px rgba(255, 255, 255, 0.3);
+        }
+
+        /* أيقونة الترتيب الماسية */
+        .rank-diamond {
+            position: absolute;
+            bottom: -12.5px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 21px;
+            height: 21px;
+            background: 
+                linear-gradient(135deg, 
+                    #ffffff 0%,
+                    #f0f0f0 25%,
+                    #d0d0d0 50%,
+                    #e8e8e8 75%,
+                    #ffffff 100%);
+            border: 1.5px solid #ffd700;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 
+                0 8px 20px rgba(255, 255, 255, 0.7),
+                0 4px 10px rgba(255, 255, 255, 0.4),
+                inset -3px -3px 8px rgba(0, 0, 0, 0.2),
+                inset 3px 3px 8px rgba(255, 255, 255, 0.8);
+            z-index: 5;
+            animation: diamondShine 3s ease-in-out infinite;
+        }
+
+
+
+        .rank-diamond span {
+            transform: rotate(-45deg);
+            font-weight: 900;
+            font-size: 0.65rem;
+            color: #1a1a1a;
+            text-shadow: 
+                1px 1px 2px rgba(255, 255, 255, 0.8),
+                -1px -1px 1px rgba(0, 0, 0, 0.3);
+            font-family: 'Amiri', serif;
+        }
+
+        /* --- تخصيصات المراكز --- */
+        
+        /* المركز الأول - ذهبي عملاق */
+        .gold-rank {
+            width: 160px;
+            z-index: 10;
+            margin-top: -10px;
+            animation-duration: 5.5s;
+        }
+
+        .gold-rank .rope { 
+            margin-top: 10px;
+            background: 
+                linear-gradient(to bottom, 
+                    transparent, 
+                    rgba(255, 238, 0, 0.2) 10%,
+                    rgba(189, 171, 14, 0.5) 50%,
+                    #cc9705);
+            height: 100px;
+        }        
+        .gold-rank .fanoos-top { 
+            width: 75px;
+            height: 40px;
+            background: 
+                linear-gradient(180deg, 
+                    #f9d77e 0%, 
+                    #ffd700 20%, 
+                    #f4d03f 40%,
+                    #daa520 70%, 
+                    #b8860b 100%);
+            box-shadow: 
+                0 3px 10px rgba(0, 0, 0, 0.6),
+                0 8px 35px rgba(255, 215, 0, 0.7),
+                inset 0 -8px 15px rgba(0, 0, 0, 0.4),
+                inset 0 20px 30px rgba(255, 255, 255, 0.6);
+        }
+        .gold-rank .fanoos-body { 
+            
+             width: 145px;
+            background: 
+                linear-gradient(135deg, 
+                    rgba(255, 248, 200, 0.12) 0%,
+                    rgba(255, 235, 150, 0.18) 25%,
+                    rgba(20, 15, 0, 0.35) 50%,
+                    rgba(255, 235, 150, 0.18) 75%,
+                    rgba(255, 248, 200, 0.12) 100%);
+            box-shadow: 
+                0 15px 50px rgba(0, 0, 0, 0.7),
+                0 8px 25px rgba(255, 215, 0, 0.3),
+                inset 5px 0 15px rgba(255, 235, 180, 0.15),
+                inset -5px 0 15px rgba(255, 235, 180, 0.15),
+                inset 0 8px 30px rgba(255, 215, 0, 0.12),
+                inset 0 -15px 40px rgba(0, 0, 0, 0.5);
+        }
+        .gold-rank .fanoos-body::before {
+
+            background: 
+                radial-gradient(ellipse at center bottom,
+                    rgba(255, 160, 50, 0.6) 0%,
+                    rgba(255, 200, 100, 0.35) 20%,
+                    rgba(255, 220, 150, 0.2) 40%,
+                    rgba(255, 235, 180, 0.12) 60%,
+                    transparent 85%);
+        }
+        .gold-rank .avatar-glow-ring { 
+            width: 65px; 
+            height: 65px;
+            filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.8));
+        }
+        .gold-rank .rank-diamond { 
+            background: 
+                linear-gradient(135deg, 
+                    #fff9e6 0%,
+                    #ffe89f 25%,
+                    #ffd700 50%,
+                    #ffed98 75%,
+                    #fff5c2 100%);
+            border-color: #fff; 
+            width: 26px; 
+            height: 26px;
+            
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.8),
+                0 5px 15px rgba(255, 215, 0, 0.6),
+                inset -4px -4px 10px rgba(218, 165, 32, 0.4),
+                inset 4px 4px 10px rgba(255, 255, 255, 1);
+        }
+
+        /* المركز الثاني - فضي */
+        .silver-rank {
+            
+            animation-delay: 1s;
+        }
+        .silver-rank .fanoos-top, .silver-rank .fanoos-base { 
+            background: 
+                linear-gradient(180deg, 
+                    #e8e8e8 0%, 
+                    #c0c0c0 30%,
+                    #a8a8a8 60%, 
+                    #909090 100%);
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.5),
+                0 5px 20px rgba(192, 192, 192, 0.5),
+                inset 0 -5px 10px rgba(0, 0, 0, 0.3),
+                inset 0 10px 20px rgba(255, 255, 255, 0.6);
+        }
+        .silver-rank .fanoos-top::before { 
+            border-color: #e0e0e0; 
+            background: 
+                radial-gradient(circle at 30% 30%, 
+                    rgba(255, 255, 255, 0.5), 
+                    transparent 50%),
+                linear-gradient(135deg, #a8a8a8, #e0e0e0);
+            box-shadow: 
+                0 0 15px rgba(192, 192, 192, 0.8),
+                0 3px 10px rgba(0, 0, 0, 0.5),
+                inset -2px -2px 5px rgba(0, 0, 0, 0.3),
+                inset 2px 2px 5px rgba(255, 255, 255, 0.6);
+        }
+        .silver-rank .fanoos-body { 
+            border-color: rgba(192, 192, 192, 0.5);
+            background: 
+                linear-gradient(135deg, 
+                    rgba(224, 224, 224, 0.08) 0%,
+                    rgba(200, 200, 200, 0.12) 25%,
+                    rgba(10, 10, 15, 0.4) 50%,
+                    rgba(200, 200, 200, 0.12) 75%,
+                    rgba(224, 224, 224, 0.08) 100%);
+        }
+        .silver-rank .fanoos-body::before {
+            background: 
+                radial-gradient(ellipse at center bottom,
+                    rgba(180, 180, 200, 0.4) 0%,
+                    rgba(200, 200, 220, 0.25) 20%,
+                    rgba(220, 220, 240, 0.15) 40%,
+                    rgba(230, 230, 245, 0.08) 60%,
+                    transparent 80%);
+        }
+        .silver-rank .avatar-glow-ring { 
+            background: 
+                conic-gradient(from 0deg, 
+                    transparent 0deg,
+                    rgba(192, 192, 192, 0.4) 60deg,
+                    #c0c0c0 120deg,
+                    rgba(192, 192, 192, 0.6) 180deg,
+                    #c0c0c0 240deg,
+                    rgba(192, 192, 192, 0.4) 300deg,
+                    transparent 360deg);
+            filter: drop-shadow(0 0 15px rgba(192, 192, 192, 0.6));
+        }
+        .silver-rank .score-pill { 
+            color: #fff; 
+            text-shadow: 
+                0 0 20px rgba(192, 192, 192, 1),
+                0 0 10px rgba(192, 192, 192, 0.8),
+                0 3px 8px rgba(0, 0, 0, 1),
+                0 1px 0 rgba(0, 0, 0, 0.9);
+            border-color: rgba(192, 192, 192, 0.6);
+            
+            background: 
+                linear-gradient(90deg, 
+                    rgba(0, 0, 0, 0.6), 
+                    rgba(192, 192, 192, 0.2) 30%,
+                    rgba(192, 192, 192, 0.3) 50%, 
+                    rgba(192, 192, 192, 0.2) 70%,
+                    rgba(0, 0, 0, 0.6));
+        }
+        .silver-rank .rank-diamond { 
+            background: 
+                linear-gradient(135deg, 
+                    #f5f5f5 0%,
+                    #e0e0e0 25%,
+                    #c8c8c8 50%,
+                    #e0e0e0 75%,
+                    #ffffff 100%);
+            border-color: #a8a8a8;
+            box-shadow: 
+                0 8px 20px rgba(0, 0, 0, 0.7),
+                0 4px 10px rgba(192, 192, 192, 0.4),
+                inset -3px -3px 8px rgba(0, 0, 0, 0.2),
+                inset 3px 3px 8px rgba(255, 255, 255, 0.9);
+        }
+
+
+        .silver-rank .rope { 
+            background: 
+                linear-gradient(to bottom, 
+                    transparent, 
+                    rgba(128, 128, 128, 0.2) 10%,
+                    rgba(117, 112, 109, 0.5) 50%,
+                    #555454);
+            height: 150px;
+        }
+
+        /* المركز الثالث - برونزي */
+        .bronze-rank {
+            
+            animation-delay: 2s;
+        }
+        .bronze-rank .fanoos-top, .bronze-rank .fanoos-base { 
+            background: 
+                linear-gradient(180deg, 
+                    #e29a5c 0%, 
+                    #cd7f32 30%,
+                    #b87333 60%, 
+                    #965a2e 100%);
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.5),
+                0 5px 20px rgba(205, 127, 50, 0.5),
+                inset 0 -5px 10px rgba(0, 0, 0, 0.3),
+                inset 0 10px 20px rgba(255, 200, 150, 0.4);
+        }
+        .bronze-rank .fanoos-top::before { 
+            border-color: #cd7f32; 
+            background: 
+                radial-gradient(circle at 30% 30%, 
+                    rgba(255, 200, 150, 0.5), 
+                    transparent 50%),
+                linear-gradient(135deg, #965a2e, #cd7f32);
+            box-shadow: 
+                0 0 15px rgba(205, 127, 50, 0.8),
+                0 3px 10px rgba(0, 0, 0, 0.5),
+                inset -2px -2px 5px rgba(0, 0, 0, 0.3),
+                inset 2px 2px 5px rgba(255, 200, 150, 0.5);
+        }
+        .bronze-rank .fanoos-body { 
+            border-color: rgba(205, 127, 50, 0.5);
+            background: 
+                linear-gradient(135deg, 
+                    rgba(226, 154, 92, 0.08) 0%,
+                    rgba(205, 127, 50, 0.12) 25%,
+                    rgba(15, 10, 5, 0.4) 50%,
+                    rgba(205, 127, 50, 0.12) 75%,
+                    rgba(226, 154, 92, 0.08) 100%);
+        }
+        .bronze-rank .fanoos-body::before {
+            background: 
+                radial-gradient(ellipse at center bottom,
+                    rgba(205, 127, 50, 0.4) 0%,
+                    rgba(226, 154, 92, 0.25) 20%,
+                    rgba(240, 180, 120, 0.15) 40%,
+                    rgba(250, 200, 150, 0.08) 60%,
+                    transparent 80%);
+        }
+        .bronze-rank .avatar-glow-ring { 
+            background: 
+                conic-gradient(from 0deg, 
+                    transparent 0deg,
+                    rgba(205, 127, 50, 0.4) 60deg,
+                    #cd7f32 120deg,
+                    rgba(205, 127, 50, 0.6) 180deg,
+                    #cd7f32 240deg,
+                    rgba(205, 127, 50, 0.4) 300deg,
+                    transparent 360deg);
+            filter: drop-shadow(0 0 15px rgba(205, 127, 50, 0.6));
+        }
+        .bronze-rank .score-pill { 
+            color: #fff; 
+            text-shadow: 
+                0 0 20px rgba(205, 127, 50, 1),
+                0 0 10px rgba(205, 127, 50, 0.8),
+                0 3px 8px rgba(0, 0, 0, 1),
+                0 1px 0 rgba(0, 0, 0, 0.9);
+            border-color: rgba(205, 127, 50, 0.6);
+           
+            background: 
+                linear-gradient(90deg, 
+                    rgba(0, 0, 0, 0.6), 
+                    rgba(205, 127, 50, 0.2) 30%,
+                    rgba(205, 127, 50, 0.3) 50%, 
+                    rgba(205, 127, 50, 0.2) 70%,
+                    rgba(0, 0, 0, 0.6));
+        }
+        .bronze-rank .rank-diamond { 
+            background: 
+                linear-gradient(135deg, 
+                    #f5d5b5 0%,
+                    #e29a5c 25%,
+                    #cd7f32 50%,
+                    #e29a5c 75%,
+                    #f5d5b5 100%);
+            border-color: #965a2e;
+            box-shadow: 
+                0 8px 20px rgba(0, 0, 0, 0.7),
+                0 4px 10px rgba(205, 127, 50, 0.4),
+                inset -3px -3px 8px rgba(0, 0, 0, 0.2),
+                inset 3px 3px 8px rgba(255, 200, 150, 0.6);
+        }
+        .bronze-rank .rope { 
+            background: 
+                linear-gradient(to bottom, 
+                    transparent, 
+                    rgba(139, 69, 19, 0.2) 10%,
+                    rgba(139, 69, 19, 0.5) 50%,
+                    #8b4513);
+            height: 150px;
+        }
+
+        /* المركز الرابع - أخضر زمردي */
+        .fourth-rank {
+            width: 125px;
+            animation-delay: 3s;
+        }
+        .fourth-rank .rope { 
+            background: 
+                linear-gradient(to bottom, 
+                    transparent, 
+                    rgba(34, 139, 34, 0.2) 10%,
+                    rgba(34, 139, 34, 0.5) 50%,
+                    #228b22);
+            height: 175px;
+        }
+        .fourth-rank .fanoos-top, .fourth-rank .fanoos-base { 
+            background: 
+                linear-gradient(180deg, 
+                    #90ee90 0%, 
+                    #50c878 30%,
+                    #3cb371 60%, 
+                    #2e8b57 100%);
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.5),
+                0 5px 20px rgba(80, 200, 120, 0.5),
+                inset 0 -5px 10px rgba(0, 0, 0, 0.3),
+                inset 0 10px 20px rgba(144, 238, 144, 0.4);
+        }
+        .fourth-rank .fanoos-top::before { 
+            border-color: #50c878; 
+            background: 
+                radial-gradient(circle at 30% 30%, 
+                    rgba(144, 238, 144, 0.5), 
+                    transparent 50%),
+                linear-gradient(135deg, #2e8b57, #50c878);
+            box-shadow: 
+                0 0 15px rgba(80, 200, 120, 0.8),
+                0 3px 10px rgba(0, 0, 0, 0.5),
+                inset -2px -2px 5px rgba(0, 0, 0, 0.3),
+                inset 2px 2px 5px rgba(144, 238, 144, 0.5);
+        }
+        .fourth-rank .fanoos-body { 
+            width: 90px;
+            height: 125px;
+            border-color: rgba(80, 200, 120, 0.5);
+            background: 
+                linear-gradient(135deg, 
+                    rgba(144, 238, 144, 0.08) 0%,
+                    rgba(80, 200, 120, 0.12) 25%,
+                    rgba(10, 20, 10, 0.4) 50%,
+                    rgba(80, 200, 120, 0.12) 75%,
+                    rgba(144, 238, 144, 0.08) 100%);
+        }
+        .fourth-rank .fanoos-body::before {
+            background: 
+                radial-gradient(ellipse at center bottom,
+                    rgba(80, 200, 120, 0.4) 0%,
+                    rgba(100, 220, 140, 0.25) 20%,
+                    rgba(120, 240, 160, 0.15) 40%,
+                    rgba(140, 250, 180, 0.08) 60%,
+                    transparent 80%);
+        }
+        .fourth-rank .avatar-glow-ring { 
+            background: 
+                conic-gradient(from 0deg, 
+                    transparent 0deg,
+                    rgba(80, 200, 120, 0.4) 60deg,
+                    #50c878 120deg,
+                    rgba(80, 200, 120, 0.6) 180deg,
+                    #50c878 240deg,
+                    rgba(80, 200, 120, 0.4) 300deg,
+                    transparent 360deg);
+            filter: drop-shadow(0 0 15px rgba(80, 200, 120, 0.6));
+        }
+        .fourth-rank .score-pill { 
+            color: #fff; 
+            font-size: 0.8rem;
+            text-shadow: 
+                0 0 20px rgba(80, 200, 120, 1),
+                0 0 10px rgba(80, 200, 120, 0.8),
+                0 3px 8px rgba(0, 0, 0, 1),
+                0 1px 0 rgba(0, 0, 0, 0.9);
+            border-color: rgba(80, 200, 120, 0.6);
+            
+            background: 
+                linear-gradient(90deg, 
+                    rgba(0, 0, 0, 0.6), 
+                    rgba(80, 200, 120, 0.2) 30%,
+                    rgba(80, 200, 120, 0.3) 50%, 
+                    rgba(80, 200, 120, 0.2) 70%,
+                    rgba(0, 0, 0, 0.4));
+        }
+        .fourth-rank .rank-diamond { 
+            background: 
+                linear-gradient(135deg, 
+                    #e8f5e9 0%,
+                    #90ee90 25%,
+                    #50c878 50%,
+                    #90ee90 75%,
+                    #e8f5e9 100%);
+            border-color: #2e8b57;
+            box-shadow: 
+                0 8px 20px rgba(0, 0, 0, 0.7),
+                0 4px 10px rgba(80, 200, 120, 0.4),
+                inset -3px -3px 8px rgba(0, 0, 0, 0.2),
+                inset 3px 3px 8px rgba(144, 238, 144, 0.6);
+        }
+        .fourth-rank .fanoos-body .metal-frame {
+            background: linear-gradient(45deg,
+                rgba(80,200,120,0.28) 0%,
+                rgba(60,180,100,0.55) 25%,
+                rgba(40,160,80,0.9) 50%,
+                rgba(60,180,100,0.55) 75%,
+                rgba(80,200,120,0.28) 100%);
+            box-shadow:
+                inset 0 0 18px rgba(70,190,110,0.22),
+                0 0 12px rgba(50,170,90,0.18);
+        }
+
+        /* المركز الخامس - بنفسجي */
+        .fifth-rank {
+            width: 125px;
+            animation-delay: 4s;
+        }
+        .fifth-rank .rope { 
+            background: 
+                linear-gradient(to bottom, 
+                    transparent, 
+                    rgba(128, 0, 128, 0.2) 10%,
+                    rgba(128, 0, 128, 0.5) 50%,
+                    #800080);
+            height: 175px;
+        }
+        .fifth-rank .fanoos-top, .fifth-rank .fanoos-base { 
+            background: 
+                linear-gradient(180deg, 
+                    #dda0dd 0%, 
+                    #ba55d3 30%,
+                    #9370db 60%, 
+                    #8b008b 100%);
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.5),
+                0 5px 20px rgba(186, 85, 211, 0.5),
+                inset 0 -5px 10px rgba(0, 0, 0, 0.3),
+                inset 0 10px 20px rgba(221, 160, 221, 0.4);
+        }
+        .fifth-rank .fanoos-top::before { 
+            border-color: #ba55d3; 
+            background: 
+                radial-gradient(circle at 30% 30%, 
+                    rgba(221, 160, 221, 0.5), 
+                    transparent 50%),
+                linear-gradient(135deg, #8b008b, #ba55d3);
+            box-shadow: 
+                0 0 15px rgba(186, 85, 211, 0.8),
+                0 3px 10px rgba(0, 0, 0, 0.5),
+                inset -2px -2px 5px rgba(0, 0, 0, 0.3),
+                inset 2px 2px 5px rgba(221, 160, 221, 0.5);
+        }
+        .fifth-rank .fanoos-body { 
+            width: 90px;
+            height: 125px;
+            border-color: rgba(186, 85, 211, 0.5);
+            background: 
+                linear-gradient(135deg, 
+                    rgba(221, 160, 221, 0.08) 0%,
+                    rgba(186, 85, 211, 0.12) 25%,
+                    rgba(20, 10, 20, 0.4) 50%,
+                    rgba(186, 85, 211, 0.12) 75%,
+                    rgba(221, 160, 221, 0.08) 100%);
+        }
+        .fifth-rank .fanoos-body::before {
+            background: 
+                radial-gradient(ellipse at center bottom,
+                    rgba(186, 85, 211, 0.4) 0%,
+                    rgba(200, 100, 220, 0.25) 20%,
+                    rgba(210, 120, 230, 0.15) 40%,
+                    rgba(220, 140, 240, 0.08) 60%,
+                    transparent 80%);
+        }
+        .fifth-rank .avatar-glow-ring { 
+            background: 
+                conic-gradient(from 0deg, 
+                    transparent 0deg,
+                    rgba(186, 85, 211, 0.4) 60deg,
+                    #ba55d3 120deg,
+                    rgba(186, 85, 211, 0.6) 180deg,
+                    #ba55d3 240deg,
+                    rgba(186, 85, 211, 0.4) 300deg,
+                    transparent 360deg);
+            filter: drop-shadow(0 0 15px rgba(186, 85, 211, 0.6));
+        }
+        .fifth-rank .score-pill { 
+            color: #fff; 
+            font-size: 0.8rem;
+            text-shadow: 
+                0 0 20px rgba(186, 85, 211, 1),
+                0 0 10px rgba(186, 85, 211, 0.8),
+                0 3px 8px rgba(0, 0, 0, 1),
+                0 1px 0 rgba(0, 0, 0, 0.9);
+            border-color: rgba(186, 85, 211, 0.6);
+            
+            background: 
+                linear-gradient(90deg, 
+                    rgba(0, 0, 0, 0.6), 
+                    rgba(186, 85, 211, 0.2) 30%,
+                    rgba(186, 85, 211, 0.3) 50%, 
+                    rgba(186, 85, 211, 0.2) 70%,
+                    rgba(0, 0, 0, 0.4));
+        }
+        .fifth-rank .rank-diamond { 
+            background: 
+                linear-gradient(135deg, 
+                    #f3e5f5 0%,
+                    #dda0dd 25%,
+                    #ba55d3 50%,
+                    #dda0dd 75%,
+                    #f3e5f5 100%);
+            border-color: #8b008b;
+            box-shadow: 
+                0 8px 20px rgba(0, 0, 0, 0.7),
+                0 4px 10px rgba(186, 85, 211, 0.4),
+                inset -3px -3px 8px rgba(0, 0, 0, 0.2),
+                inset 3px 3px 8px rgba(221, 160, 221, 0.6);
+        }
+        .fifth-rank .fanoos-body .metal-frame {
+            background: linear-gradient(45deg,
+                rgba(186,85,211,0.28) 0%,
+                rgba(160,70,190,0.55) 25%,
+                rgba(140,60,170,0.9) 50%,
+                rgba(160,70,190,0.55) 75%,
+                rgba(186,85,211,0.28) 100%);
+            box-shadow:
+                inset 0 0 18px rgba(176,80,200,0.22),
+                0 0 12px rgba(150,65,180,0.18);
+        }
+
+
+        /* أيقونات SVG التجميلية داخل الفانوس */
+        .decoration-icon {
+            position: absolute;
+            opacity: 0.25;
+            z-index: 4;
+            fill: currentColor;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+        }
+        .moon-icon { 
+            top: 15px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            width: 17.5px;
+        }
+        .star-icon { 
+            bottom: 40px; 
+            right: 17.5px; 
+            width: 12px; 
+            animation: twinkle 2.5s infinite;
+        }
+
+        /* أضلاع معدنية عمودية */
+        .vertical-edges {
+            position: absolute;
+            inset: 0;
+            clip-path: polygon(
+                25% 0%,
+                75% 0%,
+                85% 5%,
+                92% 10%,
+                96% 13%,
+                100% 15%,
+                100% 85%,
+                96% 87%,
+                92% 90%,
+                85% 95%,
+                75% 100%,
+                25% 100%,
+                15% 95%,
+                8% 90%,
+                4% 87%,
+                0% 85%,
+                0% 15%,
+                4% 13%,
+                8% 10%,
+                15% 5%
+            );
+            z-index: 13;
+            pointer-events: none;
+        }
+
+        .vertical-edges::before,
+        .vertical-edges::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: linear-gradient(180deg,
+                rgba(255, 215, 0, 0.4) 0%,
+                rgba(255, 215, 0, 0.7) 15%,
+                rgba(184, 134, 11, 0.8) 50%,
+                rgba(255, 215, 0, 0.7) 85%,
+                rgba(255, 215, 0, 0.4) 100%);
+            box-shadow: 
+                0 0 8px rgba(255, 215, 0, 0.5),
+                inset 0 0 3px rgba(255, 255, 255, 0.4);
+        }
+
+        .vertical-edges::before {
+            left: 25%;
+            transform: skewY(8deg);
+        }
+
+        .vertical-edges::after {
+            right: 25%;
+            transform: skewY(-8deg);
+        }
+
+        /* إطار معدني سداسي */
+        .fanoos-body .metal-frame {
+            position: absolute;
+            inset: 0;
+            clip-path: polygon(
+                25% 0%,    /* أعلى يسار */
+                75% 0%,    /* أعلى يمين */
+                85% 5%,    /* بداية المنحنى */
+                92% 10%,   /* نقطة منحنى */
+                93% 13%,   /* نقطة منحنى */
+                100% 15%,  /* زاوية يمنى علوية */
+                100% 85%,  /* زاوية يمنى سفلية */
+                94% 87%,   /* نقطة منحنى */
+                92% 90%,   /* نقطة منحنى */
+                85% 95%,   /* نهاية المنحنى */
+                75% 100%, /* أسفل يمين */
+                25% 100%, /* أسفل يسار */
+                15% 95%,   /* بداية المنحنى */
+                8% 90%,    /* نقطة منحنى */
+                6% 87%,    /* نقطة منحنى */
+                0% 85%,   /* زاوية يسرى سفلية */
+                0% 15%,   /* زاوية يسرى علوية */
+                6% 13%,    /* نقطة منحنى */
+                8% 10%,    /* نقطة منحنى */
+                15% 5%     /* نهاية المنحنى */
+            );
+            
+            background: 
+                linear-gradient(45deg,
+                    rgba(255, 215, 0, 0.3) 0%,
+                    rgba(255, 215, 0, 0.6) 12.5%,
+                    rgba(184, 134, 11, 0.8) 25%,
+                    rgba(255, 215, 0, 0.6) 37.5%,
+                    rgba(255, 215, 0, 0.3) 50%,
+                    rgba(255, 215, 0, 0.6) 62.5%,
+                    rgba(184, 134, 11, 0.8) 75%,
+                    rgba(255, 215, 0, 0.6) 87.5%,
+                    rgba(255, 215, 0, 0.3) 100%);
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            padding: 1.5px;
+            pointer-events: none;
+            z-index: 15;
+            box-shadow: 
+                inset 0 0 20px rgba(255, 215, 0, 0.4),
+                0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Silver frame for 2nd place */
+        .silver-rank .fanoos-body .metal-frame {
+            background: linear-gradient(45deg,
+                rgba(230,230,235,0.28) 0%,
+                rgba(200,200,205,0.55) 25%,
+                rgba(160,160,165,0.9) 50%,
+                rgba(200,200,205,0.55) 75%,
+                rgba(230,230,235,0.28) 100%);
+            box-shadow:
+                inset 0 0 18px rgba(220,220,225,0.28),
+                0 0 12px rgba(200,200,205,0.18);
+        }
+
+        /* Bronze frame for 3rd place */
+        .bronze-rank .fanoos-body .metal-frame {
+            background: linear-gradient(45deg,
+                rgba(205,127,50,0.28) 0%,
+                rgba(165,100,40,0.55) 25%,
+                rgba(120,70,30,0.9) 50%,
+                rgba(165,100,40,0.55) 75%,
+                rgba(205,127,50,0.28) 100%);
+            box-shadow:
+                inset 0 0 18px rgba(190,110,55,0.22),
+                0 0 12px rgba(160,90,40,0.18);
+        }
+
+
+
+        /* خطوط انعكاس الزجاج */
+        .fanoos-body .center-strip {
+            position: absolute;
+            inset: 0;
+            clip-path: polygon(
+                25% 0%,
+                75% 0%,
+                85% 5%,
+                92% 10%,
+                96% 13%,
+                100% 15%,
+                100% 85%,
+                96% 87%,
+                92% 90%,
+                85% 95%,
+                75% 100%,
+                25% 100%,
+                15% 95%,
+                8% 90%,
+                4% 87%,
+                0% 85%,
+                0% 15%,
+                4% 13%,
+                8% 10%,
+                15% 5%
+            );
+            background: 
+                linear-gradient(135deg,
+                    rgba(255, 255, 255, 0.15) 0%,
+                    transparent 20%,
+                    transparent 40%,
+                    rgba(255, 255, 255, 0.08) 50%,
+                    transparent 60%,
+                    transparent 80%,
+                    rgba(255, 255, 255, 0.12) 100%);
+            pointer-events: none;
+            z-index: 14;
+            mix-blend-mode: overlay;
+        }
+
+        /* Animations */
+        @keyframes sway {
+            0%, 100% { transform: rotate(-2.5deg); }
+            50% { transform: rotate(2.5deg); }
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes twinkle {
+            0%, 100% { 
+                opacity: 0.15; 
+                transform: scale(1) rotate(0deg);
+            }
+            50% { 
+                opacity: 0.4; 
+                transform: scale(1.3) rotate(180deg);
+            }
+        }
+
+        @keyframes candleGlow {
+            0%, 100% {
+                opacity: 0.6;
+                transform: translateX(-50%) scale(1);
+            }
+            50% {
+                opacity: 0.9;
+                transform: translateX(-50%) scale(1.1);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.15);
+            }
+        }
+
+        @keyframes diamondShine {
+            0%, 100% {
+                box-shadow: 
+                    0 8px 20px rgba(0, 0, 0, 0.7),
+                    0 4px 10px rgba(255, 215, 0, 0.4),
+                    inset -3px -3px 8px rgba(0, 0, 0, 0.2),
+                    inset 3px 3px 8px rgba(255, 255, 255, 0.8);
+            }
+            50% {
+                box-shadow: 
+                    0 8px 25px rgba(0, 0, 0, 0.8),
+                    0 4px 15px rgba(255, 215, 0, 0.7),
+                    inset -3px -3px 8px rgba(0, 0, 0, 0.2),
+                    inset 3px 3px 12px rgba(255, 255, 255, 1);
+            }
+        }
+
+        /* تأثيرات hover */
+        .fanoos-container:hover {
+            animation-play-state: paused;
+        }
+
+        .fanoos-container:hover .fanoos-body {
+            transform: scale(1.02);
+            box-shadow: 
+                0 15px 50px rgba(0, 0, 0, 0.8),
+                0 8px 20px rgba(255, 215, 0, 0.4),
+                inset 6px 0 15px rgba(255, 235, 180, 0.15),
+                inset -6px 0 15px rgba(255, 235, 180, 0.15),
+                inset 0 6px 25px rgba(255, 215, 0, 0.15),
+                inset 0 -15px 45px rgba(0, 0, 0, 0.6);
+        }
+
+        .fanoos-container:hover .avatar-glow-ring {
+            animation-duration: 2s;
+        }

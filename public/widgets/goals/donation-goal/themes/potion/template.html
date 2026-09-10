@@ -1,0 +1,79 @@
+<div id="donation-goal-theme-root" class="donation-goal-theme-panel is-active" data-theme="potion">
+  <div class="potion-scene">
+    <div class="potion-compose">
+      <!-- DOM order matches original Potion Bottle widget (glass layers + liquid coords) -->
+      <div class="potion-bottle" id="potion-container">
+        <img class="front" src="/widgets/goals/like-goal/themes/potion/assets/bottle.webp" alt="" decoding="async" fetchpriority="high" />
+        <div class="bow-wrap">
+          <img class="bow-face" src="/widgets/goals/like-goal/themes/potion/assets/bow.webp" alt="" decoding="async" fetchpriority="low" />
+        </div>
+
+        <div class="liquid">
+          <div class="mask">
+            <svg width="0" height="0" viewBox="0 0 200 200" style="position:absolute" aria-hidden="true">
+              <defs>
+                <clipPath id="liquidmask">
+                  <path
+                    transform="translate(-2.1 0.000000) scale(0.80)"
+                    d="M247.66,120c0,63.32-51.33,114.66-114.66,114.66S18.34,183.32,18.34,120S69.68,5.34,133,5.34S247.66,56.68,247.66,120z"
+                  />
+                </clipPath>
+              </defs>
+            </svg>
+
+            <div class="liquid-rect-wrap liquid-rect-wrap-back" id="liquid-rect-wrap-back">
+              <svg id="svg-element-back" viewBox="0 0 224 251">
+                <path id="liquid-path-back" fill="rgb(254, 255, 254)"></path>
+              </svg>
+            </div>
+
+            <div class="liquid-rect-wrap" id="liquid-rect-wrap">
+              <svg id="svg-element" viewBox="0 0 224 251">
+                <defs>
+                  <linearGradient id="front-gradient-2" x1="0%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" stop-color="#8D72AA"></stop>
+                    <stop offset="100%" stop-color="#f3cdf5"></stop>
+                  </linearGradient>
+                </defs>
+                <path id="liquid-path" fill="url(#front-gradient-2)"></path>
+              </svg>
+            </div>
+
+            <div class="liquid-stroke-wrap" id="liquid-stroke-wrap">
+              <svg id="svg-element-stroke" viewBox="0 0 224 251">
+                <path id="liquid-path-stroke"></path>
+              </svg>
+            </div>
+
+            <div class="particle-layer" id="particle-layer"></div>
+          </div>
+        </div>
+
+        <div class="back">
+          <svg xmlns="http://www.w3.org/2000/svg" width="266.66666" height="240" viewBox="0 0 266.66666 240" aria-hidden="true">
+            <g>
+              <path
+                transform="translate(-2 40.000000) scale(0.76)"
+                style="fill:#000000;fill-opacity:0.1;stroke-width:8;stroke-linecap:round"
+                d="M247.66,120c0,63.32-51.33,114.66-114.66,114.66S18.34,183.32,18.34,120S69.68,5.34,133,5.34S247.66,56.68,247.66,120z"
+              />
+            </g>
+          </svg>
+        </div>
+
+        <div class="heart-wrap">
+          <span class="heart h1"><svg viewBox="0 0 32 29" aria-hidden="true"><path d="M73.18,50c0,12.8-10.38,23.18-23.18,23.18S26.82,62.8,26.82,50S37.2,26.82,50,26.82S73.18,37.2,73.18,50z"></path></svg></span>
+          <span class="heart h2"><svg viewBox="0 0 32 29" aria-hidden="true"><path d="M73.18,50c0,12.8-10.38,23.18-23.18,23.18S26.82,62.8,26.82,50S37.2,26.82,50,26.82S73.18,37.2,73.18,50z"></path></svg></span>
+          <span class="heart h3"><svg viewBox="0 0 32 29" aria-hidden="true"><path d="M73.18,50c0,12.8-10.38,23.18-23.18,23.18S26.82,62.8,26.82,50S37.2,26.82,50,26.82S73.18,37.2,73.18,50z"></path></svg></span>
+          <span class="heart h4"><svg viewBox="0 0 32 29" aria-hidden="true"><path d="M73.18,50c0,12.8-10.38,23.18-23.18,23.18S26.82,62.8,26.82,50S37.2,26.82,50,26.82S73.18,37.2,73.18,50z"></path></svg></span>
+          <span class="heart h5"><svg viewBox="0 0 32 29" aria-hidden="true"><path d="M73.18,50c0,12.8-10.38,23.18-23.18,23.18S26.82,62.8,26.82,50S37.2,26.82,50,26.82S73.18,37.2,73.18,50z"></path></svg></span>
+        </div>
+      </div>
+
+      <div class="potion-label textGlowing">
+        <span class="potion-goal-title">Donation Goal</span>
+        <span class="potion-goal-counter">$0 / $500</span>
+      </div>
+    </div>
+  </div>
+</div>

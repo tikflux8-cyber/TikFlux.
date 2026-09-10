@@ -1,0 +1,642 @@
+@font-face {
+  font-family: 'Roadster';
+  src: url('../../../assets/fonts/ROADSTER.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* الافتراضي أحمر (hue 0) — العجلة تدور على كامل الطيف عبر --le-h */
+:root {
+  --le-h: 0;
+  --le-s: 92%;
+  --le-l: 50%;
+  --le-main: hsl(var(--le-h), var(--le-s), var(--le-l));
+  --le-light: hsl(var(--le-h), 100%, 78%);
+  --le-dark: hsl(var(--le-h), 75%, 22%);
+  --le-label-text: hsl(var(--le-h), 55%, 97%);
+  --le-label-glow: hsla(var(--le-h), 100%, 75%, 0.85);
+  --le-glow-90: hsla(var(--le-h), var(--le-s), var(--le-l), 0.9);
+  --le-glow-80: hsla(var(--le-h), var(--le-s), var(--le-l), 0.8);
+  --le-glow-70: hsla(var(--le-h), var(--le-s), var(--le-l), 0.7);
+  --le-glow-60: hsla(var(--le-h), var(--le-s), var(--le-l), 0.6);
+  --le-glow-50: hsla(var(--le-h), var(--le-s), var(--le-l), 0.5);
+  --le-border-50: hsla(var(--le-h), var(--le-s), var(--le-l), 0.5);
+  --le-bg-12: hsla(var(--le-h), var(--le-s), var(--le-l), 0.12);
+  --le-shadow-25: hsla(var(--le-h), var(--le-s), var(--le-l), 0.25);
+  /* الإطار: الأساس rgb(202,123,123) → hue 0°، تشبع مرفوع لأن الأصل باهت */
+  --le-frame-base-h: 0;
+  --le-frame-s: 90%;
+  --le-frame-l: 52%;
+  --le-frame-img-saturate: 5.55;
+  --le-frame-brightness: 1;
+  --le-frame-rotate: calc((var(--le-h) - var(--le-frame-base-h)) * 1deg);
+  --le-frame-glow-50: hsla(var(--le-h), var(--le-frame-s), var(--le-frame-l), 0.5);
+  --le-frame-glow-40: hsla(var(--le-h), var(--le-frame-s), var(--le-frame-l), 0.4);
+  --le-frame-glow-35: hsla(var(--le-h), var(--le-frame-s), var(--le-frame-l), 0.35);
+  --le-frame-glow-25: hsla(var(--le-h), var(--le-frame-s), var(--le-frame-l), 0.25);
+  --le-frame-glow-70: hsla(var(--le-h), var(--le-frame-s), var(--le-frame-l), 0.7);
+  /* فراشة: grayscale→sepia→hue-rotate لتوحيد كل ألوان PNG بلون accent واحد */
+  --le-frame-butterfly-sepia-h: 38;
+  --le-frame-butterfly-tint-saturate: 4.5;
+  --le-frame-butterfly-tint-hue: calc((var(--le-h) - var(--le-frame-butterfly-sepia-h)) * 1deg);
+  /* نار: الأساس برتقالي ناري ≈ hsl(28, 100%, 55%) */
+  --le-frame-fire-base-h: 28;
+  --le-frame-fire-rotate: calc((var(--le-h) - var(--le-frame-fire-base-h)) * 1deg);
+  /* لومي: التوهج الزهري الأساسي ≈ hsl(333, 94%, 79%) من Lumi.png */
+  --le-frame-lumi-base-h: 333;
+  --le-frame-lumi-rotate: calc((var(--le-h) - var(--le-frame-lumi-base-h)) * 1deg);
+  /* سبيريت: الأزرق البحري الأساسي ≈ hsl(185, 70%, 63%) من Spirit.png */
+  --le-frame-spirit-base-h: 185;
+  --le-frame-spirit-rotate: calc((var(--le-h) - var(--le-frame-spirit-base-h)) * 1deg);
+  /* مونلايت: الأزرق القمري ≈ hsl(211, 49%, 71%) من Moonlight.png */
+  --le-frame-moonlight-base-h: 211;
+  --le-frame-moonlight-rotate: calc((var(--le-h) - var(--le-frame-moonlight-base-h)) * 1deg);
+  /* نيكرولورد: الأزرق السماوي ≈ hsl(180, 67%, 63%) من Necrolord.png */
+  --le-frame-necrolord-base-h: 180;
+  --le-frame-necrolord-rotate: calc((var(--le-h) - var(--le-frame-necrolord-base-h)) * 1deg);
+  /* توينستارز: الزهري الأساسي ≈ hsl(332, 80%, 77%) من Twinstars.png */
+  --le-frame-twinstars-base-h: 332;
+  --le-frame-twinstars-rotate: calc((var(--le-h) - var(--le-frame-twinstars-base-h)) * 1deg);
+  /* بوتشاكو: البنفسجي الأساسي ≈ hsl(270) من Pochacco.png */
+  --le-frame-pochacco-base-h: 270;
+  --le-frame-pochacco-rotate: calc((var(--le-h) - var(--le-frame-pochacco-base-h)) * 1deg);
+  /* رينبو: الزهري الأساسي ≈ hsl(306, 57%, 75%) من Rainbow.png */
+  --le-frame-rainbow-base-h: 306;
+  --le-frame-rainbow-rotate: calc((var(--le-h) - var(--le-frame-rainbow-base-h)) * 1deg);
+  /* لونار: الزهري الأساسي ≈ hsl(296, 49%, 66%) من LunarFlowers.png */
+  --le-frame-lunarflowers-base-h: 296;
+  --le-frame-lunarflowers-rotate: calc((var(--le-h) - var(--le-frame-lunarflowers-base-h)) * 1deg);
+  /* انجل: البنفسجي الأساسي ≈ hsl(260) من AngelDevil.png */
+  --le-frame-angeldevil-base-h: 260;
+  --le-frame-angeldevil-rotate: calc((var(--le-h) - var(--le-frame-angeldevil-base-h)) * 1deg);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  overflow: hidden;
+  height: 100%;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  background: transparent;
+  overflow: hidden;
+  position: relative;
+  font-family: 'Tajawal', sans-serif;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.avatar-container {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 220px;
+  height: 220px;
+}
+
+.avatar {
+  position: absolute;
+  width: 166px;
+  height: 166px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  object-fit: cover;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+.avatar.placeholder {
+  position: absolute;
+  width: 166px;
+  height: 166px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  color: var(--le-main);
+  border-radius: 50%;
+}
+
+/* الإطار: hue-rotate على الصورة + glow بنفس درجات rgb(202,123,123) */
+.frame {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  pointer-events: none;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  filter:
+    hue-rotate(var(--le-frame-rotate))
+    saturate(var(--le-frame-img-saturate))
+    brightness(var(--le-frame-brightness))
+    drop-shadow(0 0 5px var(--le-frame-glow-50))
+    drop-shadow(0 0 12px var(--le-frame-glow-40))
+    drop-shadow(0 0 25px var(--le-frame-glow-25));
+  animation: frameGlow 2s ease-in-out infinite;
+}
+
+@keyframes frameGlow {
+  0%, 100% {
+    filter:
+      hue-rotate(var(--le-frame-rotate))
+      saturate(var(--le-frame-img-saturate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 5px var(--le-frame-glow-50))
+      drop-shadow(0 0 12px var(--le-frame-glow-40))
+      drop-shadow(0 0 25px var(--le-frame-glow-25));
+  }
+  50% {
+    filter:
+      hue-rotate(var(--le-frame-rotate))
+      saturate(var(--le-frame-img-saturate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 8px var(--le-frame-glow-70))
+      drop-shadow(0 0 18px var(--le-frame-glow-50))
+      drop-shadow(0 0 35px var(--le-frame-glow-35));
+  }
+}
+
+/* ثيم الفراشة — لون موحّد يتبع العجلة (بدل ألوان متعددة في PNG) */
+.frame.frame-theme-butterfly {
+  filter:
+    grayscale(1)
+    sepia(1)
+    saturate(var(--le-frame-butterfly-tint-saturate))
+    hue-rotate(var(--le-frame-butterfly-tint-hue))
+    brightness(calc(var(--le-frame-brightness) * 1.08))
+    contrast(1.12)
+    drop-shadow(0 0 5px var(--le-frame-glow-50))
+    drop-shadow(0 0 12px var(--le-frame-glow-40))
+    drop-shadow(0 0 25px var(--le-frame-glow-25));
+  animation: frameGlowButterfly 2s ease-in-out infinite;
+}
+
+@keyframes frameGlowButterfly {
+  0%, 100% {
+    filter:
+      grayscale(1)
+      sepia(1)
+      saturate(var(--le-frame-butterfly-tint-saturate))
+      hue-rotate(var(--le-frame-butterfly-tint-hue))
+      brightness(calc(var(--le-frame-brightness) * 1.08))
+      contrast(1.12)
+      drop-shadow(0 0 5px var(--le-frame-glow-50))
+      drop-shadow(0 0 12px var(--le-frame-glow-40))
+      drop-shadow(0 0 25px var(--le-frame-glow-25));
+  }
+  50% {
+    filter:
+      grayscale(1)
+      sepia(1)
+      saturate(var(--le-frame-butterfly-tint-saturate))
+      hue-rotate(var(--le-frame-butterfly-tint-hue))
+      brightness(calc(var(--le-frame-brightness) * 1.08))
+      contrast(1.12)
+      drop-shadow(0 0 8px var(--le-frame-glow-70))
+      drop-shadow(0 0 18px var(--le-frame-glow-50))
+      drop-shadow(0 0 35px var(--le-frame-glow-35));
+  }
+}
+
+/* ثيم النار — hue-rotate فقط بدون تشبع/سطوع زائد */
+.frame.frame-theme-fire {
+  filter:
+    hue-rotate(var(--le-frame-fire-rotate))
+    brightness(var(--le-frame-brightness))
+    drop-shadow(0 0 5px var(--le-frame-glow-50))
+    drop-shadow(0 0 12px var(--le-frame-glow-40))
+    drop-shadow(0 0 25px var(--le-frame-glow-25));
+  animation: frameGlowFire 2s ease-in-out infinite;
+}
+
+@keyframes frameGlowFire {
+  0%, 100% {
+    filter:
+      hue-rotate(var(--le-frame-fire-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 5px var(--le-frame-glow-50))
+      drop-shadow(0 0 12px var(--le-frame-glow-40))
+      drop-shadow(0 0 25px var(--le-frame-glow-25));
+  }
+  50% {
+    filter:
+      hue-rotate(var(--le-frame-fire-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 8px var(--le-frame-glow-70))
+      drop-shadow(0 0 18px var(--le-frame-glow-50))
+      drop-shadow(0 0 35px var(--le-frame-glow-35));
+  }
+}
+
+/* ثيم لومي — hue-rotate من الزهري الأساسي (333°) */
+.frame.frame-theme-lumi {
+  filter:
+    hue-rotate(var(--le-frame-lumi-rotate))
+    brightness(var(--le-frame-brightness))
+    drop-shadow(0 0 5px var(--le-frame-glow-50))
+    drop-shadow(0 0 12px var(--le-frame-glow-40))
+    drop-shadow(0 0 25px var(--le-frame-glow-25));
+  animation: frameGlowLumi 2s ease-in-out infinite;
+}
+
+@keyframes frameGlowLumi {
+  0%, 100% {
+    filter:
+      hue-rotate(var(--le-frame-lumi-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 5px var(--le-frame-glow-50))
+      drop-shadow(0 0 12px var(--le-frame-glow-40))
+      drop-shadow(0 0 25px var(--le-frame-glow-25));
+  }
+  50% {
+    filter:
+      hue-rotate(var(--le-frame-lumi-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 8px var(--le-frame-glow-70))
+      drop-shadow(0 0 18px var(--le-frame-glow-50))
+      drop-shadow(0 0 35px var(--le-frame-glow-35));
+  }
+}
+
+/* ثيم سبيريت — hue-rotate من الأزرق البحري الأساسي (185°) */
+.frame.frame-theme-spirit {
+  filter:
+    hue-rotate(var(--le-frame-spirit-rotate))
+    brightness(var(--le-frame-brightness))
+    drop-shadow(0 0 5px var(--le-frame-glow-50))
+    drop-shadow(0 0 12px var(--le-frame-glow-40))
+    drop-shadow(0 0 25px var(--le-frame-glow-25));
+  animation: frameGlowSpirit 2s ease-in-out infinite;
+}
+
+@keyframes frameGlowSpirit {
+  0%, 100% {
+    filter:
+      hue-rotate(var(--le-frame-spirit-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 5px var(--le-frame-glow-50))
+      drop-shadow(0 0 12px var(--le-frame-glow-40))
+      drop-shadow(0 0 25px var(--le-frame-glow-25));
+  }
+  50% {
+    filter:
+      hue-rotate(var(--le-frame-spirit-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 8px var(--le-frame-glow-70))
+      drop-shadow(0 0 18px var(--le-frame-glow-50))
+      drop-shadow(0 0 35px var(--le-frame-glow-35));
+  }
+}
+
+/* ثيم مونلايت — hue-rotate من الأزرق القمري الأساسي (211°) */
+.frame.frame-theme-moonlight {
+  filter:
+    hue-rotate(var(--le-frame-moonlight-rotate))
+    brightness(var(--le-frame-brightness))
+    drop-shadow(0 0 5px var(--le-frame-glow-50))
+    drop-shadow(0 0 12px var(--le-frame-glow-40))
+    drop-shadow(0 0 25px var(--le-frame-glow-25));
+  animation: frameGlowMoonlight 2s ease-in-out infinite;
+}
+
+@keyframes frameGlowMoonlight {
+  0%, 100% {
+    filter:
+      hue-rotate(var(--le-frame-moonlight-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 5px var(--le-frame-glow-50))
+      drop-shadow(0 0 12px var(--le-frame-glow-40))
+      drop-shadow(0 0 25px var(--le-frame-glow-25));
+  }
+  50% {
+    filter:
+      hue-rotate(var(--le-frame-moonlight-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 8px var(--le-frame-glow-70))
+      drop-shadow(0 0 18px var(--le-frame-glow-50))
+      drop-shadow(0 0 35px var(--le-frame-glow-35));
+  }
+}
+
+/* ثيم نيكرولورد — hue-rotate من الأزرق السماوي الأساسي (180°) */
+.frame.frame-theme-necrolord {
+  filter:
+    hue-rotate(var(--le-frame-necrolord-rotate))
+    brightness(var(--le-frame-brightness))
+    drop-shadow(0 0 5px var(--le-frame-glow-50))
+    drop-shadow(0 0 12px var(--le-frame-glow-40))
+    drop-shadow(0 0 25px var(--le-frame-glow-25));
+  animation: frameGlowNecrolord 2s ease-in-out infinite;
+}
+
+@keyframes frameGlowNecrolord {
+  0%, 100% {
+    filter:
+      hue-rotate(var(--le-frame-necrolord-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 5px var(--le-frame-glow-50))
+      drop-shadow(0 0 12px var(--le-frame-glow-40))
+      drop-shadow(0 0 25px var(--le-frame-glow-25));
+  }
+  50% {
+    filter:
+      hue-rotate(var(--le-frame-necrolord-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 8px var(--le-frame-glow-70))
+      drop-shadow(0 0 18px var(--le-frame-glow-50))
+      drop-shadow(0 0 35px var(--le-frame-glow-35));
+  }
+}
+
+/* ثيم توينستارز — hue-rotate من الزهري الأساسي (332°) */
+.frame.frame-theme-twinstars {
+  filter:
+    hue-rotate(var(--le-frame-twinstars-rotate))
+    brightness(var(--le-frame-brightness))
+    drop-shadow(0 0 5px var(--le-frame-glow-50))
+    drop-shadow(0 0 12px var(--le-frame-glow-40))
+    drop-shadow(0 0 25px var(--le-frame-glow-25));
+  animation: frameGlowTwinstars 2s ease-in-out infinite;
+}
+
+@keyframes frameGlowTwinstars {
+  0%, 100% {
+    filter:
+      hue-rotate(var(--le-frame-twinstars-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 5px var(--le-frame-glow-50))
+      drop-shadow(0 0 12px var(--le-frame-glow-40))
+      drop-shadow(0 0 25px var(--le-frame-glow-25));
+  }
+  50% {
+    filter:
+      hue-rotate(var(--le-frame-twinstars-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 8px var(--le-frame-glow-70))
+      drop-shadow(0 0 18px var(--le-frame-glow-50))
+      drop-shadow(0 0 35px var(--le-frame-glow-35));
+  }
+}
+
+/* ثيم بوتشاكو — hue-rotate من البنفسجي الأساسي (270°) */
+.frame.frame-theme-pochacco {
+  filter:
+    hue-rotate(var(--le-frame-pochacco-rotate))
+    brightness(var(--le-frame-brightness))
+    drop-shadow(0 0 5px var(--le-frame-glow-50))
+    drop-shadow(0 0 12px var(--le-frame-glow-40))
+    drop-shadow(0 0 25px var(--le-frame-glow-25));
+  animation: frameGlowPochacco 2s ease-in-out infinite;
+}
+
+@keyframes frameGlowPochacco {
+  0%, 100% {
+    filter:
+      hue-rotate(var(--le-frame-pochacco-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 5px var(--le-frame-glow-50))
+      drop-shadow(0 0 12px var(--le-frame-glow-40))
+      drop-shadow(0 0 25px var(--le-frame-glow-25));
+  }
+  50% {
+    filter:
+      hue-rotate(var(--le-frame-pochacco-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 8px var(--le-frame-glow-70))
+      drop-shadow(0 0 18px var(--le-frame-glow-50))
+      drop-shadow(0 0 35px var(--le-frame-glow-35));
+  }
+}
+
+/* ثيم رينبو — hue-rotate من الزهري الأساسي (306°) */
+.frame.frame-theme-rainbow {
+  filter:
+    hue-rotate(var(--le-frame-rainbow-rotate))
+    brightness(var(--le-frame-brightness))
+    drop-shadow(0 0 5px var(--le-frame-glow-50))
+    drop-shadow(0 0 12px var(--le-frame-glow-40))
+    drop-shadow(0 0 25px var(--le-frame-glow-25));
+  animation: frameGlowRainbow 2s ease-in-out infinite;
+}
+
+@keyframes frameGlowRainbow {
+  0%, 100% {
+    filter:
+      hue-rotate(var(--le-frame-rainbow-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 5px var(--le-frame-glow-50))
+      drop-shadow(0 0 12px var(--le-frame-glow-40))
+      drop-shadow(0 0 25px var(--le-frame-glow-25));
+  }
+  50% {
+    filter:
+      hue-rotate(var(--le-frame-rainbow-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 8px var(--le-frame-glow-70))
+      drop-shadow(0 0 18px var(--le-frame-glow-50))
+      drop-shadow(0 0 35px var(--le-frame-glow-35));
+  }
+}
+
+/* ثيم لونار — hue-rotate من الزهري الأساسي (296°) */
+.frame.frame-theme-lunarflowers {
+  filter:
+    hue-rotate(var(--le-frame-lunarflowers-rotate))
+    brightness(var(--le-frame-brightness))
+    drop-shadow(0 0 5px var(--le-frame-glow-50))
+    drop-shadow(0 0 12px var(--le-frame-glow-40))
+    drop-shadow(0 0 25px var(--le-frame-glow-25));
+  animation: frameGlowLunarflowers 2s ease-in-out infinite;
+}
+
+@keyframes frameGlowLunarflowers {
+  0%, 100% {
+    filter:
+      hue-rotate(var(--le-frame-lunarflowers-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 5px var(--le-frame-glow-50))
+      drop-shadow(0 0 12px var(--le-frame-glow-40))
+      drop-shadow(0 0 25px var(--le-frame-glow-25));
+  }
+  50% {
+    filter:
+      hue-rotate(var(--le-frame-lunarflowers-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 8px var(--le-frame-glow-70))
+      drop-shadow(0 0 18px var(--le-frame-glow-50))
+      drop-shadow(0 0 35px var(--le-frame-glow-35));
+  }
+}
+
+.frame.frame-theme-angeldevil {
+  filter:
+    hue-rotate(var(--le-frame-angeldevil-rotate))
+    brightness(var(--le-frame-brightness))
+    drop-shadow(0 0 5px var(--le-frame-glow-50))
+    drop-shadow(0 0 12px var(--le-frame-glow-40))
+    drop-shadow(0 0 25px var(--le-frame-glow-25));
+  animation: frameGlowAngeldevil 2s ease-in-out infinite;
+}
+
+@keyframes frameGlowAngeldevil {
+  0%, 100% {
+    filter:
+      hue-rotate(var(--le-frame-angeldevil-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 5px var(--le-frame-glow-50))
+      drop-shadow(0 0 12px var(--le-frame-glow-40))
+      drop-shadow(0 0 25px var(--le-frame-glow-25));
+  }
+  50% {
+    filter:
+      hue-rotate(var(--le-frame-angeldevil-rotate))
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 8px var(--le-frame-glow-70))
+      drop-shadow(0 0 18px var(--le-frame-glow-50))
+      drop-shadow(0 0 35px var(--le-frame-glow-35));
+  }
+}
+
+.username {
+  position: absolute;
+  left: 250px;
+  top: 50%;
+  transform: translateY(-30%) skewX(-10deg);
+  font-family: 'Roadster', sans-serif;
+  font-size: 118px;
+  font-weight: normal;
+  color: var(--le-main);
+  white-space: nowrap;
+  line-height: 1;
+  text-shadow:
+    -3px 0 var(--le-light),
+    3px 0 var(--le-dark),
+    0 0 10px var(--le-glow-90),
+    0 0 20px var(--le-glow-90),
+    0 0 40px var(--le-glow-80),
+    0 0 60px var(--le-glow-70),
+    0 0 100px var(--le-glow-60),
+    0 0 140px var(--le-glow-50);
+  animation: powerPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes powerPulse {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.35);
+  }
+}
+
+.label {
+  position: absolute;
+  left: 255px;
+  top: 50%;
+  transform: translateY(-85px);
+  padding: 4px 12px;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--le-label-text);
+  border: 1px solid var(--le-border-50);
+  border-radius: 20px;
+  background: var(--le-bg-12);
+  backdrop-filter: blur(3px);
+  text-shadow: 0 0 10px var(--le-label-glow);
+  box-shadow: 0 0 15px var(--le-shadow-25);
+}
+
+.stage.swap .username,
+.stage.swap .label {
+  animation: textSwap 0.35s ease, powerPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes textSwap {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* عكس التصميم: الصورة يمين — الاسم والليبل يسار بنفس الأبعاد */
+.stage.layout-reversed .avatar-container {
+  left: auto;
+  right: 20px;
+}
+
+.stage.layout-reversed .username {
+  left: auto;
+  right: 250px;
+}
+
+.stage.layout-reversed .label {
+  left: auto;
+  right: 255px;
+}
+
+.stage.layout-reversed .frame {
+  transform: translate(-50%, -50%) scaleX(-1);
+}
+
+/* أبيض/أسود/رمادي — إطار أبيض وأسود مثل potion bow.webp */
+.le-achromatic .frame.frame-theme-butterfly,
+.le-achromatic .frame.frame-theme-fire,
+.le-achromatic .frame.frame-theme-lumi,
+.le-achromatic .frame.frame-theme-spirit,
+.le-achromatic .frame.frame-theme-moonlight,
+.le-achromatic .frame.frame-theme-necrolord,
+.le-achromatic .frame.frame-theme-twinstars,
+.le-achromatic .frame.frame-theme-pochacco,
+.le-achromatic .frame.frame-theme-rainbow,
+.le-achromatic .frame.frame-theme-lunarflowers,
+.le-achromatic .frame.frame-theme-angeldevil {
+  filter:
+    grayscale(1)
+    brightness(var(--le-frame-brightness))
+    drop-shadow(0 0 5px var(--le-frame-glow-50))
+    drop-shadow(0 0 12px var(--le-frame-glow-40))
+    drop-shadow(0 0 25px var(--le-frame-glow-25));
+  animation: frameGlowAchromatic 2s ease-in-out infinite;
+}
+
+@keyframes frameGlowAchromatic {
+  0%, 100% {
+    filter:
+      grayscale(1)
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 5px var(--le-frame-glow-50))
+      drop-shadow(0 0 12px var(--le-frame-glow-40))
+      drop-shadow(0 0 25px var(--le-frame-glow-25));
+  }
+  50% {
+    filter:
+      grayscale(1)
+      brightness(var(--le-frame-brightness))
+      drop-shadow(0 0 8px var(--le-frame-glow-70))
+      drop-shadow(0 0 18px var(--le-frame-glow-50))
+      drop-shadow(0 0 35px var(--le-frame-glow-35));
+  }
+}

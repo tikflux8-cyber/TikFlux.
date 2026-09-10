@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="/assets/img/tikoverlay-mark.png?v=20260802" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gift Challenge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/vendor/fontawesome/css/all.min.css" />
+  <style>
+    :root {
+      --text: #f8fafc;
+      --muted: #8a97b0;
+      --red-primary: #ff0000;
+      --red-soft: #ff0000;
+      --blue-primary: #008dff;
+      --blue-soft: #39d1ff;
+      --win: #00ff62;
+      --tie: #ffbb00;
+      --glass: rgba(0, 0, 0, 0.75);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      color: var(--text);
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    /* ── Layout ───────────────────────────────── */
+    .wrap {
+      width: 100%;
+      height: 100%;
+      padding: 20px;
+      
+      grid-template-rows: 84px 34px 1fr;
+      gap: 12px;
+      position: relative;
+    }
+    .hud-glow {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(70% 50% at 8%  50%, rgba(255,31,77,.16), transparent 65%),
+        radial-gradient(70% 50% at 92% 50%, rgba(0,141,255,.16), transparent 65%);
+      filter: blur(30px);
+      opacity: .9;
+    }
+
+    /* ── Challenge bar ────────────────────────── */
+    .challenge-bar-wrap {
+      position: relative;
+      padding-top: 22px;
+    }
+    .challenge-top {
+      height: 50px;
+      position: relative;
+      border-radius: 20px;
+      overflow: visible;
+      border: 1px solid rgba(255,255,255,.16);
+      background: linear-gradient(180deg, rgba(12,18,38,.92), rgba(4,8,20,.82));
+      box-shadow: 0 10px 36px rgba(0,0,0,.62), inset 0 0 20px rgba(255,255,255,.04);
+    }
+    .challenge-track {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      border-radius: inherit;
+      overflow: hidden;
+    }
+    .challenge-segment {
+      position: relative;
+      height: 100%;
+      overflow: hidden;
+      transition: width 340ms cubic-bezier(.22,.61,.36,1);
+    }
+    .challenge-segment.red {
+      background:
+linear-gradient(
+89deg, rgb(59 0 6), rgba(255, 0, 21, 0.948)), repeating-linear-gradient(-55deg, rgba(255, 255, 255, .09) 0 10px, transparent 10px 20px);
+      box-shadow: inset 0 0 44px rgba(255,20,50,.55), 0 0 30px rgba(255,20,50,.38);
+    }
+    .challenge-segment.blue {
+      background:linear-gradient(269deg, rgb(0 36 69 / 94%), rgba(35, 195, 255, .97)), repeating-linear-gradient(-55deg, rgba(255, 255, 255, .09) 0 10px, transparent 10px 20px);
+      box-shadow: inset 0 0 44px rgba(0,135,255,.6), 0 0 30px rgba(0,135,255,.38);
+    }
+    .bar-score {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 4;
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: .4px;
+      line-height: 1;
+      color: #fff;
+      text-shadow:
+        0 1px 2px rgba(0,0,0,.9),
+        0 0 8px rgba(0,0,0,.55);
+      white-space: nowrap;
+      pointer-events: none;
+      font-variant-numeric: tabular-nums;
+    }
+    /* RTL: red team on the right (inline-start), blue on the left (inline-end) */
+    .bar-score--red  { inset-inline-start: 16px; }
+    .bar-score--blue { inset-inline-end: 16px; }
+
+    /* Inward sheen – from outer edge → toward center dividing line, smooth fade */
+    .challenge-segment::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 10%, rgba(255,255,255,.52) 50%, transparent 90%);
+      opacity: 0;
+    }
+    /* Red bar (left in LTR) – sheen enters from far right, travels inward left */
+    .challenge-segment.red::after  { animation: sheenInRed  1.7s ease-in-out infinite; }
+    /* Blue bar (right in LTR) – sheen enters from far left, travels inward right */
+    .challenge-segment.blue::after { animation: sheenInBlue 1.7s ease-in-out infinite; }
+    @keyframes sheenInRed {
+      0%   { transform: translateX(110%);  opacity: 0; }
+      18%  { opacity: .9; }
+      72%  { opacity: .9; }
+      100% { transform: translateX(-18%); opacity: 0; }
+    }
+    @keyframes sheenInBlue {
+      0%   { transform: translateX(-110%);  opacity: 0; }
+      18%  { opacity: .9; }
+      72%  { opacity: .9; }
+      100% { transform: translateX(18%); opacity: 0; }
+    }
+
+    .timer-pill {
+      position: absolute;
+      left: 50%;
+      top: -10px;
+      transform: translate(-50%, -50%);
+      min-width: 108px;
+      padding: 7px 20px 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      line-height: 1.1;
+      border-radius: 14px 14px 0 0;
+      background: #000000;
+      border: 1px solid rgba(255,255,255,.24);
+      border-bottom: none;
+      box-shadow:
+        0 -6px 22px rgba(0,0,0,.45),
+        inset 0 0 12px rgba(255,255,255,.05);
+      transition: color .2s ease, border-color .2s ease, box-shadow .2s ease;
+      z-index: -6;
+      pointer-events: none;
+    }
+    .timer-pill.warning {
+      color: #ffe369;
+      border-color: rgba(255,223,93,.65);
+      background: linear-gradient(
+        to bottom,
+        rgba(18, 14, 4, 0.98) 0%,
+        rgba(18, 14, 4, 0.98) 54%,
+        rgba(18, 14, 4, 0.42) 68%,
+        transparent 100%
+      );
+      box-shadow: 0 -6px 22px rgba(255,223,93,.22), inset 0 0 12px rgba(255,223,93,.08);
+    }
+    .timer-pill.danger {
+      color: #ff6a88;
+      border-color: rgba(255,80,120,.75);
+      background: linear-gradient(
+        to bottom,
+        rgba(20, 6, 12, 0.98) 0%,
+        rgba(20, 6, 12, 0.98) 54%,
+        rgba(20, 6, 12, 0.42) 68%,
+        transparent 100%
+      );
+      box-shadow: 0 -6px 26px rgba(255,40,95,.38);
+      animation: pulseDanger .72s ease-in-out infinite alternate;
+    }
+    @keyframes pulseDanger {
+      from { transform: translate(-50%, -50%) scale(1); }
+      to   { transform: translate(-50%, -50%) scale(1.06); }
+    }
+
+    /* ── Board ──────────────────────────────────── */
+    .board {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: stretch;
+      position: relative;
+      top: 10px;
+    }
+    .gift-card {
+      background: var(--glass);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 24px;
+      backdrop-filter: blur(20px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 12px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(0,0,0,.48);
+    }
+    .gift-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 28%, rgb(0 0 0 / 37%), transparent 55%);
+      pointer-events: none;
+    }
+    .gift-card.left {
+      border-color: rgb(255, 0, 0);
+      box-shadow: 0 16px 40px rgba(0,0,0,.48), 0 0 32px rgba(255,31,77,.16);
+    }
+    .gift-card.right {
+      border-color: rgb(0, 103, 187);
+      box-shadow: 0 16px 40px rgba(0,0,0,.48), 0 0 32px rgba(0,141,255,.16);
+    }
+    .gift-card.winner {
+      border-color: var(--win);
+      box-shadow: 0 20px 48px rgba(0,0,0,.54), 0 0 55px rgba(53,255,132,.36);
+      animation: winnerEdge 1.1s ease-in-out infinite alternate;
+    }
+    @keyframes winnerEdge {
+      from { transform: translateY(0)    scale(1); }
+      to   { transform: translateY(-5px) scale(1.018); }
+    }
+    .gift-image {
+      width: 162px;
+      height: 162px;
+      object-fit: contain;
+      filter: drop-shadow(0 14px 26px rgba(0,0,0,.58));
+      animation: floaty 2.4s ease-in-out infinite;
+    }
+
+    /* Multi-gift mosaic inside each team card */
+    .gift-mosaic {
+      position: relative;
+      width: 200px;
+      height: 188px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .gift-mosaic .m-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .gift-mosaic .m-item img {
+      object-fit: contain;
+      filter: drop-shadow(0 10px 22px rgba(0,0,0,.55));
+      animation: floaty 2.4s ease-in-out infinite;
+    }
+    .gift-mosaic[data-layout="1"] .m-item img {
+      width: 162px;
+      height: 162px;
+    }
+    .gift-mosaic[data-layout="2"] {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      width: 200px;
+      height: 170px;
+    }
+    .gift-mosaic[data-layout="2"] .m-item img {
+      width: 88px;
+      height: 88px;
+    }
+    /* Triangle: one top, two bottom */
+    .gift-mosaic[data-layout="3"] {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto 1fr;
+      gap: 6px 10px;
+      width: 200px;
+      height: 188px;
+      align-content: center;
+    }
+    .gift-mosaic[data-layout="3"] .m-item:nth-child(1) {
+      grid-column: 1 / -1;
+      justify-self: center;
+    }
+    .gift-mosaic[data-layout="3"] .m-item img {
+      width: 76px;
+      height: 76px;
+    }
+    .gift-mosaic[data-layout="3"] .m-item:nth-child(1) img {
+      width: 86px;
+      height: 86px;
+    }
+    /* 2×2 grid */
+    .gift-mosaic[data-layout="4"] {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 8px;
+      width: 200px;
+      height: 188px;
+    }
+    .gift-mosaic[data-layout="4"] .m-item img {
+      width: 78px;
+      height: 78px;
+    }
+    /* Center + 4 corners (first gift = center, larger) */
+    .gift-mosaic[data-layout="5"] {
+      width: 210px;
+      height: 200px;
+    }
+    .gift-mosaic[data-layout="5"] .m-item {
+      position: absolute;
+    }
+    .gift-mosaic[data-layout="5"] .m-item:nth-child(1) {
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+    }
+    .gift-mosaic[data-layout="5"] .m-item:nth-child(1) img {
+      width: 88px;
+      height: 88px;
+    }
+    .gift-mosaic[data-layout="5"] .m-item:nth-child(2) { left: 4px; top: 4px; }
+    .gift-mosaic[data-layout="5"] .m-item:nth-child(3) { right: 4px; top: 4px; }
+    .gift-mosaic[data-layout="5"] .m-item:nth-child(4) { left: 4px; bottom: 4px; }
+    .gift-mosaic[data-layout="5"] .m-item:nth-child(5) { right: 4px; bottom: 4px; }
+    .gift-mosaic[data-layout="5"] .m-item:nth-child(n+2) img {
+      width: 52px;
+      height: 52px;
+    }
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-7px); }
+    }
+    .gift-name {
+      margin-top: 10px;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: .2px;
+      text-align: center;
+      text-shadow: 0 0 16px rgba(255,255,255,.15);
+    }
+    .gift-score {
+      margin-top: 6px;
+      font-size: 58px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+    .left .gift-score {
+      color: var(--red-soft);
+      text-shadow: 0 0 20px rgba(255,40,77,.7), 0 0 50px rgba(255,40,77,.32);
+    }
+    .right .gift-score {
+      color: var(--blue-soft);
+      text-shadow: 0 0 20px rgba(0,141,255,.7), 0 0 50px rgba(0,141,255,.32);
+    }
+    .vs {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0, 0, 0, 0.94);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 29px;
+      font-weight: 900;
+      text-shadow: 0 0 16px rgba(255,255,255,.28);
+      box-shadow: 0 0 32px rgba(0,0,0,.55), inset 0 0 18px rgba(255,255,255,.05),
+                  0 0 0 5px rgba(255,255,255,.04);
+      z-index: 4;
+    }
+
+    /* ── Winner / Tie overlay ─────────────────── */
+    .winner-overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, rgba(0,0,0,.3), rgba(0,0,0,.86));
+      backdrop-filter: blur(13px);
+      z-index: 10;
+    }
+    .winner-overlay.show {
+      display: flex;
+      animation: fadeIn .3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* Winner box */
+    .winner-box {
+      min-width: 360px;
+      text-align: center;
+      border-radius: 28px;
+      padding: 26px 32px 22px;
+      border: 1px solid rgba(53,255,132,.38);
+      background: linear-gradient(158deg, rgb(66 113 80 / 97%), rgb(0 0 0));
+      box-shadow:
+        0 26px 60px rgba(0,0,0,.58),
+        0 0 70px rgba(53,255,132,.42),
+        inset 0 1px 0 rgba(255,255,255,.09);
+      animation: winnerBreath 1.5s ease-in-out infinite, winnerLift 2.6s ease-in-out infinite;
+      position: relative;
+      z-index: 11;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+    }
+    .winner-box::after {
+      content: "";
+      position: absolute;
+      inset: -120% -25%;
+      background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,.18) 50%, transparent 60%);
+      transform: translateX(-120%) rotate(6deg);
+      animation: winnerShine 2.2s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes winnerBreath {
+      0%, 100% { box-shadow: 0 26px 60px rgba(0,0,0,.58), 0 0 70px rgba(53,255,132,.42), inset 0 1px 0 rgba(255,255,255,.09); }
+      50%       { box-shadow: 0 30px 70px rgba(0,0,0,.6),  0 0 100px rgba(53,255,132,.6),  inset 0 1px 0 rgba(255,255,255,.09); }
+    }
+    @keyframes winnerLift {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50%      { transform: translateY(-4px) scale(1.01); }
+    }
+    @keyframes winnerShine {
+      0%, 18%   { transform: translateX(-120%) rotate(6deg); opacity: 0; }
+      28%, 72%  { opacity: 1; }
+      100%      { transform: translateX(120%) rotate(6deg); opacity: 0; }
+    }
+    .winner-crown {
+      font-size: 34px;
+      line-height: 1;
+      margin-bottom: 6px;
+      color: #ffd84f;
+      text-shadow: 0 0 16px rgba(255,216,79,.8), 0 0 34px rgba(255,192,64,.45);
+      animation: crownBounce 1.1s ease-in-out infinite;
+    }
+    @keyframes crownBounce {
+      0%, 100% { transform: translateY(0)    rotate(-4deg); }
+      50%       { transform: translateY(-6px) rotate(4deg); }
+    }
+    .winner-label {
+      font-size: 24px;
+      font-family: "Cairo", "Tajawal", "Segoe UI", Tahoma, Arial, sans-serif;
+      font-weight: 900;
+      color: #f8fff5;
+      letter-spacing: 1px;
+      text-shadow: 0 0 14px rgba(53,255,132,.45), 0 0 28px rgba(255,255,255,.22);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .winner-image {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      animation: winnerPop .9s cubic-bezier(.22,.61,.36,1) forwards;
+      filter: drop-shadow(0 12px 30px rgba(53,255,132,.45));
+      display: block;
+      margin: 0 auto;
+    }
+    @keyframes winnerPop {
+      0%   { transform: scale(.45)  rotate(-12deg); opacity: 0; }
+      60%  { transform: scale(1.12) rotate(4deg);  opacity: 1; }
+      100% { transform: scale(1)    rotate(0deg);  opacity: 1; }
+    }
+    .winner-name {
+      margin-top: 10px;
+      font-size: 27px;
+      font-weight: 900;
+      color: var(--win);
+      text-shadow: 0 0 26px rgba(53,255,132,.65);
+    }
+    .winner-score-display {
+      margin-top: 10px;
+      font-size: 44px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 1px;
+      text-shadow: 0 0 22px rgba(255,255,255,.45);
+    }
+    .winner-score-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,.32);
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .loser-score-display {
+      margin-top: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255,255,255,.32);
+      letter-spacing: .8px;
+    }
+
+    /* Tie box */
+    .tie-box {
+      text-align: center;
+      border-radius: 28px;
+      padding: 26px 38px 24px;
+      border: 1px solid rgba(240,192,64,.32);
+      background: linear-gradient(158deg, rgba(5,9,20,.97), rgba(14,18,34,.95));
+      box-shadow:
+        0 26px 60px rgba(0,0,0,.58),
+        0 0 55px rgba(240,192,64,.28),
+        inset 0 1px 0 rgba(255,255,255,.07);
+      position: relative;
+      z-index: 11;
+      animation: tieFloat 2.1s ease-in-out infinite;
+    }
+    @keyframes tieFloat {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-5px); }
+    }
+    .tie-title {
+      font-size: 44px;
+      font-weight: 900;
+      color: var(--tie);
+      text-shadow: 0 0 30px rgba(240,192,64,.6);
+      letter-spacing: .5px;
+    }
+    .tie-subtitle {
+      font-size: 11px;
+      font-weight: 800;
+      color: rgba(255,255,255,.35);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin: 4px 0 22px;
+    }
+    .tie-gifts {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+    }
+    .tie-gift-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+    .tie-gift-image {
+      width: 96px;
+      height: 96px;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,.55));
+    }
+    .tie-gift-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: rgba(255,255,255,.72);
+    }
+    .tie-gift-score {
+      font-size: 30px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .tie-gift-score.red {
+      color: var(--red-soft);
+      text-shadow: 0 0 16px rgba(255,64,96,.55);
+    }
+    .tie-gift-score.blue {
+      color: var(--blue-soft);
+      text-shadow: 0 0 16px rgba(57,209,255,.55);
+    }
+    .tie-equals {
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--tie);
+      opacity: .8;
+      align-self: center;
+      padding-bottom: 18px;
+    }
+
+    /* ── Confetti ───────────────────────────────── */
+    .confetti-layer {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      z-index: 12;
+    }
+    .confetti {
+      position: absolute;
+      opacity: .95;
+      left: var(--start-x, 50%);
+      bottom: var(--start-y, -10px);
+      animation: explodeCorner cubic-bezier(.19,.82,.26,1) forwards;
+    }
+    .confetti.rect {
+      width: 10px;
+      height: 18px;
+      border-radius: 3px;
+      box-shadow: 0 0 8px rgba(255,255,255,.2);
+    }
+    .confetti.circle {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(255,255,255,.3);
+    }
+    .confetti.star {
+      width: 14px;
+      height: 14px;
+      clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+    }
+    @keyframes explodeCorner {
+      0%   { transform: translate(0,0) scale(.6) rotate(0deg); opacity: 0; }
+      12%  { opacity: 1; }
+      82%  {
+        transform:
+          translate(var(--dx,0px), calc(-1 * var(--rise,420px)))
+          rotate(var(--rot,540deg))
+          scale(1.05);
+        opacity: 1;
+      }
+      100% {
+        transform:
+          translate(var(--dx,0px), calc(-1 * var(--rise,420px) - 52px))
+          rotate(var(--rot,540deg));
+        opacity: 0;
+      }
+    }
+
+    /* ── VS + حالة التحدي (تحت VS) ───────────────── */
+    .vs-stack {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      z-index: 4;
+      pointer-events: none;
+    }
+    .vs-stack .vs {
+      position: relative;
+      left: auto;
+      top: auto;
+      transform: none;
+    }
+    .status.status-pill {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 24px;
+      border-radius: 999px;
+      background: #000000;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
+      max-width: min(320px, 90vw);
+      text-align: center;
+    }
+    .status.status-pill .status-label {
+      font-family: "Tajawal", system-ui, sans-serif;
+      font-size: 1.125rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      line-height: 1.35;
+      margin: 0;
+    }
+    .status.status-pill.live .status-label {
+      color: #4ade80;
+    }
+    .status.status-pill.paused .status-label {
+      color: #f87171;
+    }
+    .status.status-pill.ready .status-label {
+      color: #cbd5e1;
+    }
+    .status.status-pill.ended .status-label {
+      color: #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hud-glow"></div>
+    <div class="challenge-bar-wrap">
+      <div class="challenge-top">
+        <div class="challenge-track">
+          <div id="redBar" class="challenge-segment red" style="width:50%;"></div>
+          <div id="blueBar" class="challenge-segment blue" style="width:50%;"></div>
+        </div>
+        <span id="redBarScore" class="bar-score bar-score--red">0</span>
+        <span id="blueBarScore" class="bar-score bar-score--blue">0</span>
+        <div id="timer" class="timer-pill">00:00</div>
+      </div>
+    </div>
+    <div class="board">
+      <div id="giftOneCard" class="gift-card left">
+        <div id="giftOneMosaic" class="gift-mosaic" data-layout="1"></div>
+        <div id="giftOneName" class="gift-name">-</div>
+        <div id="giftOneScore" class="gift-score">0</div>
+      </div>
+      <div class="vs-stack">
+        <div class="vs">VS</div>
+        <div id="status" class="status status-pill ready" dir="rtl" aria-live="polite">
+          <span id="statusLabel" class="status-label">جاهز للتشغيل</span>
+        </div>
+      </div>
+      <div id="giftTwoCard" class="gift-card right">
+        <div id="giftTwoMosaic" class="gift-mosaic" data-layout="1"></div>
+        <div id="giftTwoName" class="gift-name">-</div>
+        <div id="giftTwoScore" class="gift-score">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="winnerOverlay" class="winner-overlay">
+    <!-- Winner mode -->
+    <div id="winnerBox" class="winner-box">
+      <div class="winner-crown" aria-hidden="true"><i class="fa-solid fa-trophy"></i></div>
+      <div class="winner-label">&#x200F;الفائز</div>
+      <img id="winnerImage" class="winner-image" alt="" />
+      <div id="winnerName" class="winner-name">-</div>
+      <div id="winnerScore" class="winner-score-display"></div>
+      <div class="winner-score-label">نقطة</div>
+      <div id="loserScore" class="loser-score-display"></div>
+    </div>
+    <!-- Tie mode -->
+    <div id="tieBox" class="tie-box" style="display:none">
+      <div class="tie-title">تعادل!</div>
+      <div class="tie-subtitle">Draw</div>
+      <div class="tie-gifts">
+        <div class="tie-gift-item">
+          <img id="tieImageOne" class="tie-gift-image" alt="" />
+          <div id="tieNameOne" class="tie-gift-name">-</div>
+          <div id="tieScoreOne" class="tie-gift-score red">0</div>
+        </div>
+        <div class="tie-equals">=</div>
+        <div class="tie-gift-item">
+          <img id="tieImageTwo" class="tie-gift-image" alt="" />
+          <div id="tieNameTwo" class="tie-gift-name">-</div>
+          <div id="tieScoreTwo" class="tie-gift-score blue">0</div>
+        </div>
+      </div>
+    </div>
+    <div id="confettiLayer" class="confetti-layer"></div>
+  </div>
+
+  <script src="/assets/b/8c386c8dbec5a57f.js"></script>
+  <script src="/assets/b/28b98888f9aaae4a.js"></script>
+  <script src="/assets/b/c7b6503f1ecf6480.js"></script>
+  <script src="/assets/b/92e7bea3403fba1f.js"></script>
+  <script src="/assets/b/01d1141ee70f1850.js"></script>
+</body>
+</html>

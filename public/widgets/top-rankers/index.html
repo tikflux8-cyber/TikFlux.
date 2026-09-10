@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/assets/img/tikoverlay-mark.png?v=20260802" type="image/png">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>TikOverlay - أفضل 3 في اللايف</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&family=Teko:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/vendor/fontawesome/css/all.min.css">
+    
+    <style>
+        :root {
+            /* التاج يتبع --rank-color للمركز الأول */
+            --rank2-color: #00d2ff; /* سماوي مشع */
+            --rank3-color: #d15fee; /* بنفسجي نيون */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            overflow: hidden;
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: transparent;
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center; 
+            overflow: hidden;
+        }
+
+        .leaderboard-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding-top: 40px;
+        }
+
+        /* --- الوحدة (Rank Unit) --- */
+        .rank-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            opacity: 1;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        /* تخصيص الأحجام */
+        .rank-2, .rank-3 { 
+            transform: scale(0.9); 
+            margin-top: 70px; 
+        }
+        
+        .rank-1 { 
+            transform: scale(1.1); 
+            margin-top: -20px; 
+            z-index: 10; 
+        }
+
+        /* --- الإطار الدوار (The Magic Ring) --- */
+        .avatar-wrapper {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+        }
+
+        /* حلقة الدوران الخلفية */
+        .avatar-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            background: conic-gradient(transparent, transparent, var(--rank-color));
+            animation: spin 2s linear infinite;
+            box-shadow: 0 0 20px var(--rank-color);
+        }
+        
+        /* طبقة ثانية لتنعيم الدوران */
+        .avatar-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            background: conic-gradient(transparent, var(--rank-color), transparent 60%);
+            animation: spin 2s linear infinite;
+            filter: blur(10px);
+            opacity: 0.7;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* الصورة */
+        .avatar-img {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            position: relative;
+            z-index: 2;
+            border: 2px solid #999999;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- شارة الرقم (Badge) --- */
+        .rank-badge {
+            position: absolute;
+            bottom: 0;
+            right: 5px;
+            width: 35px;
+            height: 35px;
+            background: var(--rank-color);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            z-index: 10;
+            border: 3px solid #1a1a1a;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* --- المعلومات (The Glowing Pill) --- */
+        .info-container {
+            margin-top: -5px;
+            background: rgb(87 87 87 / 54%);
+            
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgb(121 121 121);
+            z-index: 6;
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            min-width: 120px;
+        }
+
+        .player-name {
+            display: block;
+            color: #aaa;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+        }
+
+        .score {
+            display: block;
+            font-family: 'Teko', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #fff;
+            text-shadow: 0 0 10px var(--rank-color), 0 0 20px var(--rank-color);
+        }
+
+        /* ألوان مخصصة لكل مركز */
+        .rank-1 { --rank-color: #ffb500; }
+        .rank-2 { --rank-color: #8b8b8b; }
+        .rank-3 { --rank-color: #b64f00; }
+
+        .rank-1 .player-name { color: #ffc400; }
+        .rank-2 .player-name { color: #cccccc; }
+        .rank-3 .player-name { color: #ff6f00; }
+        /* التاج — نفس لون accent المركز الأول (--rank-color) */
+        .crown {
+            position: absolute;
+            top: -55px;
+            color: var(--rank-color);
+            font-size: 2.2rem;
+            filter: drop-shadow(0 0 15px var(--rank-color));
+            animation: float 2.5s ease-in-out infinite;
+            z-index: 20;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="leaderboard-container">
+
+        <!-- Rank 2 (Left) -->
+        <div class="rank-unit rank-2" data-rank="2">
+            <div class="avatar-wrapper">
+                <img src="/assets/img/avatar2.png" class="avatar-img" alt="Player 2">
+                <div class="rank-badge">2</div>
+            </div>
+            <div class="info-container">
+                <span class="player-name">...</span>
+                <span class="score">0</span>
+            </div>
+        </div>
+
+        <!-- Rank 1 (Center - The King) -->
+        <div class="rank-unit rank-1" data-rank="1">
+            <div class="crown"><i class="fas fa-crown"></i></div>
+            <div class="avatar-wrapper">
+                <img src="/assets/img/avatar1.png" class="avatar-img" alt="Player 1">
+                <div class="rank-badge">1</div>
+            </div>
+            <div class="info-container">
+                <span class="player-name">...</span>
+                <span class="score">0</span>
+            </div>
+        </div>
+
+        <!-- Rank 3 (Right) -->
+        <div class="rank-unit rank-3" data-rank="3">
+            <div class="avatar-wrapper">
+                <img src="/assets/img/avatar3.png" class="avatar-img" alt="Player 3">
+                <div class="rank-badge">3</div>
+            </div>
+            <div class="info-container">
+                <span class="player-name">...</span>
+                <span class="score">0</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Socket.IO -->
+    <script src="/assets/b/8c386c8dbec5a57f.js"></script>
+    <script src="/assets/b/28b98888f9aaae4a.js"></script>
+    <!-- Main Widget Script -->
+    <script type="text/javascript" charset="UTF-8">
+        /**
+         * TikOverlay Top Rankers Widget
+         */
+
+        // Auto-detect environment
+        const hostname = window.location.hostname;
+        const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+        const API_URL = window.ENV_CONFIG?.API_URL || (isLocal ? 'http://localhost:3000' : 'https://api.tikoverlay.live');
+        const EDGE_WS_URL = window.ENV_CONFIG?.EDGE_WS_URL || (isLocal ? 'ws://localhost:3000/ws' : 'wss://edge.tikoverlay.live/ws');
+        
+        // Get parameters
+        const params = new URLSearchParams(window.location.search);
+        const userId = params.get('uid');
+        const isMock = !userId || params.get('mock') === '1';
+        const uuidV4LikeRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        const hasInvalidUid = !isMock && !uuidV4LikeRegex.test(String(userId || '').trim());
+
+        let socket = null;
+        
+        // Default placeholder images (local)
+        const defaultAvatars = {
+            1: '/assets/img/avatar1.png',
+            2: '/assets/img/avatar2.png',
+            3: '/assets/img/avatar3.png'
+        };
+        
+        // Store previous data to detect changes
+        const previousData = {
+            1: { nickname: null, coinCount: null, avatar: defaultAvatars[1] },
+            2: { nickname: null, coinCount: null, avatar: defaultAvatars[2] },
+            3: { nickname: null, coinCount: null, avatar: defaultAvatars[3] }
+        };
+
+        console.log('🏆 [TopRankers] Starting with userId:', userId, '| Mock:', isMock);
+
+        function showInvalidLinkError() {
+            document.body.innerHTML =
+                '<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;"><div style="display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;font-family:Cairo,Arial,sans-serif;font-size:1.35rem;font-weight:800;"><img src="/assets/img/tikoverlay-mark.png" alt="TikOverlay" style="width:170px;max-width:60vw;" /><div style="color:#ff0000;">الرابط خطأ<br/>تاكد من نسخ الرابط بشكل صحيح</div></div></div>';
+        }
+
+        /**
+         * Initialize Widget
+         */
+        function initialize() {
+            if (hasInvalidUid) {
+                showInvalidLinkError();
+                return;
+            }
+            if (!isMock) {
+                void loadInitialData().then(() => connectSocket());
+            } else {
+                console.log('🎭 [TopRankers] Running in Mock Mode');
+                startMockMode();
+            }
+        }
+
+        function connectSocket() {
+            if (!userId || typeof createEdgeWsClient !== 'function') return;
+            console.log('🔌 [TopRankers] Connecting to Edge WS...');
+            socket = createEdgeWsClient({
+                streamerId: userId,
+                url: EDGE_WS_URL,
+                reconnection: true,
+                reconnectionDelay: 1000,
+                reconnectionDelayMax: 5000,
+            });
+
+            // Receive Top 3 Rankers Update
+            socket.on('top_rankers_update', (data) => {
+                if (data && data.top3) {
+                    console.log('👑 [TopRankers] Received Top 3:', data.top3);
+                    updateRankers(data.top3);
+                }
+            });
+
+            // Fallback: receive via 'event' channel
+            socket.on('event', (eventData) => {
+                if (eventData.type === 'top_rankers_update' && eventData.data && eventData.data.top3) {
+                    console.log('👑 [TopRankers] Received Top 3 via event:', eventData.data.top3);
+                    updateRankers(eventData.data.top3);
+                }
+            });
+
+            socket.on('disconnect', (reason) => {
+                console.log('❌ [TopRankers] Disconnected:', reason);
+            });
+
+            socket.on('reconnect', (attemptNumber) => {
+                console.log('✅ [TopRankers] Reconnected after', attemptNumber, 'attempts');
+                loadInitialData();
+            });
+
+            socket.on('error', (error) => {
+                console.error('❌ [TopRankers] Socket error:', error);
+            });
+        }
+
+        /**
+         * Optional initial snapshot from API (top_rankers is live-only in cache today).
+         */
+        async function loadInitialData() {
+            try {
+                if (!userId) {
+                    console.warn('⚠️ [TopRankers] No userId available for initial data load');
+                    return;
+                }
+                
+                console.log('📊 [TopRankers] Loading initial data from server...');
+                
+                const response = await fetch(`${API_URL}/api/widget/initial-data/${userId}/top_rankers`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    console.warn('⚠️ [TopRankers] Failed to load initial data:', response.status);
+                    return;
+                }
+                
+                const result = await response.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    console.log('✅ [TopRankers] Initial data loaded:', result.data);
+                    updateRankers(result.data);
+                } else {
+                    console.log('ℹ️ [TopRankers] No data available yet');
+                }
+                
+            } catch (error) {
+                console.error('❌ [TopRankers] Error loading initial data:', error);
+            }
+        }
+
+        /**
+         * Update Rankers Display - Smart Update (Only Changed Data)
+         */
+        function updateRankers(rankers) {
+            if (!Array.isArray(rankers) || rankers.length === 0) {
+                console.log('⚠️ [TopRankers] No rankers data');
+                return;
+            }
+
+            // Take only top 3
+            const top3 = rankers.slice(0, 3);
+            
+            // Update each unit
+            top3.forEach((ranker, index) => {
+                const rank = index + 1;
+                const unit = document.querySelector(`.rank-unit[data-rank="${rank}"]`);
+                
+                if (!unit) return;
+                
+                const prev = previousData[rank];
+                const newNickname = ranker.nickname || ranker.uniqueId || 'مستخدم';
+                const newCoinCount = ranker.coinCount || 0;
+                const newAvatar = ranker.avatar || '';
+                
+                let hasChanges = false;
+                
+                // Update player name - ONLY if changed
+                const nameEl = unit.querySelector('.player-name');
+                if (nameEl && prev.nickname !== newNickname) {
+                    nameEl.textContent = newNickname;
+                    prev.nickname = newNickname;
+                    hasChanges = true;
+                    console.log(`📝 [TopRankers] Rank ${rank} - Name changed to: ${newNickname}`);
+                }
+                
+                // Update score - ONLY if changed
+                const scoreEl = unit.querySelector('.score');
+                if (scoreEl && prev.coinCount !== newCoinCount) {
+                    const currentCount = prev.coinCount || 0;
+                    animateNumber(scoreEl, currentCount, newCoinCount, 500);
+                    prev.coinCount = newCoinCount;
+                    hasChanges = true;
+                    console.log(`💰 [TopRankers] Rank ${rank} - Coins changed: ${currentCount} → ${newCoinCount}`);
+                }
+                
+                // Update avatar - ONLY if changed
+                const avatarEl = unit.querySelector('.avatar-img');
+                if (avatarEl && prev.avatar !== newAvatar) {
+                    if (newAvatar) {
+                        avatarEl.src = newAvatar;
+                        avatarEl.alt = newNickname;
+                        avatarEl.style.display = 'block';
+                        avatarEl.onerror = () => {
+                            avatarEl.style.display = 'none';
+                        };
+                        console.log(`🖼️ [TopRankers] Rank ${rank} - Avatar changed`);
+                    } else {
+                        avatarEl.style.display = 'none';
+                    }
+                    prev.avatar = newAvatar;
+                    hasChanges = true;
+                }
+            });
+        }
+
+        /**
+         * Animate Number Change
+         */
+        function animateNumber(element, from, to, duration) {
+            const start = Date.now();
+            const range = to - from;
+            
+            function update() {
+                const now = Date.now();
+                const progress = Math.min((now - start) / duration, 1);
+                const current = Math.floor(from + (range * progress));
+                
+                element.textContent = formatNumber(current);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            
+            update();
+        }
+
+        /**
+         * Format Number with Commas
+         */
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            }
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        /**
+         * Mock Mode - Demo Data
+         */
+        function startMockMode() {
+            const mockData = [
+                { 
+                    rank: 1, 
+                    coinCount: 125400, 
+                    userId: '1', 
+                    uniqueId: 'ahmed123', 
+                    nickname: 'أحمد محمد', 
+                    avatar: '/assets/img/avatar1.png'
+                },
+                { 
+                    rank: 2, 
+                    coinCount: 98750, 
+                    userId: '2', 
+                    uniqueId: 'fatima_ali', 
+                    nickname: 'فاطمة علي', 
+                    avatar: '/assets/img/avatar2.png'
+                },
+                { 
+                    rank: 3, 
+                    coinCount: 76200, 
+                    userId: '3', 
+                    uniqueId: 'mohamed_s', 
+                    nickname: 'محمد سالم', 
+                    avatar: '/assets/img/avatar3.png'
+                }
+            ];
+
+            console.log('🎭 [TopRankers] Loading mock data...');
+            
+            setTimeout(() => {
+                updateRankers(mockData);
+                
+                // Update coins every 2 seconds for demo
+                setInterval(() => {
+                    mockData.forEach(user => {
+                        user.coinCount += Math.floor(Math.random() * 500);
+                    });
+                    
+                    updateRankers(mockData);
+                }, 2000);
+            }, 500);
+        }
+
+        // Start when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initialize);
+        } else {
+            initialize();
+        }
+    </script>
+</body>
+</html>

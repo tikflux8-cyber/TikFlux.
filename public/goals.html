@@ -1,0 +1,1323 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-i18n-layout-dir="rtl">
+<head>
+  <script src="/assets/b/aa9c4c6deef9b265.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/">
+  <link rel="icon" href="/assets/img/tikoverlay-mark.png?v=20260802" type="image/png">
+  <link rel="shortcut icon" href="/assets/img/tikoverlay-mark.png?v=20260802" type="image/png">
+  <title data-i18n="common.pageTitle">TikOverlay</title>
+  <meta name="description" content="TikOverlay Ù…Ù†ØµØ© Ø§Ø­ØªØ±Ø§ÙÙŠØ© Ù„ØµÙ†Ø§Ø¹ Ø§Ù„Ø¨Ø« Ø¹Ù„Ù‰ TikTok LIVE. Ø£Ø¶Ù ØªØ±Ø§ÙƒØ¨Ø§Øª ØªÙØ§Ø¹Ù„ÙŠØ©ØŒ Ø§Ø¹Ø±Ø¶ Ø£ÙØ¶Ù„ Ø§Ù„Ø¯Ø§Ø¹Ù…ÙŠÙ†ØŒ ÙØ¹Ù‘Ù„ TTS ÙˆØ¨ÙˆØª Ø§Ù„Ø¯Ø±Ø¯Ø´Ø©ØŒ ÙˆØ£Ù†Ø´Ø¦ ØªØ¬Ø±Ø¨Ø© Ø¨Ø« ØªÙØ§Ø¹Ù„ÙŠØ© Ø¨Ø§Ù„ÙƒØ§Ù…Ù„ Ø¹Ø¨Ø± Ø§Ù„ÙˆÙŠØ¨ Ø£Ùˆ ØªØ·Ø¨ÙŠÙ‚ Ø³Ø·Ø­ Ø§Ù„Ù…ÙƒØªØ¨.">
+  <meta name="keywords" content="TikOverlay, Tik Overlay, TikTok overlay, TikTok LIVE tools, ØªÙŠÙƒ Ø§ÙˆÙØ±Ù„ÙŠ, ØªÙŠÙƒ Ø£ÙˆÙØ±Ù„ÙŠ, ØªÙŠÙƒ Ø§ÙˆÙØ±ÙŠ">
+  <meta property="og:site_name" content="TikOverlay">
+  <meta property="og:title" content="TikOverlay">
+  <meta property="og:description" content="TikOverlay for TikTok LIVE creators: interactive overlays, goals, TTS, chat bot, and pro stream tools.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tikoverlay.live/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="TikOverlay">
+  <meta name="twitter:description" content="TikOverlay for TikTok LIVE creators: interactive overlays, goals, TTS, chat bot, and pro stream tools.">
+  <link rel="canonical" href="https://tikoverlay.live/">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "TikOverlay",
+      "alternateName": ["Tik Overlay", "ØªÙŠÙƒ Ø§ÙˆÙØ±Ù„ÙŠ", "ØªÙŠÙƒ Ø£ÙˆÙØ±Ù„ÙŠ", "ØªÙŠÙƒ Ø§ÙˆÙØ±ÙŠ"],
+      "url": "https://tikoverlay.live/"
+    }
+  </script>
+  <link rel="stylesheet" href="/assets/vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="/assets/vendor/splitting/splitting.css">
+  <link rel="stylesheet" href="/assets/vendor/splitting/splitting-cells.css">
+  <link rel="stylesheet" href="/assets/css/main-dashboard.v1.css">
+  <link rel="stylesheet" href="/assets/css/actions-avatar-frame.css">
+  <link rel="stylesheet" href="/assets/css/scene-builder.css">
+  <link rel="stylesheet" href="/assets/css/tikoverlay-color-picker.css">
+  <link rel="stylesheet" href="/assets/css/alert-library.css">
+  <link rel="stylesheet" href="/assets/css/alert-library-store.css">
+  <link rel="stylesheet" href="/assets/css/stats.css">
+  <style>
+    /* Ø²Ø± ØªØºÙŠÙŠØ± Ø§Ù„Ù„ØºØ© - ØµØºÙŠØ± Ø¨Ø­Ø±ÙÙŠÙ† ÙÙ‚Ø· (AR | EN) */
+    .lang-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      height: 38px;
+      box-sizing: border-box;
+      background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 3px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+    .lang-toggle .lang-btn {
+      padding: 0 10px;
+      height: 100%;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background: transparent;
+      color: #777;
+      transition: color 0.18s ease, background 0.18s ease;
+    }
+    .lang-toggle .lang-btn:hover {
+      color: #ddd;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .lang-toggle .lang-btn.active {
+      background: rgba(177, 0, 0, 0.22);
+      color: #ff6b6b;
+      box-shadow: none;
+      -webkit-text-fill-color: #ff6b6b;
+    }
+    .lang-toggle .lang-btn.active:hover {
+      background: rgba(177, 0, 0, 0.3);
+      box-shadow: none;
+    }
+    .lang-toggle .header-tools-sep {
+      display: none;
+    }
+  </style>
+  <style>
+    /* TikOverlay Animation Styles */
+    :root {
+      --brand-animation-duration: .5s;
+    }
+
+    /* Animation for Header + Sidebar Brand */
+    .brand .char,
+    .sidebar-brand-name .char {
+      display: inline-block;
+      animation-name: char-transform;
+      animation-duration: calc(var(--brand-animation-duration));
+      animation-fill-mode: both;
+      animation-delay: calc(var(--brand-animation-duration) + .05s * (var(--char-total) - var(--char-index)));
+      animation-timing-function: cubic-bezier(.5, 0, .5, 1);
+    }
+
+    .brand .char:first-child,
+    .sidebar-brand-name .char:first-child {
+      animation-name: first-char-transform;
+      animation-duration: calc(var(--brand-animation-duration) * 2);
+      animation-delay: 0s;
+    }
+
+    @keyframes char-transform {
+      0% { 
+        opacity: 0; 
+        transform: translateY(50%) rotate(30deg);
+      }
+      70% { 
+        opacity: 1;
+        transform: translateY(-6%) rotate(-5deg);
+      }
+      90% { 
+        transform: translateY(1%) rotate(2deg);
+      }
+      100% { 
+        opacity: 1;
+        transform: translateY(0%) rotate(0deg);
+      }
+    }
+
+    @keyframes first-char-transform {
+      0% { 
+        opacity: 0;
+        transform: translateX(calc(.75ch * var(--char-total))) translateY(200%) rotate(180deg);
+      }
+      40% { 
+        opacity: 1;
+        transform: translateX(calc(.75ch * var(--char-total))) translateY(-10%) rotate(-20deg);
+      }
+      60% { 
+        transform: translateX(calc(.75ch * var(--char-total))) translateY(7%) rotate(10deg);
+      }
+      100% { 
+        opacity: 1;
+        transform: translateX(0) translateY(0) rotate(0deg);
+      }
+    }
+
+    @keyframes brand-mark-enter {
+      0% {
+        opacity: 0;
+        transform: translateY(50%) rotate(26deg) scale(0.88);
+      }
+      70% {
+        opacity: 1;
+        transform: translateY(-6%) rotate(-5deg) scale(1.04);
+      }
+      90% {
+        transform: translateY(1%) rotate(2deg) scale(1);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) rotate(0deg) scale(1);
+      }
+    }
+
+    .header-brand-mark,
+    .sidebar-brand-mark {
+      animation-name: brand-mark-enter;
+      animation-duration: calc(var(--brand-animation-duration) * 1.15);
+      animation-delay: calc(var(--brand-animation-duration) * 0.42);
+      animation-fill-mode: both;
+      animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1);
+      transform-origin: 50% 55%;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .header-brand-mark,
+      .sidebar-brand-mark,
+      .brand .char,
+      .sidebar-brand-name .char {
+        animation: none;
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+
+
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="appLoadingScreen" class="app-loading-screen">
+    <div class="loading-content">
+      <div class="loading-logo">TikOverlay</div>
+      <div class="loading-spinner">
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+      </div>
+      <div class="loading-text" data-i18n="common.loading">Ø¬Ø§Ø±Ù ØªØ­Ù…ÙŠÙ„ Ù„ÙˆØ­Ø© Ø§Ù„ØªØ­ÙƒÙ…...</div>
+    </div>
+  </div>
+
+  <header class="header">
+    <div class="header-meta-zone">
+      <div class="header-tools">
+        <button type="button" class="header-cart-btn alib-hidden" id="headerStoreBtn" data-i18n-title="header.storeAria" title="TikOverlay Store" aria-label="TikOverlay Store">
+          <i class="fas fa-shopping-cart" aria-hidden="true"></i>
+          <span class="header-store-badge alib-hidden" id="headerStoreCartBadge">0</span>
+        </button>
+        <div class="lang-toggle" id="langToggle" role="group" aria-label="Language">
+          <button type="button" id="langAr" class="lang-btn" data-lang="ar" aria-pressed="true" data-i18n-title="lang.arabic" title="Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©">AR</button>
+          <span class="header-tools-sep" aria-hidden="true"></span>
+          <button type="button" id="langEn" class="lang-btn" data-lang="en" aria-pressed="false" data-i18n-title="lang.english" title="English">EN</button>
+        </div>
+      </div>
+
+      <span class="header-divider" aria-hidden="true"></span>
+
+      <div class="room-viewers-display" id="roomViewersDisplay" style="display: flex;">
+        <div class="viewers-chip" data-i18n-title="header.viewersNow" data-tip="Ø§Ù„Ù…Ø´Ø§Ù‡Ø¯ÙˆÙ† Ø§Ù„Ø¢Ù†">
+          <i class="fas fa-eye" aria-hidden="true"></i>
+          <span class="viewers-value" id="currentViewersValue">-</span>
+        </div>
+        <div class="viewers-chip" data-i18n-title="header.viewersTotal" data-tip="Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ø´Ø§Ù‡Ø¯ÙŠÙ†">
+          <i class="fas fa-users" aria-hidden="true"></i>
+          <span class="viewers-value" id="totalUserValue">-</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-connect-zone">
+      <div class="header-connect-bar">
+        <div class="connection-status-indicator">
+          <span class="status-dot" id="headerStatusDot"></span>
+          <span class="status-label" id="headerStatusLabel">ØºÙŠØ± Ù…ØªØµÙ„</span>
+        </div>
+        <div class="header-tiktok-field">
+          <i class="fab fa-tiktok" aria-hidden="true"></i>
+          <input type="text" id="tiktokInput" class="input-tiktok" autocapitalize="none" spellcheck="false" data-i18n-placeholder="header.tiktokPlaceholder" placeholder="Ø§Ø³Ù… Ø­Ø³Ø§Ø¨ TikTok" />
+        </div>
+        <button class="btn-connect" id="connectBtn" data-i18n="header.connect">Ø§ØªØµØ§Ù„</button>
+      </div>
+    </div>
+
+    <div class="header-profile-zone">
+      <div class="room-info-display" id="roomInfoDisplay" style="display: none;">
+        <div class="room-details">
+          <div class="room-nickname" id="roomNickname">-</div>
+          <div class="room-title" id="roomTitle">-</div>
+        </div>
+        <img class="room-avatar" id="roomAvatar" src="" alt="Avatar" />
+      </div>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand" data-i18n-title="header.animationHint" title="Ø§Ø¶ØºØ· Ù„Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ø£Ù†ÙŠÙ…ÙŠØ´Ù†">
+        <img class="sidebar-brand-mark" src="assets/img/tikoverlay-mark.png" alt="" width="40" height="40" decoding="async" />
+        <span class="sidebar-brand-name" data-splitting>TikOverlay</span>
+      </div>
+      <div class="nav-menu-wrap">
+      <nav class="nav-menu">
+        <div class="nav-menu-track">
+        <button class="nav-btn active" id="accountBtn">
+          <span class="nav-icon"><i class="fas fa-user-circle"></i></span>
+          <span class="nav-text" data-i18n="sidebar.account">Ø§Ù„ØªØ³Ø¬ÙŠÙ„</span>
+          <span class="nav-indicator"></span>
+        </button>
+        <button class="nav-btn alib-hidden" id="alertStoreBtn" type="button">
+          <span class="nav-icon"><i class="fas fa-store"></i></span>
+          <span class="nav-text" data-i18n="sidebar.store">Ù…ØªØ¬Ø± Ø§Ù„Ø£Ù„ÙŠØ±ØªØ§Øª</span>
+          <span class="nav-indicator"></span>
+        </button>
+        <button class="nav-btn" id="overlaysBtn">
+          <span class="nav-icon"><i class="fas fa-layer-group"></i></span>
+          <span class="nav-text" data-i18n="sidebar.overlays">Overlays</span>
+          <span class="nav-indicator"></span>
+        </button>
+        <button class="nav-btn" id="latestEventsBtn">
+          <span class="nav-icon"><i class="fas fa-clock-rotate-left"></i></span>
+          <span class="nav-text" data-i18n="sidebar.latestEvents">Ø¢Ø®Ø± Ø§Ù„Ø£Ø­Ø¯Ø§Ø«</span>
+          <span class="nav-indicator"></span>
+        </button>
+        <button class="nav-btn nav-btn--has-new-badge" id="statsBtn">
+          <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+          <span class="nav-text" data-i18n="sidebar.stats">Ø§Ù„Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª</span>
+          <span class="nav-badge-new" data-i18n="sidebar.newBadge">NEW</span>
+          <span class="nav-indicator"></span>
+        </button>
+        <button class="nav-btn" id="topLikesBtn">
+          <span class="nav-icon"><i class="fas fa-crown"></i></span>
+          <span class="nav-text" data-i18n="sidebar.top">Top</span>
+          <span class="nav-indicator"></span>
+        </button>
+        <button class="nav-btn" id="goalsBtn">
+          <span class="nav-icon"><i class="fas fa-bullseye"></i></span>
+          <span class="nav-text" data-i18n="sidebar.goals">Ø§Ù„Ø£Ù‡Ø¯Ø§Ù</span>
+          <span class="nav-indicator"></span>
+        </button>
+        <button class="nav-btn" id="actionsBtn">
+          <span class="nav-icon"><i class="fas fa-bolt"></i></span>
+          <span class="nav-text" data-i18n="sidebar.actions">Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª</span>
+          <span class="nav-indicator"></span>
+        </button>
+        <button class="nav-btn" id="donationAlertsBtn">
+          <span class="nav-icon"><i class="fas fa-hand-holding-dollar"></i></span>
+          <span class="nav-text" data-i18n="sidebar.donationAlerts">ØªÙ†Ø¨ÙŠÙ‡Ø§Øª Ø§Ù„ØªØ¨Ø±Ø¹Ø§Øª</span>
+          <span class="nav-indicator"></span>
+        </button>
+        <button class="nav-btn" id="ttsBtn">
+          <span class="nav-icon"><i class="fas fa-volume-up"></i></span>
+          <span class="nav-text" data-i18n="sidebar.tts">TTS</span>
+          <span class="nav-indicator"></span>
+        </button>
+        <button class="nav-btn" id="chatBtn">
+          <span class="nav-icon"><i class="fas fa-comments"></i></span>
+          <span class="nav-text" data-i18n="sidebar.comments">Ø§Ù„ØªØ¹Ù„ÙŠÙ‚Ø§Øª</span>
+          <span class="nav-indicator"></span>
+        </button>
+        <button class="nav-btn" id="botChatBtn">
+          <span class="nav-icon"><i class="fas fa-robot"></i></span>
+          <span class="nav-text" data-i18n="sidebar.botChat">Bot Chat</span>
+          <span class="nav-indicator"></span>
+        </button>
+        <button class="nav-btn" id="musicPlayerBtn">
+          <span class="nav-icon"><i class="fas fa-music"></i></span>
+          <span class="nav-text" data-i18n="sidebar.musicPlayer">Ù…Ø´ØºÙ„ Ø§Ù„Ù…ÙˆØ³ÙŠÙ‚Ù‰</span>
+          <span class="nav-indicator"></span>
+        </button>
+        <button class="nav-btn" id="supportersLeaderboardBtn">
+          <span class="nav-icon"><i class="fas fa-trophy"></i></span>
+          <span class="nav-text" data-i18n="sidebar.supportersLeaderboard">ØªØµÙ†ÙŠÙ Ø§Ù„Ø¯Ø§Ø¹Ù…ÙŠÙ†</span>
+          <span class="nav-indicator"></span>
+        </button>
+        <button class="nav-btn" id="socialMediaBtn">
+          <span class="nav-icon"><i class="fas fa-share-nodes"></i></span>
+          <span class="nav-text" data-i18n="sidebar.socialMedia">Ø§Ù„Ø³ÙˆØ´ÙŠØ§Ù„ Ù…ÙŠØ¯ÙŠØ§</span>
+          <span class="nav-indicator"></span>
+        </button>
+        <button class="nav-btn" id="challengesBtn">
+          <span class="nav-icon"><i class="fas fa-gamepad"></i></span>
+          <span class="nav-text" data-i18n="sidebar.challenges">ØªØ­Ø¯ÙŠØ§Øª</span>
+          <span class="nav-indicator"></span>
+        </button>
+        <button class="nav-btn" id="linkScenesBtn" type="button">
+          <span class="nav-icon"><i class="fas fa-object-group"></i></span>
+          <span class="nav-text" data-i18n="sidebar.linkScenes">ØªØ¬Ù…ÙŠØ¹ Ø§Ù„Ø±ÙˆØ§Ø¨Ø·</span>
+          <span class="nav-indicator"></span>
+        </button>
+        </div>
+      </nav>
+      <div class="nav-scroll-hint" id="navScrollHint" aria-hidden="true">
+        <span class="nav-scroll-chevron"></span>
+        <span class="nav-scroll-chevron"></span>
+      </div>
+      </div>
+      
+      <div class="sidebar-footer">
+        <div class="footer-blur"></div>
+        <div class="footer-links">
+          <a href="dashboard/terms.html" class="footer-link">
+            <i class="fas fa-file-contract"></i>
+            <span class="footer-link-text" data-i18n="sidebar.terms">Terms</span>
+          </a>
+          <a href="dashboard/privacy.html" class="footer-link">
+            <i class="fas fa-shield-alt"></i>
+            <span class="footer-link-text" data-i18n="sidebar.privacy">Privacy</span>
+          </a>
+        </div>
+        <a href="https://t.me/c6w_x" class="version" target="_blank" rel="noopener noreferrer" title="Ø§Ù„Ø¯Ø¹Ù… Ø§Ù„ÙÙ†ÙŠ">
+          <i class="fas fa-headset"></i>
+          <span class="version-text" data-i18n="sidebar.support">Ø§Ù„Ø¯Ø¹Ù… Ø§Ù„ÙÙ†ÙŠ</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <!-- Account View -->
+      <div id="accountView" class="view account-view">
+        <!-- Primary: login OR account summary -->
+        <section class="account-primary" aria-label="Account access">
+          <!-- Login Form (shown immediately, hidden when authenticated) -->
+          <div id="loginForm" class="card account-auth-card">
+            <div class="login-form-header">
+              <h2 data-i18n="login.title">ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„</h2>
+              <button id="backToMethodBtn" class="login-back-btn" type="button" style="display: none;">
+                <span data-i18n="login.back">Ø±Ø¬ÙˆØ¹</span>
+                <i class="fas fa-arrow-left" aria-hidden="true"></i>
+              </button>
+            </div>
+            <div class="login-auth-stage">
+              <!-- Step 1: Choose login method -->
+              <div id="authMethodStep" class="auth-step">
+                <button id="emailLoginBtn" class="btn-secondary auth-email-btn" type="button">
+                  <i class="fas fa-envelope auth-method-btn-icon" aria-hidden="true"></i>
+                  <span data-i18n="login.emailOption">Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ</span>
+                </button>
+
+                <button id="googleLoginBtn" class="google-btn" type="button">
+                  <span class="google-btn__icon" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:v="https://vecta.io/nano" viewBox="0 0 186.69 190.5" width="20" height="20">
+                      <g transform="translate(1184.583 765.171)">
+                        <path d="M-1089.333-687.239v36.888h51.262c-2.251 11.863-9.006 21.908-19.137 28.662l30.913 23.986c18.011-16.625 28.402-41.044 28.402-70.052 0-6.754-.606-13.249-1.732-19.483z" fill="#4285f4"/>
+                        <path d="M-1142.714-651.791l-6.972 5.337-24.679 19.223h0c15.673 31.086 47.796 52.561 85.03 52.561 25.717 0 47.278-8.486 63.038-23.033l-30.913-23.986c-8.486 5.715-19.31 9.179-32.125 9.179-24.765 0-45.806-16.712-53.34-39.226z" fill="#34a853"/>
+                        <path d="M-1174.365-712.61c-6.494 12.815-10.217 27.276-10.217 42.689s3.723 29.874 10.217 42.689c0 .086 31.693-24.592 31.693-24.592-1.905-5.715-3.031-11.776-3.031-18.098s1.126-12.383 3.031-18.098z" fill="#fbbc05"/>
+                        <path d="M-1089.333-727.244c14.028 0 26.497 4.849 36.455 14.201l27.276-27.276c-16.539-15.413-38.013-24.852-63.731-24.852-37.234 0-69.359 21.388-85.032 52.561l31.692 24.592c7.533-22.514 28.575-39.226 53.34-39.226z" fill="#ea4335"/>
+                      </g>
+                    </svg>
+                  </span>
+                  <span class="google-btn__text" data-i18n="login.googleSignIn">Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© Ø¹Ø¨Ø± Google</span>
+                </button>
+                <p class="auth-message" id="emailMessage"></p>
+              </div>
+
+              <!-- Step 2: Email + OTP -->
+              <div id="emailStep" class="auth-step auth-step-hidden">
+                <input type="email" id="emailInput" class="input-field" data-i18n-placeholder="login.emailPlaceholder" placeholder="Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ" />
+                <button id="sendCodeBtn" class="btn-primary auth-send-code-btn" disabled>
+                  <span class="auth-send-code-btn__text" data-i18n="login.sendCodeLoading">Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...</span>
+                  <i class="fas fa-paper-plane auth-send-code-btn__icon" aria-hidden="true"></i>
+                </button>
+                <p class="auth-message" id="emailStepMessage"></p>
+              </div>
+
+              <div id="verifyStep" class="auth-step auth-step-hidden">
+                <p class="otp-target-label">
+                  <span data-i18n="login.codeSentTo">ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„ÙƒÙˆØ¯ Ø¥Ù„Ù‰</span>
+                  <span class="otp-target-email" id="otpTargetEmail"></span>
+                </p>
+                <div class="otp-grid" id="otpGrid">
+                  <input class="otp-input" type="text" inputmode="numeric" maxlength="1" />
+                  <input class="otp-input" type="text" inputmode="numeric" maxlength="1" />
+                  <input class="otp-input" type="text" inputmode="numeric" maxlength="1" />
+                  <input class="otp-input" type="text" inputmode="numeric" maxlength="1" />
+                  <input class="otp-input" type="text" inputmode="numeric" maxlength="1" />
+                  <input class="otp-input" type="text" inputmode="numeric" maxlength="1" />
+                </div>
+                <div class="otp-resend-row">
+                  <span class="otp-countdown" id="resendTimerText">60s</span>
+                  <button id="resendCodeBtn" class="otp-resend-btn" type="button" disabled data-i18n="login.resendCode">Ø¥Ø¹Ø§Ø¯Ø© Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø±Ù…Ø²</button>
+                </div>
+                <button id="verifyBtn" class="btn-primary auth-send-code-btn" type="button" data-i18n="login.verify">ØªØ­Ù‚Ù‚</button>
+                <p class="auth-message" id="verifyMessage"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Account + plan â€” calm two-card layout -->
+          <div id="accountCardsContainer" class="account-cards-container account-summary account-summary--calm" style="display: none;">
+            <div class="account-summary__grid">
+              <section id="accountInfo" class="account-calm-card" aria-labelledby="accountCalmTitle">
+                <h3 id="accountCalmTitle" class="account-calm-card__title" data-i18n="account.accountShort">Ø§Ù„Ø­Ø³Ø§Ø¨</h3>
+                <div class="account-calm-card__profile">
+                  <div class="account-calm-card__avatar" aria-hidden="true">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div class="account-calm-card__identity">
+                    <span class="account-calm-card__name" id="accountDisplayName">-</span>
+                    <span class="account-calm-card__email" id="userEmail">-</span>
+                  </div>
+                </div>
+                <button type="button" class="account-calm-card__btn account-calm-card__btn--ghost" id="logoutBtn" style="display: none;" data-i18n="account.logout">
+                  ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬
+                </button>
+              </section>
+
+              <section id="activeSubscriptionInfo" class="account-calm-card account-calm-card--plan" style="display: none;" aria-labelledby="planCalmTitle">
+                <h3 id="planCalmTitle" class="account-calm-card__title" data-i18n="account.planShort">Ø§Ù„Ø®Ø·Ø©</h3>
+                <div class="account-calm-card__plan-row">
+                  <div class="account-calm-card__plan-main">
+                    <span class="account-calm-card__eyebrow" data-i18n="account.currentPlan">Ø¨Ø§Ù‚ØªÙƒ Ø§Ù„Ø­Ø§Ù„ÙŠØ©</span>
+                    <span class="account-calm-card__plan-name" id="subscriptionPlan">-</span>
+                    <p class="account-calm-card__plan-status" id="subscriptionStatusBadge">
+                      <span id="subscriptionStatusText" data-i18n="account.subscriptionActive">Ø§Ø´ØªØ±Ø§Ùƒ Ù†Ø´Ø· - Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ù…ÙŠØ²Ø§Øª Ù…ØªØ§Ø­Ø©</span>
+                    </p>
+                    <div class="account-calm-card__dates">
+                      <div class="account-calm-card__date">
+                        <span class="account-calm-card__date-label" data-i18n="account.startDate">ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©</span>
+                        <span class="account-calm-card__date-value" id="subscriptionStartDate" dir="ltr">-</span>
+                      </div>
+                      <div class="account-calm-card__date">
+                        <span class="account-calm-card__date-label" data-i18n="account.endDate">ØªØ§Ø±ÙŠØ® Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡</span>
+                        <span class="account-calm-card__date-value" id="subscriptionEndDate" dir="ltr">-</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="account-calm-card__plan-side">
+                    <span class="account-calm-card__badge" id="subscriptionPlanBadge">â€”</span>
+                    <div class="account-calm-card__remaining" id="subscriptionRemaining" aria-live="polite">
+                      <span class="account-calm-card__date-label" data-i18n="account.remaining">Ù…ØªØ¨Ù‚ÙŠ</span>
+                      <span class="account-calm-card__remaining-value" id="subscriptionRemainingValue" dir="ltr">â€”</span>
+                    </div>
+                  </div>
+                </div>
+                <button type="button" class="account-calm-card__btn account-calm-card__btn--ghost subscription-manage-btn" id="manageSubscriptionBtn" style="display: none;" data-i18n="account.manageSubscription">
+                  Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ
+                </button>
+              </section>
+            </div>
+          </div>
+
+          <!--
+            Connection Mode â€” Desktop App Only.
+            Placed with account summary so settings stay together.
+            Hidden in browser; setupConnectionModeUI() reveals it when desktop.
+          -->
+          <div id="connectionModeCard" class="connection-mode-card connection-mode-card--compact" style="display: none;">
+            <div class="connection-mode-card__head">
+              <span class="connection-mode-card__title" data-i18n="connectionMode.title">ÙˆØ¶Ø¹ Ø§Ù„Ø§ØªØµØ§Ù„</span>
+              <span class="connection-mode-card__desc" data-i18n="connectionMode.desc">Ø§Ø®ØªØ± Ø·Ø±ÙŠÙ‚Ø© Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø£Ø­Ø¯Ø§Ø« Ø§Ù„Ø¨Ø« Ø§Ù„Ù…Ø¨Ø§Ø´Ø±.</span>
+            </div>
+            <div class="connection-mode-options">
+              <label class="connection-mode-option" data-mode="cloud">
+                <input type="radio" name="connectionMode" id="connectionModeCloud" value="cloud" checked />
+                <span class="connection-mode-pill">
+                  <i class="fas fa-cloud" aria-hidden="true"></i>
+                  <span data-i18n="connectionMode.cloud">Ø³Ø­Ø§Ø¨ÙŠ (Ø§ÙØªØ±Ø§Ø¶ÙŠ)</span>
+                </span>
+              </label>
+              <label class="connection-mode-option" data-mode="local">
+                <input type="radio" name="connectionMode" id="connectionModeLocal" value="local" />
+                <span class="connection-mode-pill">
+                  <i class="fas fa-desktop" aria-hidden="true"></i>
+                  <span data-i18n="connectionMode.local">Ù…Ø­Ù„ÙŠ</span>
+                </span>
+              </label>
+            </div>
+            <span class="connection-mode-locked-hint" id="connectionModeLockedHint" style="display: none;" data-i18n="connectionMode.lockedHint">
+              Ù„Ø§ ÙŠÙ…ÙƒÙ† ØªØºÙŠÙŠØ± ÙˆØ¶Ø¹ Ø§Ù„Ø§ØªØµØ§Ù„ Ø£Ø«Ù†Ø§Ø¡ Ø§Ù„Ø§ØªØµØ§Ù„ Ø§Ù„Ø­Ø§Ù„ÙŠ. Ø§Ù„Ø±Ø¬Ø§Ø¡ Ù‚Ø·Ø¹ Ø§Ù„Ø§ØªØµØ§Ù„ Ø£ÙˆÙ„Ø§Ù‹.
+            </span>
+          </div>
+        </section>
+
+        <!-- Plans -->
+        <section class="account-plans-section" aria-label="Subscription plans">
+        <!-- Subscription Panel (visible for everyone) -->
+        <div id="subscriptionPanel" class="subscription-panel animate-fade-in-up">  
+          
+          <div class="subscription-header">
+            <h2 data-i18n="account.choosePlan"> Ø§Ø®ØªØ± Ø®Ø·Ø© Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ</h2>
+            <p class="subscription-subtitle" data-i18n="account.getAllFeatures">Ø§Ø­ØµÙ„ Ø¹Ù„Ù‰ Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ù…ÙŠØ²Ø§Øª Ø§Ù„Ù…ØªÙ‚Ø¯Ù…Ø©</p>
+          </div>
+
+          <div class="subscription-plans">
+            <!-- Quarterly Plan -->
+            <div class="plan-card">
+              <div class="plan-badge" data-i18n="account.quarterlyPlan">Ø§Ù„Ø®Ø·Ø© Ø§Ù„Ø±Ø¨Ø¹ Ø³Ù†ÙˆÙŠØ©</div>
+              <div class="plan-header">
+                <h3 class="plan-name" data-i18n="account.quarterlyPlan">Ø§Ù„Ø®Ø·Ø© Ø§Ù„Ø±Ø¨Ø¹ Ø³Ù†ÙˆÙŠØ©</h3>
+                <div class="plan-price">
+                  <span class="price-currency">$</span>
+                  <span class="price-amount">39.99</span>
+                  <span class="price-period" data-i18n="account.per3Months">/ 3 Ø£Ø´Ù‡Ø±</span>
+                </div>
+                <div class="plan-savings" data-i18n="account.saveAmount">ÙˆÙÙ‘Ø± $4.98</div>
+              </div>
+              
+              <div class="plan-features">
+                <div class="feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span data-i18n="account.allOverlaysWidgets">Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù€ Overlays ÙˆØ§Ù„Ù€ Widgets</span>
+                </div>
+                <div class="feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span data-i18n="account.ttsUnlimited">TTS Ø¨Ø¯ÙˆÙ† Ù‚ÙŠÙˆØ¯</span>
+                </div>
+                <div class="feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span data-i18n="account.botChatAdvanced">Bot Chat Ù…ØªÙ‚Ø¯Ù…</span>
+                </div>
+                <div class="feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span data-i18n="account.allThemesEffects">Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø«ÙŠÙ…Ø§Øª ÙˆØ§Ù„ØªØ£Ø«ÙŠØ±Ø§Øª</span>
+                </div>
+                <div class="feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span data-i18n="account.premiumSupport">Ø¯Ø¹Ù… ÙÙ†ÙŠ Ù…Ù…ÙŠØ²</span>
+                </div>
+                <div class="feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span data-i18n="account.continuousUpdates">ØªØ­Ø¯ÙŠØ«Ø§Øª Ù…Ø³ØªÙ…Ø±Ø©</span>
+                </div>
+              </div>
+
+              <button type="button" class="btn-subscribe" data-plan="quarterly">
+                <span data-i18n="account.subscribeNow">Ø§Ø´ØªØ±Ùƒ Ø§Ù„Ø¢Ù†</span>
+                <i class="fas fa-arrow-left"></i>
+              </button>
+            </div>
+
+            <!-- Monthly Plan -->
+            <div class="plan-card">
+              <div class="plan-badge" data-i18n="account.monthly">Ø´Ù‡Ø±ÙŠ</div>
+              <div class="plan-header">
+                <h3 class="plan-name" data-i18n="account.monthlyPlan">Ø§Ù„Ø®Ø·Ø© Ø§Ù„Ø´Ù‡Ø±ÙŠØ©</h3>
+                <div class="plan-price">
+                  <span class="price-currency">$</span>
+                  <span class="price-amount">14.99</span>
+                  <span class="price-period" data-i18n="account.perMonth">/ Ø´Ù‡Ø±</span>
+                </div>
+              </div>
+              
+              <div class="plan-features">
+                <div class="feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span data-i18n="account.allOverlaysWidgets">Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù€ Overlays ÙˆØ§Ù„Ù€ Widgets</span>
+                </div>
+                <div class="feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span data-i18n="account.ttsUnlimited">TTS Ø¨Ø¯ÙˆÙ† Ù‚ÙŠÙˆØ¯</span>
+                </div>
+                <div class="feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span data-i18n="account.botChatAdvanced">Bot Chat Ù…ØªÙ‚Ø¯Ù…</span>
+                </div>
+                <div class="feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span data-i18n="account.allThemesEffects">Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø«ÙŠÙ…Ø§Øª ÙˆØ§Ù„ØªØ£Ø«ÙŠØ±Ø§Øª</span>
+                </div>
+                <div class="feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span data-i18n="account.premiumSupport">Ø¯Ø¹Ù… ÙÙ†ÙŠ Ù…Ù…ÙŠØ²</span>
+                </div>
+                <div class="feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span data-i18n="account.continuousUpdates">ØªØ­Ø¯ÙŠØ«Ø§Øª Ù…Ø³ØªÙ…Ø±Ø©</span>
+                </div>
+              </div>
+
+              <button type="button" class="btn-subscribe" data-plan="monthly">
+                <span data-i18n="account.subscribeNow">Ø§Ø´ØªØ±Ùƒ Ø§Ù„Ø¢Ù†</span>
+                <i class="fas fa-arrow-left"></i>
+              </button>
+            </div>
+
+            <!-- Yearly Plan -->
+            <div class="plan-card plan-featured">
+              <div class="plan-badge featured" data-i18n="account.maximumSavings">Ø£ÙƒØ¨Ø± ØªÙˆÙÙŠØ±</div>
+              <div class="plan-header">
+                <h3 class="plan-name" data-i18n="account.yearlyPlan">Ø§Ù„Ø®Ø·Ø© Ø§Ù„Ø³Ù†ÙˆÙŠØ©</h3>
+                <div class="plan-price">
+                  <span class="price-currency">$</span>
+                  <span class="price-amount">139.99</span>
+                  <span class="price-period" data-i18n="account.perYear">/ Ø³Ù†Ø©</span>
+                </div>
+                <div class="plan-savings" data-i18n="account.saveAmountYearly">ÙˆÙÙ‘Ø± $39.89 Ù…Ù‚Ø§Ø±Ù†Ø© Ø¨Ø§Ù„Ø¯ÙØ¹ Ø§Ù„Ø´Ù‡Ø±ÙŠ</div>
+              </div>
+
+              <div class="plan-features">
+                <div class="feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span data-i18n="account.allOverlaysWidgets">Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù€ Overlays ÙˆØ§Ù„Ù€ Widgets</span>
+                </div>
+                <div class="feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span data-i18n="account.ttsUnlimited">TTS Ø¨Ø¯ÙˆÙ† Ù‚ÙŠÙˆØ¯</span>
+                </div>
+                <div class="feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span data-i18n="account.botChatAdvanced">Bot Chat Ù…ØªÙ‚Ø¯Ù…</span>
+                </div>
+                <div class="feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span data-i18n="account.allThemesEffects">Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø«ÙŠÙ…Ø§Øª ÙˆØ§Ù„ØªØ£Ø«ÙŠØ±Ø§Øª</span>
+                </div>
+                <div class="feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span data-i18n="account.premiumSupport">Ø¯Ø¹Ù… ÙÙ†ÙŠ Ù…Ù…ÙŠØ²</span>
+                </div>
+                <div class="feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span data-i18n="account.continuousUpdates">ØªØ­Ø¯ÙŠØ«Ø§Øª Ù…Ø³ØªÙ…Ø±Ø©</span>
+                </div>
+              </div>
+
+              <button type="button" class="btn-subscribe" data-plan="yearly">
+                <span data-i18n="account.subscribeNow">Ø§Ø´ØªØ±Ùƒ Ø§Ù„Ø¢Ù†</span>
+                <i class="fas fa-arrow-left"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="subscription-footer">
+            <p>
+              <i class="fab fa-paypal" aria-hidden="true"></i>
+              <span data-i18n="account.securePayment">Ø§Ù„Ø¯ÙØ¹ Ø§Ù„Ø¢Ù…Ù† Ø¹Ø¨Ø± PayPal</span>
+            </p>
+            <p>
+              <i class="fas fa-lock" aria-hidden="true"></i>
+              <span data-i18n="account.cancelAnytime">Ø¥Ù„ØºØ§Ø¡ Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ ÙÙŠ Ø£ÙŠ ÙˆÙ‚Øª</span>
+            </p>
+          </div>
+        </div>
+        </section>
+
+        <!-- Secondary: desktop app + live activity -->
+        <section class="account-secondary" aria-label="More">
+          <div class="desktop-app-promo account-calm-strip" id="desktop-app-promo-section">
+            <div class="desktop-app-promo__inner">
+              <div class="desktop-app-promo__brand">
+                <img class="desktop-app-promo__icon" src="assets/img/tikoverlay-mark.png" alt="" width="120" height="120">
+                <span class="desktop-app-promo__app-name" data-i18n="account.desktopAppName">TikOverlay Desktop</span>
+                <div class="desktop-app-promo__copy">
+                  <h3 class="desktop-app-promo__title">
+                    <span data-i18n="account.desktopAppAvailable">ØªØ·Ø¨ÙŠÙ‚ Ø³Ø·Ø­ Ø§Ù„Ù…ÙƒØªØ¨ Ù…ØªÙˆÙØ± Ø§Ù„Ø¢Ù†!</span>
+                  </h3>
+                  <p class="desktop-app-promo__desc" data-i18n="account.desktopAppDesc">
+                    Ø§Ø­ØµÙ„ Ø¹Ù„Ù‰ ØªØ¬Ø±Ø¨Ø© Ø£ÙØ¶Ù„ ÙˆØ£Ø¯Ø§Ø¡ Ø£Ø³Ø±Ø¹ Ù…Ø¹ ØªØ·Ø¨ÙŠÙ‚ TikOverlay Desktop. Ù…ÙŠØ²Ø§Øª Ø­ØµØ±ÙŠØ© Ù…Ø«Ù„ Bot Chat Ø§Ù„Ø°ÙƒÙŠØŒ ØªØ­Ø¯ÙŠØ«Ø§Øª ØªÙ„Ù‚Ø§Ø¦ÙŠØ©ØŒ ÙˆÙˆØ§Ø¬Ù‡Ø© Ù…Ø­Ø³Ù‘Ù†Ø© Ù„Ù„Ø¨Ø« Ø§Ù„Ù…Ø¨Ø§Ø´Ø±!
+                  </p>
+                </div>
+              </div>
+              <a href="/app" class="desktop-download-btn">
+                <i class="fas fa-download" aria-hidden="true"></i>
+                <span data-i18n="account.downloadApp">ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚</span>
+              </a>
+            </div>
+          </div>
+
+          <section
+            id="platform-ticker-widget"
+            class="platform-ticker-widget account-calm-ticker"
+            aria-live="polite"
+          >
+            <div class="platform-ticker-widget__header">
+              <div class="platform-ticker-widget__title-row">
+                <span class="platform-ticker-widget__icon" aria-hidden="true">
+                  <i class="fas fa-bolt"></i>
+                </span>
+                <h3 class="platform-ticker-widget__title" data-i18n="account.platformTickerTitle">
+                  Ù†Ø´Ø§Ø· Ø§Ù„Ù…Ù†ØµØ© ÙÙŠ Ø§Ù„ÙˆÙ‚Øª Ø§Ù„Ø­Ø§Ù„ÙŠ
+                </h3>
+                <span
+                  id="platformTickerWsStatus"
+                  class="platform-ticker-widget__ws-badge platform-ticker-widget__ws-badge--off"
+                  title=""
+                >
+                  <span class="platform-ticker-widget__ws-dot" aria-hidden="true"></span>
+                  <span id="platformTickerWsLabel" data-i18n="account.platformTickerConnecting">Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø§ØªØµØ§Ù„â€¦</span>
+                </span>
+              </div>
+              <div class="platform-ticker-widget__counter-wrap">
+                <p id="platformTickerCounter" class="platform-ticker-widget__counter">0</p>
+                <div class="platform-ticker-widget__since">
+                  <span class="platform-ticker-widget__since-label" data-i18n="account.platformTickerSince">Ø­Ø¯Ø« Ù…Ù†Ø°</span>
+                  <span id="platformTickerSinceClock" class="platform-ticker-widget__since-clock" dir="ltr">00:00:00</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="platform-ticker-widget__table-wrap">
+              <div class="platform-ticker-widget__table-head">
+                <span data-i18n="account.platformTickerStreamer">Ø§Ù„Ø³ØªØ±ÙŠÙ…Ø±</span>
+                <span data-i18n="account.platformTickerUser">Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…</span>
+                <span data-i18n="account.platformTickerEvent">Ø§Ù„Ø­Ø¯Ø«</span>
+              </div>
+              <div id="platformTickerBody" class="platform-ticker-widget__body"></div>
+            </div>
+          </section>
+        </section>
+
+        <!-- About Service â€” showcase style (brand colors) -->
+        <section class="about-service about-showcase" aria-labelledby="aboutServiceTitle">
+          <div class="about-showcase__head">
+            <div class="about-showcase__brand" aria-hidden="true">
+              <span class="about-showcase__line about-showcase__line--left"></span>
+              <span class="about-showcase__diamond"></span>
+              <img class="about-showcase__logo" src="assets/img/tikoverlay-mark.png" alt="" width="40" height="40">
+              <span class="about-showcase__diamond"></span>
+              <span class="about-showcase__line about-showcase__line--right"></span>
+            </div>
+            <h3 id="aboutServiceTitle" data-i18n="account.aboutServiceWhy">Ù„Ù…Ø§Ø°Ø§ TikOverlayØŸ</h3>
+            <p class="about-showcase__subtitle" data-i18n="account.aboutServiceWhyDesc">
+              ÙƒÙ„ Ù…Ø§ ØªØ­ØªØ§Ø¬Ù‡ Ù„Ø¨Ø« Ù…Ø¨Ø§Ø´Ø± Ø§Ø­ØªØ±Ø§ÙÙŠ Ø¹Ù„Ù‰ TikTok ÙÙŠ Ù…ÙƒØ§Ù† ÙˆØ§Ø­Ø¯
+            </p>
+          </div>
+
+          <div class="about-content">
+            <div class="about-grid">
+              <div class="about-item">
+                <div class="about-icon" aria-hidden="true">
+                  <svg class="about-icon__hex" viewBox="0 0 80 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="40,3 75,22.5 75,65.5 40,85 5,65.5 5,22.5" stroke="currentColor" stroke-width="1.6"/>
+                  </svg>
+                  <i class="fas fa-layer-group"></i>
+                </div>
+                <div class="about-text">
+                  <h4 data-i18n="account.aboutOverlays">Overlays Ù…ØªÙ‚Ø¯Ù…Ø©</h4>
+                  <p data-i18n="account.aboutOverlaysDesc">ØªØ±Ø§ÙƒØ¨Ø§Øª Ø§Ø­ØªØ±Ø§ÙÙŠØ© Ù„Ù„Ø¨Ø« Ø§Ù„Ù…Ø¨Ø§Ø´Ø± Ù…Ø¹ ØªØ£Ø«ÙŠØ±Ø§Øª Ù…Ø°Ù‡Ù„Ø©</p>
+                </div>
+              </div>
+
+              <div class="about-item">
+                <div class="about-icon" aria-hidden="true">
+                  <svg class="about-icon__hex" viewBox="0 0 80 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="40,3 75,22.5 75,65.5 40,85 5,65.5 5,22.5" stroke="currentColor" stroke-width="1.6"/>
+                  </svg>
+                  <i class="fas fa-palette"></i>
+                </div>
+                <div class="about-text">
+                  <h4 data-i18n="account.aboutThemes">Ø«ÙŠÙ…Ø§Øª Ù…ØªÙ†ÙˆØ¹Ø©</h4>
+                  <p data-i18n="account.aboutThemesDesc">ØªØµØ§Ù…ÙŠÙ… Ø¬Ø§Ù‡Ø²Ø© ÙˆÙ‚Ø§Ø¨Ù„Ø© Ù„Ù„ØªØ®ØµÙŠØµ Ø¨Ø§Ù„ÙƒØ§Ù…Ù„</p>
+                </div>
+              </div>
+
+              <div class="about-item">
+                <div class="about-icon" aria-hidden="true">
+                  <svg class="about-icon__hex" viewBox="0 0 80 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="40,3 75,22.5 75,65.5 40,85 5,65.5 5,22.5" stroke="currentColor" stroke-width="1.6"/>
+                  </svg>
+                  <i class="fas fa-robot"></i>
+                </div>
+                <div class="about-text">
+                  <h4 data-i18n="account.aboutBotChat">Bot Chat Ø°ÙƒÙŠ</h4>
+                  <p data-i18n="account.aboutBotChatDesc">Ø±Ø¯ÙˆØ¯ ØªÙ„Ù‚Ø§Ø¦ÙŠØ© Ø°ÙƒÙŠØ© ÙˆØªÙØ§Ø¹Ù„ Ù…Ø¹ Ø§Ù„Ù…Ø´Ø§Ù‡Ø¯ÙŠÙ†</p>
+                </div>
+              </div>
+
+              <div class="about-item">
+                <div class="about-icon" aria-hidden="true">
+                  <svg class="about-icon__hex" viewBox="0 0 80 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="40,3 75,22.5 75,65.5 40,85 5,65.5 5,22.5" stroke="currentColor" stroke-width="1.6"/>
+                  </svg>
+                  <i class="fas fa-volume-up"></i>
+                </div>
+                <div class="about-text">
+                  <h4 data-i18n="account.aboutTTS">TTS Ù…ØªØ·ÙˆØ±</h4>
+                  <p data-i18n="account.aboutTTSDesc">ØªØ­ÙˆÙŠÙ„ Ø§Ù„Ù†Øµ Ù„ØµÙˆØª Ø¨Ø¬ÙˆØ¯Ø© Ø¹Ø§Ù„ÙŠØ© ÙˆÙ„ØºØ§Øª Ù…ØªØ¹Ø¯Ø¯Ø©</p>
+                </div>
+              </div>
+
+              <div class="about-item">
+                <div class="about-icon" aria-hidden="true">
+                  <svg class="about-icon__hex" viewBox="0 0 80 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="40,3 75,22.5 75,65.5 40,85 5,65.5 5,22.5" stroke="currentColor" stroke-width="1.6"/>
+                  </svg>
+                  <i class="fas fa-bullseye"></i>
+                </div>
+                <div class="about-text">
+                  <h4 data-i18n="account.aboutGoals">Ø£Ù‡Ø¯Ø§Ù ØªÙØ§Ø¹Ù„ÙŠØ©</h4>
+                  <p data-i18n="account.aboutGoalsDesc">Ø£Ù‡Ø¯Ø§Ù Ù„Ù„Ù…ØªØ§Ø¨Ø¹Ø§Øª ÙˆØ§Ù„Ù‡Ø¯Ø§ÙŠØ§ ÙˆØ§Ù„Ø¥Ø¹Ø¬Ø§Ø¨Ø§Øª</p>
+                </div>
+              </div>
+
+              <div class="about-item">
+                <div class="about-icon" aria-hidden="true">
+                  <svg class="about-icon__hex" viewBox="0 0 80 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="40,3 75,22.5 75,65.5 40,85 5,65.5 5,22.5" stroke="currentColor" stroke-width="1.6"/>
+                  </svg>
+                  <i class="fas fa-headset"></i>
+                </div>
+                <div class="about-text">
+                  <h4 data-i18n="account.aboutSupport">Ø¯Ø¹Ù… Ù…Ø³ØªÙ…Ø±</h4>
+                  <p data-i18n="account.aboutSupportDesc">ÙØ±ÙŠÙ‚ Ø¯Ø¹Ù… ÙÙ†ÙŠ Ù…ØªØ§Ø­ Ù„Ù„Ù…Ø³Ø§Ø¹Ø¯Ø© Ø¯Ø§Ø¦Ù…Ø§Ù‹</p>
+                </div>
+              </div>
+
+              <div class="about-item">
+                <div class="about-icon" aria-hidden="true">
+                  <svg class="about-icon__hex" viewBox="0 0 80 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="40,3 75,22.5 75,65.5 40,85 5,65.5 5,22.5" stroke="currentColor" stroke-width="1.6"/>
+                  </svg>
+                  <i class="fas fa-bell"></i>
+                </div>
+                <div class="about-text">
+                  <h4 data-i18n="account.aboutAlerts">ØªÙ†Ø¨ÙŠÙ‡Ø§Øª Ø°ÙƒÙŠØ© Ø¨Ø§Ù„Ø¯ÙˆÙ„Ø©</h4>
+                  <p data-i18n="account.aboutAlertsDesc">ØªØ®ØµÙŠØµ Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª Ø­Ø³Ø¨ Ø¯ÙˆÙ„ Ø§Ù„Ù…ØªÙØ§Ø¹Ù„ÙŠÙ†</p>
+                </div>
+              </div>
+
+              <div class="about-item">
+                <div class="about-icon" aria-hidden="true">
+                  <svg class="about-icon__hex" viewBox="0 0 80 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="40,3 75,22.5 75,65.5 40,85 5,65.5 5,22.5" stroke="currentColor" stroke-width="1.6"/>
+                  </svg>
+                  <i class="fas fa-trophy"></i>
+                </div>
+                <div class="about-text">
+                  <h4 data-i18n="account.aboutStats">ØªØ­Ø¯ÙŠØ§Øª Ù‚ÙˆÙŠØ© Ø¨ÙŠÙ† Ø§Ù„Ù…ØªØ§Ø¨Ø¹ÙŠÙ†</h4>
+                  <p data-i18n="account.aboutStatsDesc">ØªØ­Ø¯ÙŠØ§Øª Ø§Ù„Ù‡Ø¯Ø§ÙŠØ§ ÙˆØ§Ù„ØªÙØ§Ø¹Ù„ Ù„Ø±ÙØ¹ Ø­Ù…Ø§Ø³ Ø§Ù„Ø¬Ù…Ù‡ÙˆØ± ÙˆÙ…Ù†Ø§ÙØ³Ø© Ø§Ù„Ù…ØªØ§Ø¨Ø¹ÙŠÙ†</p>
+                </div>
+              </div>
+
+              <div class="about-item">
+                <div class="about-icon" aria-hidden="true">
+                  <svg class="about-icon__hex" viewBox="0 0 80 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="40,3 75,22.5 75,65.5 40,85 5,65.5 5,22.5" stroke="currentColor" stroke-width="1.6"/>
+                  </svg>
+                  <i class="fas fa-hourglass-half"></i>
+                </div>
+                <div class="about-text">
+                  <h4 data-i18n="account.aboutSubathon">Ø³Ø¨Ø«ÙˆÙ† ØªÙØ§Ø¹Ù„ÙŠ</h4>
+                  <p data-i18n="account.aboutSubathonDesc">Ø¹Ø¯Ø§Ø¯ Ø³Ø¨Ø«ÙˆÙ† ÙŠØªØ£Ø«Ø± Ù…Ø¨Ø§Ø´Ø±Ø© Ø¨ØªÙØ§Ø¹Ù„ Ø§Ù„Ø¨Ø« Ù…Ø«Ù„ Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© ÙˆØ§Ù„Ù„Ø§ÙŠÙƒØ§Øª ÙˆØ§Ù„Ù‡Ø¯Ø§ÙŠØ§</p>
+                </div>
+              </div>
+
+              <div class="about-item">
+                <div class="about-icon" aria-hidden="true">
+                  <svg class="about-icon__hex" viewBox="0 0 80 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="40,3 75,22.5 75,65.5 40,85 5,65.5 5,22.5" stroke="currentColor" stroke-width="1.6"/>
+                  </svg>
+                  <i class="fas fa-music"></i>
+                </div>
+                <div class="about-text">
+                  <h4 data-i18n="account.aboutMusicPlayer">Ù…Ø´ØºÙ„ Ù…ÙˆØ³ÙŠÙ‚Ù‰</h4>
+                  <p data-i18n="account.aboutMusicPlayerDesc">ÙŠØ¹Ù…Ù„ Ø¹Ø¨Ø± Ø£ÙˆØ§Ù…Ø± Ø¨Ø§Ù„ØªØ¹Ù„ÙŠÙ‚Ø§Øª Ù„Ø·Ù„Ø¨ Ø§Ù„Ø£ØºØ§Ù†ÙŠ ÙˆØ¥Ø¯Ø§Ø±Ø© Ø§Ù„ØªØ´ØºÙŠÙ„ Ø£Ø«Ù†Ø§Ø¡ Ø§Ù„Ø¨Ø« Ø§Ù„Ù…Ø¨Ø§Ø´Ø±</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Global App Footer (only on account view) -->
+        <footer class="app-footer">
+          <div class="app-footer-inner">
+            <!-- Contact section -->
+            <div class="app-footer-section">
+              <h4 class="app-footer-title" data-i18n="footer.contact">ØªÙˆØ§ØµÙ„</h4>
+              <div class="app-footer-links">
+                <a href="https://t.me/tikoverlay" target="_blank" rel="noopener noreferrer" class="app-footer-link">
+                  <i class="fab fa-telegram"></i>
+                  <span data-i18n="footer.telegram">ØªÙŠÙ„ÙŠØ¬Ø±Ø§Ù…</span>
+                </a>
+                <a href="https://www.instagram.com/c6w.x" target="_blank" rel="noopener noreferrer" class="app-footer-link">
+                  <i class="fab fa-instagram"></i>
+                  <span data-i18n="footer.instagram">Ø¥Ù†Ø³ØªØºØ±Ø§Ù…</span>
+                </a>
+                <a href="https://www.tiktok.com/@c6w.x" target="_blank" rel="noopener noreferrer" class="app-footer-link">
+                  <i class="fab fa-tiktok"></i>
+                  <span data-i18n="footer.tiktok">ØªÙŠÙƒ ØªÙˆÙƒ</span>
+                </a>
+                <a href="/cdn-cgi/l/email-protection#12616762627d606652667b797d6477607e736b3c717d7f" class="app-footer-link">
+                  <i class="fas fa-envelope"></i>
+                  <span data-i18n="footer.email">Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Product section -->
+            <div class="app-footer-section">
+              <h4 class="app-footer-title" data-i18n="footer.product">Ø§Ù„Ù…Ù†ØªØ¬</h4>
+              <div class="app-footer-links">
+                <a href="dashboard/features.html" class="app-footer-link">
+                  <i class="fas fa-star"></i>
+                  <span data-i18n="footer.features">Ø§Ù„Ù…Ù…ÙŠØ²Ø§Øª</span>
+                </a>
+                <a href="dashboard/pricing.html" class="app-footer-link">
+                  <i class="fas fa-tags"></i>
+                  <span data-i18n="footer.pricing">Ø§Ù„Ø£Ø³Ø¹Ø§Ø±</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Learn section -->
+            <div class="app-footer-section">
+              <h4 class="app-footer-title" data-i18n="footer.learn">ØªØ¹Ù„Ù…</h4>
+              <div class="app-footer-links">
+                <a href="dashboard/guides.html" class="app-footer-link">
+                  <i class="fas fa-book-open"></i>
+                  <span data-i18n="footer.guides">Ø§Ù„Ø§Ø¯Ù„Ø©</span>
+                </a>
+                <a href="dashboard/faq.html" class="app-footer-link">
+                  <i class="fas fa-circle-question"></i>
+                  <span data-i18n="footer.faq">Ø§Ù„Ø£Ø³Ø¦Ù„Ø© Ø§Ù„Ø´Ø§Ø¦Ø¹Ø©</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="app-footer-bottom">
+            <div class="app-footer-bottom-links">
+              <a href="dashboard/terms.html" class="app-footer-bottom-link">
+                <i class="fas fa-file-contract"></i>
+                <span data-i18n="footer.terms">Ø§Ù„Ø´Ø±ÙˆØ·</span>
+              </a>
+              <a href="dashboard/privacy.html" class="app-footer-bottom-link">
+                <i class="fas fa-shield-alt"></i>
+                <span data-i18n="footer.privacy">Ø§Ù„Ø®ØµÙˆØµÙŠØ©</span>
+              </a>
+              <a href="dashboard/refund-policy.html" class="app-footer-bottom-link">
+                <i class="fas fa-rotate-left"></i>
+                <span data-i18n="footer.refund">Ø³ÙŠØ§Ø³Ø© Ø§Ù„Ø§Ø³ØªØ±Ø¯Ø§Ø¯</span>
+              </a>
+            </div>
+
+            <div class="app-footer-bottom-links">
+              <div class="app-footer-lang-toggle" id="footerLangToggle" aria-label="Language switch">
+                <button type="button" id="footerLangAr" class="app-footer-lang-btn" data-lang="ar" data-i18n="footer.langAr">Ø¹Ø±Ø¨ÙŠ</button>
+                <button type="button" id="footerLangEn" class="app-footer-lang-btn" data-lang="en" data-i18n="footer.langEn">English</button>
+              </div>
+              <span class="app-footer-meta" data-i18n="footer.madeForStreamers">Ù…ØµÙ…Ù… Ø®ØµÙŠØµØ§Ù‹ Ù„ØµÙ†Ø§Ø¹ Ø§Ù„Ø¨Ø« Ø¹Ù„Ù‰ TikTok</span>
+            </div>
+          </div>
+        </footer>
+
+      </div>
+
+      <!-- Overlays View (Lazy Loaded) -->
+      <div id="overlaysView" class="view" style="display: none;">
+        <!-- Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø³ÙŠØªÙ… ØªØ­Ù…ÙŠÙ„Ù‡ Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ§Ù‹ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© -->
+      </div>
+
+      <!-- Social Media View -->
+      <div id="socialMediaView" class="view" style="display: none;">
+        <!-- Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø³ÙŠØªÙ… ØªØ­Ù…ÙŠÙ„Ù‡ Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ§Ù‹ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© -->
+      </div>
+      
+      <!-- Top Rankings View (Top Likes + Top Gifters) -->
+      <div id="topLikesView" class="view" style="display: none;">
+        <!-- Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø³ÙŠØªÙ… ØªØ­Ù…ÙŠÙ„Ù‡ Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ§Ù‹ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© -->
+      </div>
+
+      <!-- Goals View -->
+      <div id="goalsView" class="view" style="display: none;">
+        <!-- Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø³ÙŠØªÙ… ØªØ­Ù…ÙŠÙ„Ù‡ Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ§Ù‹ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© -->
+      </div>
+
+      <!-- Actions View (Lazy Loaded) -->
+      <div id="actionsView" class="view" style="display: none;">
+        <!-- Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø³ÙŠØªÙ… ØªØ­Ù…ÙŠÙ„Ù‡ Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ§Ù‹ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© -->
+      </div>
+
+      <!-- Donation Alerts View (Streamlabs â€” isolated from TikTok actions) -->
+      <div id="donationAlertsView" class="view" style="display: none;">
+        <!-- Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø³ÙŠØªÙ… ØªØ­Ù…ÙŠÙ„Ù‡ Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ§Ù‹ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© -->
+      </div>
+
+      <!-- Challenges View (Lazy Loaded) -->
+      <div id="challengesView" class="view" style="display: none;">
+        <!-- Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø³ÙŠØªÙ… ØªØ­Ù…ÙŠÙ„Ù‡ Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ§Ù‹ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© -->
+      </div>
+
+      <!-- Link Scenes / Scene Builder (Lazy Loaded) -->
+      <div id="linkScenesView" class="view" style="display: none;">
+        <!-- Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø³ÙŠØªÙ… ØªØ­Ù…ÙŠÙ„Ù‡ Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ§Ù‹ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© -->
+      </div>
+
+      <!-- TTS View (Lazy Loaded) -->
+      <div id="ttsView" class="view" style="display: none;">
+        <!-- Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø³ÙŠØªÙ… ØªØ­Ù…ÙŠÙ„Ù‡ Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ§Ù‹ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© -->
+      </div>
+
+      <!-- Chat Comments View (Lazy Loaded) -->
+      <div id="chatView" class="view" style="display: none;">
+        <!-- Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø³ÙŠØªÙ… ØªØ­Ù…ÙŠÙ„Ù‡ Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ§Ù‹ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© -->
+      </div>
+
+      <!-- Bot Chat View (Lazy Loaded - Desktop Only) -->
+      <div id="botChatView" class="view" style="display: none;">
+        <!-- Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø³ÙŠØªÙ… ØªØ­Ù…ÙŠÙ„Ù‡ Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ§Ù‹ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© -->
+      </div>
+
+      <!-- Music Player View (Lazy Loaded - Desktop Only) -->
+      <div id="musicPlayerView" class="view" style="display: none;">
+        <!-- Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø³ÙŠØªÙ… ØªØ­Ù…ÙŠÙ„Ù‡ Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ§Ù‹ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© -->
+      </div>
+
+      <!-- Supporters Leaderboard View (ØªØµÙ†ÙŠÙ Ø§Ù„Ø¯Ø§Ø¹Ù…ÙŠÙ†) -->
+      <div id="supportersLeaderboardView" class="view" style="display: none;">
+        <!-- Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø³ÙŠØªÙ… ØªØ­Ù…ÙŠÙ„Ù‡ Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ§Ù‹ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© -->
+      </div>
+
+      <!-- Alert Library Store View -->
+      <div id="alertStoreView" class="view" style="display: none;">
+        <!-- Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø³ÙŠØªÙ… ØªØ­Ù…ÙŠÙ„Ù‡ Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ§Ù‹ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© -->
+      </div>
+
+      <!-- Latest Events View -->
+      <div id="latestEventsView" class="view" style="display: none;">
+        <!-- Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø³ÙŠØªÙ… ØªØ­Ù…ÙŠÙ„Ù‡ Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ§Ù‹ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© -->
+      </div>
+
+      <!-- Stream Stats View -->
+      <div id="statsView" class="view" style="display: none;">
+        <!-- Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø³ÙŠØªÙ… ØªØ­Ù…ÙŠÙ„Ù‡ Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ§Ù‹ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© -->
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Modal Root Container (Portal) -->
+  <div id="modal-root"></div>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="/assets/vendor/supabase/supabase.min.js"></script>
+  <script>
+  window.ENV_CONFIG = { supabaseUrl:'http://localhost:3000', supabaseAnonKey:'local-mock', apiUrl:'http://localhost:3000', edgeWsUrl:'ws://localhost:3000/ws', paypalClientId:'', paypalMode:'sandbox', paypalPlanIds:{}, isAlertLibraryStoreEnabled:function(){return true}, isLinkScenesEnabled:function(){return true} };
+  </script>
+  <script>
+  (function(){
+    var UID='550e8400-e29b-41d4-a716-446655440000';
+    var u={id:UID,email:'user@tikflux.local',user_metadata:{name:'TikFlux User',avatar_url:''}};
+    var s={user:u,access_token:'mock',refresh_token:'mock',expires_at:Date.now()+86400000};
+    var listeners=[];
+    window.supabase.createClient=function(){
+      return{
+        auth:{
+          onAuthStateChange:function(cb){listeners.push(cb);setTimeout(function(){cb('INITIAL_SESSION',s)},10);return{data:{subscription:{unsubscribe:function(){}}}},
+          getSession:function(){return Promise.resolve({data:{session:s},error:null})},
+          getUser:function(){return Promise.resolve({data:{user:u},error:null})},
+          signInWithOtp:function(){return Promise.resolve({data:{},error:null})},
+          verifyOtp:function(){return Promise.resolve({data:{session:s,user:u},error:null})},
+          signOut:function(){return Promise.resolve({error:null})},
+          signInWithPassword:function(){return Promise.resolve({data:{user:u,session:s},error:null})},
+          signUp:function(){return Promise.resolve({data:{user:u,session:s},error:null})},
+          signInWithOAuth:function(){return Promise.resolve({data:{url:''},error:null})},
+          exchangeCodeForSession:function(){return Promise.resolve({data:{session:s},error:null})},
+          setSession:function(){return Promise.resolve({error:null})},
+          refreshSession:function(){return Promise.resolve({data:{session:s},error:null})}
+        },
+        from:function(t){var q={select:function(){return q},eq:function(){return q},neq:function(){return q},gt:function(){return q},gte:function(){return q},lt:function(){return q},lte:function(){return q},like:function(){return q},ilike:function(){return q},is:function(){return q},in:function(){return q},contains:function(){return q},containedBy:function(){return q},order:function(){return q},limit:function(){return q},range:function(){return q},single:function(){return q},maybeSingle:function(){return q},then:function(r){r({data:null,error:null});return Promise.resolve({data:null,error:null})},catch:function(){return q}};
+        return q},
+        rpc:function(){return Promise.resolve({data:null,error:null})},
+        storage:{from:function(){return{upload:function(){return Promise.resolve({data:{path:''},error:null})},getPublicUrl:function(p){return Promise.resolve({data:{publicUrl:''+p}})},list:function(){return Promise.resolve({data:[],error:null})},remove:function(){return Promise.resolve({data:[],error:null})}}}
+      }
+    };
+    window.supabaseClient=window.supabase.createClient();
+    window.TIKOVERLAY_USER_ID=UID;
+    window.showToast=function(){};
+    window.hasActiveSubscription=true;
+    // Force all auth checks to return true
+    var _origFetch=window.fetch;
+    window.fetch=function(url,opts){
+      if(typeof url==='string'&&url.includes('/api/subscriptions/status')){return Promise.resolve({ok:true,json:function(){return{hasActiveSubscription:true,subscription:{plan:'pro',status:'active'}}}})}
+      if(typeof url==='string'&&url.includes('/api/session')){return Promise.resolve({ok:true,json:function(){return{ok:true,session:{authenticated:true,user:{id:UID,email:'user@tikflux.local'}}}}})}
+      return _origFetch.apply(this,arguments);
+    };
+    window.authManager={user:u,isAuthenticated:function(){return Promise.resolve(true)},getSession:function(){return Promise.resolve({session:s,error:null})},getUser:function(){return Promise.resolve({user:u,error:null})},getAccessToken:function(){return Promise.resolve({token:'mock',error:null})},onAuthStateChange:function(cb){setTimeout(function(){cb('INITIAL_SESSION',s)},10);return{data:{subscription:{unsubscribe:function(){}}}}}};
+  })();
+  </script>
+  <script src="/assets/b/28b98888f9aaae4a.js"></script>
+  <script src="/assets/b/e60da56565660b05.js"></script>
+  <script src="/assets/vendor/splitting/splitting.min.js"></script>
+  <script>
+    // Initialize Splitting.js for TikOverlay brand animations
+    document.addEventListener('DOMContentLoaded', function() {
+      Splitting();
+
+      function wireBrandReplay(root, nameSelector, markSelector) {
+        if (!root) return;
+        var brandElement = root.querySelector(nameSelector);
+        var mark = root.querySelector(markSelector);
+        if (!brandElement) return;
+
+        function replayBrandAnimations() {
+          var chars = brandElement.querySelectorAll('.char');
+          chars.forEach(function (char) {
+            char.style.animation = 'none';
+          });
+          if (mark) mark.style.animation = 'none';
+
+          void brandElement.offsetWidth;
+          if (mark) void mark.offsetWidth;
+
+          chars.forEach(function (char) {
+            char.style.animation = '';
+          });
+          if (mark) mark.style.animation = '';
+        }
+
+        root.addEventListener('click', replayBrandAnimations);
+      }
+
+      wireBrandReplay(
+        document.querySelector('.sidebar-brand'),
+        '.sidebar-brand-name[data-splitting]',
+        '.sidebar-brand-mark'
+      );
+    });
+  </script>
+  <!-- Floating Telegram Button -->
+  <a class="tg-float-btn" href="https://t.me/tikoverlay" target="_blank" rel="noopener noreferrer" data-i18n-title="footer.telegramTitle" title="Ø§Ù†Ø¶Ù… Ù„Ù‚Ù†Ø§Ø© ØªÙ„Ø¬Ø±Ø§Ù…">
+    <div class="tg-float-inner">
+      <div class="tg-icon-wrap">
+        <svg class="tg-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.665 3.717L2.935 10.553c-1.215.486-1.208 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192L9.292 13.32l-.38 4.656c.557 0 .803-.256 1.116-.559l2.678-2.598 4.568 3.372c.842.464 1.449.226 1.658-.78l2.997-14.133c.306-1.226-.47-1.78-1.264-1.561z" fill="currentColor"/>
+        </svg>
+      </div>
+      <span class="tg-label" data-i18n="footer.joinTelegram">Ø§Ù†Ø¶Ù… Ù„Ù„ØªÙ„Ø¬Ø±Ø§Ù…</span>
+    </div>
+  </a>
+
+  <!-- Floating Desktop App Button (hidden in desktop app) -->
+  <a class="app-float-btn" href="/app" target="_blank" rel="noopener noreferrer" data-i18n-title="footer.downloadApp" title="ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚" id="desktop-app-btn">
+    <div class="app-float-inner">
+      <div class="app-icon-wrap">
+        <img src="assets/img/tikoverlay-mark.png" alt="TikOverlay" class="app-svg">
+      </div>
+      <span class="app-label" data-i18n="footer.downloadApp">ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚</span>
+    </div>
+  </a>
+
+  <script>
+    // Ø¥Ø®ÙØ§Ø¡ Ù‚Ø³Ù… ÙˆØ²Ø± ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ Ø¥Ø°Ø§ ÙƒØ§Ù† Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… ÙÙŠ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚
+    (function() {
+      const isDesktopApp = window.TIKOVERLAY_DESKTOP && window.TIKOVERLAY_DESKTOP.isDesktop === true;
+      
+      if (isDesktopApp) {
+        // Ø¥Ø®ÙØ§Ø¡ Ù‚Ø³Ù… Desktop App Promo
+        const promoSection = document.getElementById('desktop-app-promo-section');
+        if (promoSection) {
+          promoSection.style.display = 'none';
+          promoSection.remove(); // Ø­Ø°Ù Ø§Ù„Ù‚Ø³Ù… Ù†Ù‡Ø§Ø¦ÙŠØ§Ù‹ Ù…Ù† DOM
+        }
+        
+        // Ø¥Ø®ÙØ§Ø¡ Ø²Ø± Ø§Ù„ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø·Ø§ÙÙŠ
+        const appBtn = document.getElementById('desktop-app-btn');
+        if (appBtn) {
+          appBtn.classList.add('hidden-in-desktop');
+          appBtn.style.display = 'none';
+          appBtn.remove(); // Ø­Ø°Ù Ø§Ù„Ø²Ø± Ù†Ù‡Ø§Ø¦ÙŠØ§Ù‹ Ù…Ù† DOM
+        }
+        
+      }
+    })();
+  </script>
+
+  <script>
+    (function() {
+      function initNavScrollHint() {
+        var menu = document.querySelector('.sidebar .nav-menu');
+        var hint = document.getElementById('navScrollHint');
+        if (!menu || !hint) return;
+
+        function update() {
+          var canScroll = menu.scrollHeight > menu.clientHeight + 2;
+          var nearBottom = menu.scrollTop + menu.clientHeight >= menu.scrollHeight - 8;
+          hint.classList.toggle('is-hidden', !canScroll || nearBottom);
+        }
+
+        menu.addEventListener('scroll', update, { passive: true });
+        window.addEventListener('resize', update);
+        if (typeof ResizeObserver !== 'undefined') {
+          new ResizeObserver(update).observe(menu);
+        }
+        update();
+        requestAnimationFrame(update);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initNavScrollHint);
+      } else {
+        initNavScrollHint();
+      }
+    })();
+  </script>
+
+  <script src="/assets/b/3fb0cd6587e10244.js"></script>
+  <script>
+    (function() {
+      function initI18n() {
+        if (typeof i18n === 'undefined') return;
+        var base = document.querySelector('base');
+        var baseHref = base ? (base.getAttribute('href') || '/') : '/';
+        if (baseHref === '/') baseHref = '';
+        i18n.setBasePath(baseHref);
+        i18n.init(function() {
+          var lang = i18n.getLang();
+          var arBtn = document.getElementById('langAr');
+          var enBtn = document.getElementById('langEn');
+          var footerArBtn = document.getElementById('footerLangAr');
+          var footerEnBtn = document.getElementById('footerLangEn');
+
+          if (arBtn) { arBtn.classList.toggle('active', lang === 'ar'); arBtn.setAttribute('aria-pressed', lang === 'ar'); }
+          if (enBtn) { enBtn.classList.toggle('active', lang === 'en'); enBtn.setAttribute('aria-pressed', lang === 'en'); }
+          if (footerArBtn) { footerArBtn.classList.toggle('active', lang === 'ar'); }
+          if (footerEnBtn) { footerEnBtn.classList.toggle('active', lang === 'en'); }
+
+          arBtn && arBtn.addEventListener('click', function() { i18n.setLang('ar', updateToggle); });
+          enBtn && enBtn.addEventListener('click', function() { i18n.setLang('en', updateToggle); });
+          footerArBtn && footerArBtn.addEventListener('click', function() { i18n.setLang('ar', updateToggle); });
+          footerEnBtn && footerEnBtn.addEventListener('click', function() { i18n.setLang('en', updateToggle); });
+        });
+        function updateToggle() {
+          var lang = i18n.getLang();
+          var arBtn = document.getElementById('langAr');
+          var enBtn = document.getElementById('langEn');
+          var footerArBtn = document.getElementById('footerLangAr');
+          var footerEnBtn = document.getElementById('footerLangEn');
+
+          if (arBtn) { arBtn.classList.toggle('active', lang === 'ar'); arBtn.setAttribute('aria-pressed', lang === 'ar'); }
+          if (enBtn) { enBtn.classList.toggle('active', lang === 'en'); enBtn.setAttribute('aria-pressed', lang === 'en'); }
+          if (footerArBtn) { footerArBtn.classList.toggle('active', lang === 'ar'); }
+          if (footerEnBtn) { footerEnBtn.classList.toggle('active', lang === 'en'); }
+        }
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initI18n);
+      } else {
+        initI18n();
+      }
+    })();
+  </script>
+  <script src="/assets/b/8c386c8dbec5a57f.js"></script>
+  <script src="/assets/b/b667d2dce75c426d.js"></script>
+  <script src="/assets/b/58b741101830934f.js"></script>
+  <script src="/assets/b/40968a81930939db.js"></script>
+  
+  <!-- ES Modules (must use type="module") -->
+
+
+
+
+
+
+<script src="/assets/b/b466c356e58ad7ed.js"></script>  <script type="module" src="/assets/b/e368114bf932e2a5.js"></script>
+  <script data-cfasync="false">
+  (function () {
+    var KEY = 'tikoverlay_asset_reload_v1';
+    var mod = document.querySelector('script[type="module"][src*="/assets/b/"]');
+    if (!mod) return;
+    mod.addEventListener('error', function () {
+      if (sessionStorage.getItem(KEY)) return;
+      sessionStorage.setItem(KEY, '1');
+      var url = new URL(location.href);
+      url.searchParams.set('_cb', String(Date.now()));
+      location.replace(url.toString());
+    }, { once: true });
+  })();
+  </script>
+  
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a36797682e0fd399',t:'MTc4ODYzNjAyOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

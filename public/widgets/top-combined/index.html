@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/assets/img/tikflux-mark.png?v=20260802" type="image/png">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>TikFlux — تصنيف اللايكات والهدايا</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/vendor/fontawesome/css/all.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { overflow: hidden; height: 100%; }
+        body {
+            font-family: 'Cairo', Arial, sans-serif;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: transparent;
+        }
+        #theme-container {
+            width: 100%;
+            height: 100%;
+            transform-origin: center center;
+            will-change: transform, opacity;
+        }
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-size: 1.5rem;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div id="theme-container">
+        <div class="loading">Loading...</div>
+    </div>
+
+    <script src="/assets/b/8c386c8dbec5a57f.js"></script>
+    <script src="/assets/b/28b98888f9aaae4a.js"></script>
+    <script src="/assets/b/aa9c4c6deef9b265.js"></script>
+    <script src="/assets/b/3e676369681a88e4.js"></script>
+    <script src="/assets/b/01faca86f619b681.js"></script>
+<script src="/assets/b/f3e7e65150411c22.js"></script>
+
+    <script>
+        const hostname = window.location.hostname;
+        const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+        const API_URL = window.ENV_CONFIG?.API_URL || (isLocal ? 'http://localhost:3000' : 'https://api.tikflux.live');
+        const EDGE_WS_URL = window.ENV_CONFIG?.EDGE_WS_URL || (isLocal ? 'ws://localhost:3000/ws' : 'wss://edge.tikflux.live/ws');
+        const API_ROOT = isLocal ? 'http://localhost:3000' : 'https://api.tikflux.live';
+
+        /** Merged design + rotation timing (refetched after theme save from dashboard). */
+        let localCombinedSettings = {};
+
+        const params = new URLSearchParams(window.location.search);
+        const userId = params.get('uid');
+        const isMock = !userId || params.get('mock') === '1';
+        const uuidV4LikeRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        const hasInvalidUid = !isMock && !uuidV4LikeRegex.test(String(userId || '').trim());
+
+        let isInitialized = false;
+        let socket;
+
+        let latestLikes = [];
+        let latestGifters = [];
+        let mockThemeIndex = 0;
+        const MOCK_THEME_SEQUENCE = [
+            'taif',
+            'farashat',
+            'classic',
+            'cyber-blade',
+            'top-rankers',
+            'rose',
+            'rose-podium',
+            'rainbow-clouds',
+            'skulls',
+            'fawanis',
+        ];
+        const FIVE_RANK_THEMES = new Set([
+            'taif',
+            'farashat',
+            'rose',
+            'rose-podium',
+            'rainbow-clouds',
+            'skulls',
+            'top-rankers',
+            'fawanis',
+        ]);
+
+        /** @type {'likes'|'gifters'} */
+        let presentingMode = 'likes';
+        /** @type {{ cancelled: boolean }|null} */
+        let rotationToken = null;
+
+        function showInvalidLinkError() {
+            const container = document.getElementById('theme-container');
+            if (!container) return;
+            container.innerHTML =
+                '<div class="loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-size:1.35rem;font-weight:800;text-align:center;padding:24px;"><img src="/assets/img/tikflux-mark.png" alt="TikFlux" style="width:170px;max-width:60vw;" /><div style="color:#ff0000;">الرابط خطأ<br/>تاكد من نسخ الرابط بشكل صحيح</div></div>';
+        }
+
+        function sleep(ms) {
+            return new Promise((resolve) => setTimeout(resolve, ms));
+        }
+
+        function waitAbortable(ms, token) {
+            return new Promise((resolve) => {
+                const start = Date.now();
+                function tick() {
+                    if (token && token.cancelled) {
+                        resolve();
+                        return;
+                    }
+                    if (Date.now() - start >= ms) {
+                        resolve();
+                        return;
+                    }
+                    setTimeout(tick, 100);
+                }
+                tick();
+            });
+        }
+
+        function stopRotation() {
+            if (rotationToken) rotationToken.cancelled = true;
+            rotationToken = null;
+        }
+
+        function mapLikesPayload(top10) {
+            if (!Array.isArray(top10)) return [];
+            return top10.map((item) => ({
+                nickname: item.nickname,
+                avatar: item.avatar,
+                score: item.score != null ? item.score : 0,
+            }));
+        }
+
+        function mapGiftersPayload(top50) {
+            if (!Array.isArray(top50)) return [];
+            return top50.slice(0, 50).map((item) => ({
+                nickname: item.nickname,
+                avatar: item.avatar,
+                score: item.score != null ? item.score : item.totalGiftPoints ?? 0,
+            }));
+        }
+
+        function effectiveSettings() {
+            if (localCombinedSettings && Object.keys(localCombinedSettings).length > 0) {
+                return localCombinedSettings;
+            }
+            return window.ThemeLoader.getFetchedSettings?.() || {};
+        }
+
+        /** عند عدم وجود بث: نفس سلوك ودجتي اللايكات/الهدايا — إظهار مراكز وهمية --- / 0 */
+        function placeholderRankCount() {
+            const s = effectiveSettings();
+            let n = Number(s.visibleRanks);
+            if (!Number.isFinite(n) || n < 1) n = 10;
+            return Math.min(50, Math.max(1, Math.floor(n)));
+        }
+
+        function buildPlaceholderRows(count) {
+            return Array.from({ length: count }, () => ({
+                nickname: '---',
+                avatar: '',
+                score: 0,
+                placeholder: true,
+            }));
+        }
+
+        function hasMeaningfulRankingData(arr) {
+            return (
+                Array.isArray(arr) &&
+                arr.some((u) => u && !u.placeholder && Number(u.score) > 0)
+            );
+        }
+
+        function rowsForCurrentLikes() {
+            if (hasMeaningfulRankingData(latestLikes)) return latestLikes;
+            return buildPlaceholderRows(placeholderRankCount());
+        }
+
+        function rowsForCurrentGifters() {
+            if (hasMeaningfulRankingData(latestGifters)) return latestGifters;
+            return buildPlaceholderRows(placeholderRankCount());
+        }
+
+        function likesRankingsActive() {
+            return hasMeaningfulRankingData(latestLikes);
+        }
+
+        function giftersRankingsActive() {
+            return hasMeaningfulRankingData(latestGifters);
+        }
+
+        /** وضع العرض الأولي: هدايا فقط إذا لا يوجد لايكات حقيقية وهناك هدايا */
+        function pickPresentingModeForIdleView() {
+            if (!likesRankingsActive() && giftersRankingsActive()) return 'gifters';
+            return 'likes';
+        }
+
+        function readDirection() {
+            const runtimeDirection = document
+                .querySelector('#theme-container #theme-wrapper')
+                ?.getAttribute('data-direction');
+            if (runtimeDirection === 'ltr' || runtimeDirection === 'rtl') {
+                return runtimeDirection;
+            }
+            const s = effectiveSettings();
+            return s.direction === 'ltr' ? 'ltr' : 'rtl';
+        }
+
+        function readTimingMs() {
+            const s = effectiveSettings();
+            const minSec = isMock ? 2 : 3;
+            const likesSec = Math.max(minSec, Math.min(120, Number(s.likesDisplaySec) || 7));
+            const giftersSec = Math.max(minSec, Math.min(120, Number(s.giftersDisplaySec) || 7));
+            return { likesMs: likesSec * 1000, giftersMs: giftersSec * 1000 };
+        }
+
+        function getThemeDefaultRanks(themeName) {
+            if (String(themeName || '').toLowerCase() === 'default') return 20;
+            return FIVE_RANK_THEMES.has(String(themeName || '').toLowerCase()) ? 5 : 10;
+        }
+
+        async function switchMockTheme(nextTheme) {
+            const dir = readDirection();
+            const ranks = getThemeDefaultRanks(nextTheme);
+            localCombinedSettings = {
+                ...effectiveSettings(),
+                theme: nextTheme,
+                visibleRanks: ranks,
+                direction: dir,
+                likesDisplaySec: 2,
+                giftersDisplaySec: 2,
+            };
+            await window.ThemeLoader.switchTheme(nextTheme, ranks, dir);
+        }
+
+        function isNativeThemeSwitchAnimationTheme() {
+            const s = effectiveSettings();
+            const theme = String(s?.theme || '').toLowerCase();
+            return (
+                theme === 'cyber-blade' ||
+                theme === 'top-rankers' ||
+                theme === 'rose' ||
+                theme === 'rose-podium' ||
+                theme === 'rainbow-clouds' ||
+                theme === 'skulls'
+            );
+        }
+
+        function readSwitchDirection() {
+            const baseDir = readDirection();
+            // Keep classic aligned directly with selected direction.
+            return baseDir;
+        }
+
+        function getActiveThemeName() {
+            const runtimeTheme = window.ThemeLoader?.getCurrentTheme?.();
+            const settingsTheme = effectiveSettings()?.theme;
+            return String(runtimeTheme || settingsTheme || '').toLowerCase();
+        }
+
+        function getRankElements() {
+            const root = document.getElementById('theme-container');
+            if (!root) return [];
+
+            const selectors = [
+                '.rank-bar',
+                '.rank',
+                '.rank-item',
+                '.leaderboard-item',
+                '.top-item',
+                '.podium-item',
+                '.user-item',
+                '.entry',
+                '.list-item',
+            ];
+
+            return Array.from(root.querySelectorAll(selectors.join(','))).filter((el) => {
+                const rect = el.getBoundingClientRect();
+                return rect.width > 0 && rect.height > 0;
+            });
+        }
+
+        async function staggerRowsOut(token, dir) {
+            const rows = getRankElements();
+            if (!rows.length || token.cancelled) return;
+
+            const shift = dir === 'rtl' ? '24px 0' : '-24px 0';
+            const perRowMs = 320;
+            const gapMs = 110;
+
+            for (const row of rows) {
+                if (token.cancelled) return;
+                row.style.willChange = 'transform, opacity';
+                row.style.transition = `translate ${perRowMs}ms ease, opacity ${perRowMs}ms ease`;
+                row.style.transitionDelay = '0ms';
+                row.style.opacity = '0';
+                row.style.translate = shift;
+                await waitAbortable(gapMs, token);
+            }
+
+            await waitAbortable(perRowMs + 40, token);
+        }
+
+        async function staggerRowsIn(token, dir) {
+            const rows = getRankElements();
+            if (!rows.length || token.cancelled) return;
+
+            const from = dir === 'rtl' ? '-24px 0' : '24px 0';
+            const perRowMs = 360;
+            const gapMs = 120;
+
+            for (const row of rows) {
+                row.style.willChange = 'transform, opacity';
+                row.style.transition = 'none';
+                row.style.opacity = '0';
+                row.style.translate = from;
+            }
+
+            void document.getElementById('theme-container')?.offsetHeight;
+
+            for (const row of rows) {
+                if (token.cancelled) return;
+                row.style.transition = `translate ${perRowMs}ms cubic-bezier(0.22, 1, 0.36, 1), opacity ${perRowMs}ms ease-out`;
+                row.style.transitionDelay = '0ms';
+                row.style.opacity = '1';
+                row.style.translate = '0 0';
+                await waitAbortable(gapMs, token);
+            }
+
+            await waitAbortable(perRowMs + 40, token);
+        }
+
+        async function farashatRowsOut(token) {
+            const rows = getRankElements();
+            if (!rows.length || token.cancelled) return;
+            // farashat mirrors container in RTL via scaleX(-1),
+            // so logical X is inverted visually. Use fixed logical shift
+            // so visual result stays: RTL -> right, LTR -> left.
+            const shiftPx = -28;
+            const perRowMs = 320;
+            const gapMs = 120;
+
+            for (const row of rows) {
+                if (token.cancelled) return;
+                row.style.willChange = 'transform, opacity';
+                row.style.transition = `translate ${perRowMs}ms ease, opacity ${perRowMs}ms ease`;
+                row.style.opacity = '0';
+                row.style.translate = `${shiftPx}px 0`;
+                await waitAbortable(gapMs, token);
+            }
+            await waitAbortable(perRowMs + 40, token);
+        }
+
+        async function farashatRowsIn(token) {
+            const rows = getRankElements();
+            if (!rows.length || token.cancelled) return;
+            // Opposite side of exit (visual): RTL from left, LTR from right.
+            // With RTL mirrored container this maps to a fixed logical +X.
+            const fromPx = 28;
+            const perRowMs = 360;
+            const gapMs = 130;
+
+            for (const row of rows) {
+                row.style.willChange = 'transform, opacity';
+                row.style.transition = 'none';
+                row.style.opacity = '0';
+                row.style.translate = `${fromPx}px 0`;
+            }
+
+            void document.getElementById('theme-container')?.offsetHeight;
+
+            for (const row of rows) {
+                if (token.cancelled) return;
+                row.style.transition = `translate ${perRowMs}ms cubic-bezier(0.22, 1, 0.36, 1), opacity ${perRowMs}ms ease-out`;
+                row.style.opacity = '1';
+                row.style.translate = '0 0';
+                await waitAbortable(gapMs, token);
+            }
+            await waitAbortable(perRowMs + 40, token);
+        }
+
+        async function runThemeEntryAnimation(token) {
+            const activeTheme = getActiveThemeName();
+            if (activeTheme === 'farashat') {
+                await farashatRowsIn(token);
+                return;
+            }
+            const dir = readSwitchDirection();
+            await staggerRowsIn(token, dir);
+        }
+
+        async function runThemeExitAnimation(token) {
+            const activeTheme = getActiveThemeName();
+            if (activeTheme === 'farashat') {
+                await farashatRowsOut(token);
+                return;
+            }
+            const dir = readSwitchDirection();
+            await staggerRowsOut(token, dir);
+        }
+
+        async function refreshCombinedSettingsFromApi() {
+            if (!userId || isMock) return;
+            try {
+                const res = await fetch(
+                    `${API_ROOT}/api/widget/settings?widget=top_combined&uid=${encodeURIComponent(userId)}`
+                );
+                if (!res.ok) return;
+                localCombinedSettings = await res.json();
+            } catch (_) { /* ignore */ }
+        }
+
+        /** RTL: exit slides toward visual right (+X). LTR: toward visual left (−X). */
+        async function directionalSwitch(toMode, token) {
+            const dir = readSwitchDirection();
+            const el = document.getElementById('theme-container');
+            if (!el || token.cancelled) return;
+            const activeTheme = getActiveThemeName();
+
+            if (
+                isNativeThemeSwitchAnimationTheme() &&
+                window.ThemeRenderer &&
+                typeof window.ThemeRenderer.switchDataset === 'function'
+            ) {
+                await window.ThemeRenderer.switchDataset(async () => {
+                    if (token.cancelled) return;
+                    presentingMode = toMode;
+                    if (toMode === 'gifters') {
+                        window.ThemeLoader.setPresentationWidgetType('top_gifters');
+                        window.ThemeLoader.update(rowsForCurrentGifters());
+                    } else {
+                        window.ThemeLoader.setPresentationWidgetType('top_likes');
+                        window.ThemeLoader.update(rowsForCurrentLikes());
+                    }
+                });
+                return;
+            }
+
+            if (activeTheme === 'farashat') {
+                await farashatRowsOut(token);
+                if (token.cancelled) return;
+
+                presentingMode = toMode;
+                if (toMode === 'gifters') {
+                    window.ThemeLoader.setPresentationWidgetType('top_gifters');
+                    window.ThemeLoader.update(rowsForCurrentGifters());
+                } else {
+                    window.ThemeLoader.setPresentationWidgetType('top_likes');
+                    window.ThemeLoader.update(rowsForCurrentLikes());
+                }
+
+                await waitAbortable(220, token);
+                if (token.cancelled) return;
+                await farashatRowsIn(token);
+                return;
+            }
+
+            await staggerRowsOut(token, dir);
+            if (token.cancelled) return;
+
+            presentingMode = toMode;
+            if (toMode === 'gifters') {
+                window.ThemeLoader.setPresentationWidgetType('top_gifters');
+                window.ThemeLoader.update(rowsForCurrentGifters());
+            } else {
+                window.ThemeLoader.setPresentationWidgetType('top_likes');
+                window.ThemeLoader.update(rowsForCurrentLikes());
+            }
+
+            /** فاصل بسيط قبل بدء إظهار المراكز الجديدة */
+            await waitAbortable(220, token);
+            if (token.cancelled) return;
+
+            await staggerRowsIn(token, dir);
+        }
+
+        function applyCurrentRankingToRenderer() {
+            if (!window.ThemeLoader || !window.ThemeLoader.update) return;
+            presentingMode = pickPresentingModeForIdleView();
+            if (presentingMode === 'gifters') {
+                window.ThemeLoader.setPresentationWidgetType('top_gifters');
+                window.ThemeLoader.update(rowsForCurrentGifters());
+            } else {
+                window.ThemeLoader.setPresentationWidgetType('top_likes');
+                window.ThemeLoader.update(rowsForCurrentLikes());
+            }
+        }
+
+        function startRotationLoop() {
+            stopRotation();
+            const token = { cancelled: false };
+            rotationToken = token;
+
+            async function loop() {
+                while (!token.cancelled && isInitialized) {
+                    const { likesMs, giftersMs } = readTimingMs();
+                    const lReal = likesRankingsActive();
+                    const gReal = giftersRankingsActive();
+
+                    /** الاثنان فيهما بيانات: تبديل كامل بين اللايكات والهدايا */
+                    if (lReal && gReal) {
+                        presentingMode = 'likes';
+                        window.ThemeLoader.setPresentationWidgetType('top_likes');
+                        window.ThemeLoader.update(latestLikes);
+                        await waitAbortable(likesMs, token);
+                        if (token.cancelled || !isInitialized) break;
+
+                        await directionalSwitch('gifters', token);
+                        if (token.cancelled || !isInitialized) break;
+
+                        await waitAbortable(giftersMs, token);
+                        if (token.cancelled || !isInitialized) break;
+
+                        if (isMock) {
+                            // 1) Exit current theme once (no extra likes cycle).
+                            await runThemeExitAnimation(token);
+                            if (token.cancelled || !isInitialized) break;
+
+                            // 2) Move to next theme.
+                            mockThemeIndex = (mockThemeIndex + 1) % MOCK_THEME_SEQUENCE.length;
+                            const nextTheme = MOCK_THEME_SEQUENCE[mockThemeIndex];
+                            await switchMockTheme(nextTheme);
+                            if (token.cancelled || !isInitialized) break;
+                            window.ThemeLoader.setPresentationWidgetType('top_likes');
+                            window.ThemeLoader.update(rowsForCurrentLikes());
+
+                            // 3) Enter next theme with visible entry animation (not instant render).
+                            await runThemeEntryAnimation(token);
+                            continue;
+                        }
+
+                        await directionalSwitch('likes', token);
+                        continue;
+                    }
+
+                    /** لايكات فقط (ولا هدايا حقيقية): لا نمرّ على شاشة الهدايا */
+                    if (lReal && !gReal) {
+                        presentingMode = 'likes';
+                        window.ThemeLoader.setPresentationWidgetType('top_likes');
+                        window.ThemeLoader.update(latestLikes);
+                        await waitAbortable(likesMs, token);
+                        continue;
+                    }
+
+                    /** هدايا فقط: لا نمرّ على اللايكات الحقيقية */
+                    if (!lReal && gReal) {
+                        presentingMode = 'gifters';
+                        window.ThemeLoader.setPresentationWidgetType('top_gifters');
+                        window.ThemeLoader.update(latestGifters);
+                        await waitAbortable(giftersMs, token);
+                        continue;
+                    }
+
+                    /** لا طرفين ببيانات: معاينة وهمية — بدّل بين اللايكات والهدايا (قلب/عملة) */
+                    presentingMode = 'likes';
+                    window.ThemeLoader.setPresentationWidgetType('top_likes');
+                    window.ThemeLoader.update(rowsForCurrentLikes());
+                    await waitAbortable(likesMs, token);
+                    if (token.cancelled || !isInitialized) break;
+
+                    await directionalSwitch('gifters', token);
+                    if (token.cancelled || !isInitialized) break;
+
+                    await waitAbortable(giftersMs, token);
+                    if (token.cancelled || !isInitialized) break;
+
+                    await directionalSwitch('likes', token);
+                }
+            }
+            loop().catch((e) => console.error('[TopCombined] rotation loop', e));
+        }
+
+        async function loadInitial(kind) {
+            try {
+                if (!userId) return;
+                const path = kind === 'gifters' ? 'top_gifters' : 'top_likes';
+                const response = await fetch(`${API_URL}/api/widget/initial-data/${encodeURIComponent(userId)}/${path}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                if (!response.ok) return;
+                const result = await response.json();
+                if (!result.success) return;
+                if (kind === 'gifters') {
+                    latestGifters = mapGiftersPayload(result.data || []);
+                } else {
+                    latestLikes = mapLikesPayload(result.data || []);
+                }
+            } catch (e) {
+                console.warn('[TopCombined] initial-data', kind, e);
+            }
+        }
+
+        async function initializeThemeSystem() {
+            if (hasInvalidUid) {
+                showInvalidLinkError();
+                return;
+            }
+            try {
+                const container = document.getElementById('theme-container');
+                await window.ThemeLoader.initialize(userId, container, 'top_combined');
+                isInitialized = true;
+
+                latestLikes = [];
+                latestGifters = [];
+
+                localCombinedSettings = { ...(window.ThemeLoader.getFetchedSettings?.() || {}) };
+
+                if (!isMock) {
+                    await refreshCombinedSettingsFromApi();
+                    await Promise.all([loadInitial('likes'), loadInitial('gifters')]);
+                    connectSocket();
+                } else {
+                    await startMock();
+                }
+
+                applyCurrentRankingToRenderer();
+                startRotationLoop();
+            } catch (error) {
+                console.error('[TopCombined] init failed:', error);
+                document.getElementById('theme-container').innerHTML =
+                    '<div class="loading">Error loading widget</div>';
+            }
+        }
+
+        function updateLikes(users) {
+            latestLikes = mapLikesPayload(users || []);
+            if (isInitialized && presentingMode === 'likes') {
+                window.ThemeLoader.update(rowsForCurrentLikes());
+            }
+        }
+
+        function updateGifters(users) {
+            latestGifters = mapGiftersPayload(users || []);
+            if (isInitialized && presentingMode === 'gifters') {
+                window.ThemeLoader.update(rowsForCurrentGifters());
+            }
+        }
+
+        function connectSocket() {
+            if (!userId || typeof createEdgeWsClient !== 'function') return;
+            socket = createEdgeWsClient({
+                streamerId: userId,
+                url: EDGE_WS_URL,
+                reconnection: true,
+                reconnectionDelay: 1000,
+                reconnectionDelayMax: 5000,
+            });
+
+            socket.on('top_likes_update', (data) => {
+                if (data && data.top10) updateLikes(data.top10);
+            });
+
+            socket.on('top_gifters_update', (data) => {
+                if (data && data.top50) updateGifters(data.top50);
+            });
+
+            socket.on('event', (eventData) => {
+                if (eventData.type === 'top_likes_update' && eventData.data && eventData.data.top10) {
+                    updateLikes(eventData.data.top10);
+                }
+                if (eventData.type === 'top_gifters_update' && eventData.data && eventData.data.top50) {
+                    updateGifters(eventData.data.top50);
+                }
+            });
+
+            socket.on('top_combined_theme_changed', async (data) => {
+                if (!data || !data.theme) return;
+                const visibleRanks = data.visibleRanks || 10;
+                const direction = data.direction === 'ltr' ? 'ltr' : 'rtl';
+                const likesDisplaySec = clampSec(data.likesDisplaySec);
+                const giftersDisplaySec = clampSec(data.giftersDisplaySec);
+                const palette =
+                    Object.prototype.hasOwnProperty.call(data, 'classicColors')
+                        ? data.classicColors ?? null
+                        : undefined;
+                const cyberPalette =
+                    Object.prototype.hasOwnProperty.call(data, 'cyberColors')
+                        ? data.cyberColors ?? null
+                        : undefined;
+                const topRankersPalette =
+                    Object.prototype.hasOwnProperty.call(data, 'topRankersColors')
+                        ? data.topRankersColors ?? null
+                        : undefined;
+                const neonShardsPalette =
+                    Object.prototype.hasOwnProperty.call(data, 'neonShardsColors')
+                        ? data.neonShardsColors ?? null
+                        : undefined;
+                const defaultPalette =
+                    Object.prototype.hasOwnProperty.call(data, 'defaultColors')
+                        ? data.defaultColors ?? null
+                        : undefined;
+                const rainbowCloudsPalette =
+                    Object.prototype.hasOwnProperty.call(data, 'rainbowCloudsColors')
+                        ? data.rainbowCloudsColors ?? null
+                        : undefined;
+                const farashatPalette =
+                    Object.prototype.hasOwnProperty.call(data, 'farashatColors')
+                        ? data.farashatColors ?? null
+                        : undefined;
+                await window.ThemeLoader.switchTheme(
+                    data.theme,
+                    visibleRanks,
+                    direction,
+                    palette,
+                    cyberPalette,
+                    topRankersPalette,
+                    neonShardsPalette,
+                    defaultPalette,
+                    rainbowCloudsPalette,
+                    farashatPalette
+                );
+                localCombinedSettings = {
+                  ...effectiveSettings(),
+                  theme: data.theme,
+                  visibleRanks,
+                  direction,
+                  likesDisplaySec,
+                  giftersDisplaySec,
+                  classicColors:
+                      palette === undefined ? effectiveSettings().classicColors ?? null : palette,
+                  cyberColors:
+                      cyberPalette === undefined ? effectiveSettings().cyberColors ?? null : cyberPalette,
+                  topRankersColors:
+                      topRankersPalette === undefined
+                          ? effectiveSettings().topRankersColors ?? null
+                          : topRankersPalette,
+                  neonShardsColors:
+                      neonShardsPalette === undefined
+                          ? effectiveSettings().neonShardsColors ?? null
+                          : neonShardsPalette,
+                  defaultColors:
+                      defaultPalette === undefined
+                          ? effectiveSettings().defaultColors ?? null
+                          : defaultPalette,
+                  rainbowCloudsColors:
+                      rainbowCloudsPalette === undefined
+                          ? effectiveSettings().rainbowCloudsColors ?? null
+                          : rainbowCloudsPalette,
+                  farashatColors:
+                      farashatPalette === undefined
+                          ? effectiveSettings().farashatColors ?? null
+                          : farashatPalette,
+                };
+                applyCurrentRankingToRenderer();
+                stopRotation();
+                startRotationLoop();
+            });
+
+            socket.on('top_likes_reset', () => {
+                latestLikes = [];
+                if (presentingMode === 'likes') window.ThemeLoader.update(rowsForCurrentLikes());
+            });
+
+            socket.on('top_gifters_reset', () => {
+                latestGifters = [];
+                if (presentingMode === 'gifters') window.ThemeLoader.update(rowsForCurrentGifters());
+            });
+
+            socket.on('reconnect', () => {
+                Promise.all([loadInitial('likes'), loadInitial('gifters')]).then(() => {
+                    if (isInitialized) applyCurrentRankingToRenderer();
+                });
+            });
+        }
+
+        async function startMock() {
+            localCombinedSettings = {
+                ...(effectiveSettings() || {}),
+                theme: MOCK_THEME_SEQUENCE[0],
+                visibleRanks: getThemeDefaultRanks(MOCK_THEME_SEQUENCE[0]),
+                likesDisplaySec: 2,
+                giftersDisplaySec: 2,
+            };
+            mockThemeIndex = 0;
+            await switchMockTheme(MOCK_THEME_SEQUENCE[0]);
+
+            const mock = [
+                { nickname: 'مستخدم تجريبي 1', avatar: '/assets/img/avatar1.png', score: 12000 },
+                { nickname: 'مستخدم تجريبي 2', avatar: '/assets/img/avatar2.png', score: 9800 },
+                { nickname: 'مستخدم تجريبي 3', avatar: '/assets/img/avatar3.png', score: 7200 },
+                { nickname: 'مستخدم تجريبي 4', avatar: '/assets/img/avatar1.png', score: 5100 },
+                { nickname: 'مستخدم تجريبي 5', avatar: '/assets/img/avatar2.png', score: 4000 },
+            ];
+            latestLikes = mock.map((u, i) => ({ ...u, score: u.score + i * 10 }));
+            latestGifters = mock.map((u, i) => ({ ...u, score: Math.floor(u.score * 1.2) + i * 111 }));
+            setInterval(() => {
+                latestLikes = latestLikes.map((u) => ({
+                    ...u,
+                    score: u.score + Math.floor(Math.random() * 80),
+                })).sort((a, b) => b.score - a.score);
+                latestGifters = latestGifters.map((u) => ({
+                    ...u,
+                    score: u.score + Math.floor(Math.random() * 120),
+                })).sort((a, b) => b.score - a.score);
+                if (presentingMode === 'likes') window.ThemeLoader.update(rowsForCurrentLikes());
+                else window.ThemeLoader.update(rowsForCurrentGifters());
+            }, 4000);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeThemeSystem);
+        } else {
+            initializeThemeSystem();
+        }
+
+        window.addEventListener('message', (event) => {
+            const d = event.data;
+            if (!d || !d.type) return;
+
+            if (d.type === 'preview_visible_ranks') {
+                const previewRanks = d.visibleRanks;
+                if (previewRanks >= 1 && previewRanks <= 50 && window.ThemeLoader.setVisibleRanks) {
+                    window.ThemeLoader.setVisibleRanks(previewRanks);
+                }
+                return;
+            }
+
+            if (d.type === 'preview_theme_settings' && d.theme) {
+                (async () => {
+                    try {
+                        const ranks = Number(d.visibleRanks) || 10;
+                        const dir = d.direction === 'ltr' ? 'ltr' : 'rtl';
+                        const palettePrev = effectiveSettings().classicColors ?? null;
+                        const palette =
+                            Object.prototype.hasOwnProperty.call(d, 'classicColors')
+                                ? d.classicColors ?? null
+                                : undefined;
+                        const cyberPrev = effectiveSettings().cyberColors ?? null;
+                        const cyberPalette =
+                            Object.prototype.hasOwnProperty.call(d, 'cyberColors')
+                                ? d.cyberColors ?? null
+                                : undefined;
+                        const trPrev = effectiveSettings().topRankersColors ?? null;
+                        const topRankersPalette =
+                            Object.prototype.hasOwnProperty.call(d, 'topRankersColors')
+                                ? d.topRankersColors ?? null
+                                : undefined;
+                        const neonShardsPalette =
+                            Object.prototype.hasOwnProperty.call(d, 'neonShardsColors')
+                                ? d.neonShardsColors ?? null
+                                : undefined;
+                        const defaultPalette =
+                            Object.prototype.hasOwnProperty.call(d, 'defaultColors')
+                                ? d.defaultColors ?? null
+                                : undefined;
+                        const rainbowCloudsPalette =
+                            Object.prototype.hasOwnProperty.call(d, 'rainbowCloudsColors')
+                                ? d.rainbowCloudsColors ?? null
+                                : undefined;
+                        const farashatPalette =
+                            Object.prototype.hasOwnProperty.call(d, 'farashatColors')
+                                ? d.farashatColors ?? null
+                                : undefined;
+                        localCombinedSettings = {
+                            ...effectiveSettings(),
+                            theme: d.theme,
+                            visibleRanks: ranks,
+                            direction: dir,
+                            likesDisplaySec: clampSec(d.likesDisplaySec ?? effectiveSettings().likesDisplaySec),
+                            giftersDisplaySec: clampSec(d.giftersDisplaySec ?? effectiveSettings().giftersDisplaySec),
+                            classicColors: palette === undefined ? palettePrev : palette,
+                            cyberColors: cyberPalette === undefined ? cyberPrev : cyberPalette,
+                            topRankersColors:
+                                topRankersPalette === undefined ? trPrev : topRankersPalette,
+                            neonShardsColors:
+                                neonShardsPalette === undefined
+                                    ? effectiveSettings().neonShardsColors ?? null
+                                    : neonShardsPalette,
+                            defaultColors:
+                                defaultPalette === undefined
+                                    ? effectiveSettings().defaultColors ?? null
+                                    : defaultPalette,
+                            rainbowCloudsColors:
+                                rainbowCloudsPalette === undefined
+                                    ? effectiveSettings().rainbowCloudsColors ?? null
+                                    : rainbowCloudsPalette,
+                            farashatColors:
+                                farashatPalette === undefined
+                                    ? effectiveSettings().farashatColors ?? null
+                                    : farashatPalette,
+                        };
+                        const paletteOnly = await window.ThemeLoader.switchTheme(
+                            d.theme,
+                            ranks,
+                            dir,
+                            palette,
+                            cyberPalette,
+                            topRankersPalette,
+                            neonShardsPalette,
+                            defaultPalette,
+                            rainbowCloudsPalette,
+                            farashatPalette
+                        );
+                        if (!paletteOnly) {
+                            applyCurrentRankingToRenderer();
+                            stopRotation();
+                            startRotationLoop();
+                        }
+                    } catch (e) {
+                        console.warn('[TopCombined] preview_theme_settings failed:', e);
+                    }
+                })();
+            }
+        });
+
+        function clampSec(v) {
+            const n = Number(v);
+            if (!Number.isFinite(n)) return 7;
+            return Math.min(120, Math.max(3, Math.floor(n)));
+        }
+    </script>
+</body>
+</html>

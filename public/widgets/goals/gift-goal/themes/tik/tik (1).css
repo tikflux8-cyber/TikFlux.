@@ -1,0 +1,141 @@
+#gift-goal-theme-root.gift-goal-theme-panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#gift-goal-theme-root {
+  --goal-accent: #020200;
+  --goal-accent-rgb: 255, 215, 0;
+  --wave-top: #7b5c00;
+  --wave-mid: #d4a800;
+  --wave-bottom: #ffee00;
+  --wave-back-top: #3d2e00;
+  --wave-back-mid: #b89500;
+  --wave-back-bottom: #e6d400;
+  --liquid-glow-1: #ffc400;
+  --liquid-glow-2: #ffd700;
+  --liquid-glow-3: #ffe44d;
+  --liquid-glow-4: #fff5aa;
+  --bubble-glow-1: #ffc400;
+  --bubble-glow-2: #ffe44d;
+  --bubble-glow-3: #fff5aa;
+  --label-grad-1: #ffc400;
+  --label-grad-2: #ffaa00;
+  --label-tail: #ffaa00;
+  --label-shadow-rgb: 255, 150, 0;
+  --value-text: #ffc800;
+  --value-shadow-rgb: 255, 200, 0;
+  /* فقاعات داكنة بلون الهدف (نفس منطق follow-goal bottle) */
+  --tik-bubble-fill: rgba(128, 108, 0, 0.9);
+  --tik-bubble-stroke: rgba(82, 69, 0, 0.92);
+}
+
+#gift-goal-theme-root .tik-scene {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+#gift-goal-theme-root .tik-goal-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transform: translateY(40px);
+}
+
+#gift-goal-theme-root .tik-heart-container {
+  position: relative;
+  width: 450px;
+  height: 450px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  animation: tikFloatHeart 5s ease-in-out infinite;
+  filter: drop-shadow(0 15px 35px rgba(var(--goal-accent-rgb, 255, 215, 0), 0.3));
+}
+
+@keyframes tikFloatHeart {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-6px) scale(1.01);
+  }
+}
+
+#gift-goal-theme-root .tik-liquid-svg,
+#gift-goal-theme-root .tik-heart-shape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#gift-goal-theme-root .tik-heart-shape {
+  z-index: 10;
+  pointer-events: none;
+}
+
+#gift-goal-theme-root .tik-goal-label {
+  position: absolute;
+  top: 70px;
+  right: 260px;
+  white-space: nowrap;
+  font-family: "Lemon", "Segoe UI", sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, var(--label-grad-1, #ffc400) 0%, var(--label-grad-2, #ffaa00) 100%);
+  box-shadow: 0 6px 25px rgba(var(--label-shadow-rgb, 255, 150, 0), 0.5), 0 3px 10px rgba(0, 0, 0, 0.3);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.35),
+    0 2px 4px rgba(0, 0, 0, 0.45);
+  z-index: 20;
+}
+
+#gift-goal-theme-root .tik-goal-label::after {
+  content: "";
+  position: absolute;
+  bottom: -17px;
+  right: 16px;
+  width: 0;
+  height: 0;
+  border-left: 18px solid transparent;
+  border-top: 18px solid var(--label-tail, #ffaa00);
+  
+}
+
+#gift-goal-theme-root .tik-goal-value {
+  position: absolute;
+  top: 130px;       /* ↕ للأسفل (زيد) | للأعلى (نقّص)              */
+  right: 260px; 
+  white-space: nowrap;
+  color: var(--value-text, #ffc800);
+  font-family: "Lemon", "Segoe UI", sans-serif;
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  /* حدود داكنة + توهج — أوضح على السائل والبث */
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.92),
+    0 2px 4px rgba(0, 0, 0, 0.75),
+    0 0 2px rgba(0, 0, 0, 0.9),
+    1px 1px 0 rgba(0, 0, 0, 0.55),
+    -1px -1px 0 rgba(0, 0, 0, 0.35),
+    0 0 10px rgba(var(--value-shadow-rgb, 255, 200, 0), 0.95),
+    0 0 20px rgba(var(--value-shadow-rgb, 255, 200, 0), 0.65),
+    0 0 28px rgba(var(--value-shadow-rgb, 255, 200, 0), 0.85);
+  z-index: 20;
+}

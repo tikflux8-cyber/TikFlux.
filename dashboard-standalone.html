@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-i18n-layout-dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikFlux Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://tikoverlay.live/assets/css/main-dashboard.v1.css">
+  <link rel="stylesheet" href="https://tikoverlay.live/assets/css/alert-library.css">
+  <link rel="stylesheet" href="https://tikoverlay.live/assets/css/alert-library-store.css">
+  <link rel="stylesheet" href="https://tikoverlay.live/assets/css/stats.css">
+  <link rel="stylesheet" href="https://tikoverlay.live/assets/css/scene-builder.css">
+  <link rel="stylesheet" href="https://tikoverlay.live/assets/css/actions-avatar-frame.css">
+  <link rel="stylesheet" href="https://tikoverlay.live/assets/css/tikoverlay-color-picker.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --brand-red: #ff2d55;
+      --brand-red-dim: rgba(255,45,85,0.15);
+      --bg-primary: #0a0a0c;
+      --bg-secondary: #111114;
+      --bg-card: #18181c;
+      --bg-card-hover: #1e1e24;
+      --border-color: rgba(255,255,255,0.06);
+      --text-primary: #e8e8ed;
+      --text-secondary: #8888a0;
+      --text-muted: #555568;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #ef4444;
+      --info: #60a5fa;
+      --sidebar-w: 220px;
+      --header-h: 56px;
+    }
+    html, body { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      overflow: hidden;
+    }
+
+    /* Loading Screen */
+    .app-loading-screen {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg-primary);
+      transition: opacity .4s ease, visibility .4s ease;
+    }
+    .app-loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .loading-content { text-align: center; }
+    .loading-logo {
+      font-size: 2.2rem; font-weight: 800; letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ff2d55, #ff6b8a);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 24px;
+    }
+    .loading-spinner { display: flex; gap: 6px; justify-content: center; margin-bottom: 16px; }
+    .spinner-ring {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--brand-red);
+      animation: pulse-ring 1.2s ease-in-out infinite;
+    }
+    .spinner-ring:nth-child(2) { animation-delay: .15s; }
+    .spinner-ring:nth-child(3) { animation-delay: .3s; }
+    @keyframes pulse-ring {
+      0%, 80%, 100% { transform: scale(0.4); opacity: 0.3; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+    .loading-text { color: var(--text-secondary); font-size: 0.85rem; }
+
+    /* Header */
+    .header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--header-h);
+      display: flex; align-items: center; gap: 12px;
+      padding: 0 16px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      backdrop-filter: blur(12px);
+    }
+    .header-brand { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    .header-brand img { width: 28px; height: 28px; border-radius: 6px; }
+    .header-brand-name {
+      font-size: 1rem; font-weight: 700;
+      background: linear-gradient(135deg, #ff2d55, #ff6b8a);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .header-meta-zone { display: flex; align-items: center; gap: 10px; margin-right: auto; }
+    .header-tools { display: flex; align-items: center; gap: 8px; }
+    .header-divider { width: 1px; height: 24px; background: var(--border-color); }
+
+    .viewers-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 20px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border-color);
+      font-size: 0.78rem; color: var(--text-secondary);
+    }
+    .viewers-chip i { font-size: 0.7rem; color: var(--text-muted); }
+    .viewers-value { font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+    .header-connect-zone { display: flex; align-items: center; gap: 8px; }
+    .header-connect-bar {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 10px; padding: 3px 3px 3px 12px;
+    }
+    .connection-status-indicator { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--text-muted);
+      transition: background .3s;
+    }
+    .status-dot.connected { background: var(--success); box-shadow: 0 0 8px rgba(52,211,153,0.5); }
+    .status-dot.connecting { background: var(--warning); animation: pulse-status 1s infinite; }
+    @keyframes pulse-status { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .status-label { font-size: 0.75rem; color: var(--text-secondary); }
+
+    .header-tiktok-field {
+      display: flex; align-items: center; gap: 6px;
+      background: transparent; border: none;
+    }
+    .header-tiktok-field i { color: var(--text-muted); font-size: 0.85rem; }
+    .input-tiktok {
+      background: transparent; border: none; outline: none;
+      color: var(--text-primary); font-size: 0.82rem;
+      width: 140px; padding: 4px 0;
+    }
+    .input-tiktok::placeholder { color: var(--text-muted); }
+
+    .btn-connect {
+      padding: 6px 16px; border-radius: 8px; border: none;
+      background: var(--brand-red); color: #fff;
+      font-size: 0.8rem; font-weight: 600; cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-connect:hover { background: #e0204a; transform: translateY(-1px); }
+    .btn-connect:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .btn-connect.disconnect { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+    .btn-connect.disconnect:hover { background: rgba(239,68,68,0.1); }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed; top: var(--header-h); right: 0; bottom: 0;
+      width: var(--sidebar-w); z-index: 90;
+      background: var(--bg-secondary);
+      border-left: 1px solid var(--border-color);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .sidebar-brand {
+      display: flex; align-items: center; gap: 8px;
+      padding: 16px 14px 12px; border-bottom: 1px solid var(--border-color);
+    }
+    .sidebar-brand-mark { width: 32px; height: 32px; border-radius: 8px; }
+    .sidebar-brand-name {
+      font-size: 0.92rem; font-weight: 700;
+      background: linear-gradient(135deg, #ff2d55, #ff6b8a);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .sidebar-nav {
+      flex: 1; overflow-y: auto; padding: 8px 0;
+      scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent;
+    }
+    .nav-btn {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 9px 14px; border: none; background: transparent;
+      color: var(--text-secondary); font-size: 0.82rem; cursor: pointer;
+      transition: all .15s; position: relative;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.04); color: var(--text-primary); }
+    .nav-btn.active {
+      color: var(--brand-red); background: var(--brand-red-dim);
+    }
+    .nav-btn.active::before {
+      content: ''; position: absolute; right: 0; top: 50%;
+      transform: translateY(-50%); width: 3px; height: 60%;
+      background: var(--brand-red); border-radius: 0 3px 3px 0;
+    }
+    .nav-icon { width: 20px; text-align: center; font-size: 0.9rem; }
+    .nav-text { flex: 1; }
+    .nav-badge-new {
+      font-size: 0.6rem; padding: 1px 5px; border-radius: 4px;
+      background: var(--brand-red); color: #fff; font-weight: 700;
+    }
+
+    /* Main Content */
+    .main-content {
+      position: fixed;
+      top: var(--header-h); right: var(--sidebar-w); bottom: 0; left: 0;
+      overflow-y: auto; padding: 20px;
+      scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent;
+    }
+    .view { display: none; animation: fadeInView .25s ease; }
+    .view.active { display: block; }
+    @keyframes fadeInView { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 12px; padding: 20px; margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 0.95rem; font-weight: 700; margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .card-title i { color: var(--brand-red); font-size: 0.9rem; }
+
+    /* Grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+    .stat-card {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 12px; padding: 18px; text-align: center;
+      transition: border-color .2s;
+    }
+    .stat-card:hover { border-color: rgba(255,255,255,0.12); }
+    .stat-icon { font-size: 1.4rem; margin-bottom: 8px; }
+    .stat-icon.likes { color: #ff2d55; }
+    .stat-icon.gifts { color: #fbbf24; }
+    .stat-icon.followers { color: #60a5fa; }
+    .stat-icon.chat { color: #34d399; }
+    .stat-icon.shares { color: #a78bfa; }
+    .stat-value { font-size: 1.6rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .stat-label { font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; }
+
+    /* Goals */
+    .goals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+    .goal-card {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 12px; padding: 18px;
+    }
+    .goal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .goal-title { font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .goal-progress-text { font-size: 0.78rem; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+    .goal-bar { height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+    .goal-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
+    .goal-fill.likes { background: linear-gradient(90deg, #ff2d55, #ff6b8a); }
+    .goal-fill.gifts { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+    .goal-fill.follows { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+    .goal-fill.hearts { background: linear-gradient(90deg, #f472b6, #ec4899); }
+
+    /* Table */
+    .leaderboard-table {
+      width: 100%; border-collapse: collapse;
+    }
+    .leaderboard-table th {
+      text-align: right; padding: 10px 14px;
+      font-size: 0.75rem; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .leaderboard-table td {
+      padding: 10px 14px; font-size: 0.85rem;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .leaderboard-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .rank-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; border-radius: 50%;
+      font-size: 0.75rem; font-weight: 700;
+    }
+    .rank-badge.gold { background: rgba(251,191,36,0.15); color: #fbbf24; }
+    .rank-badge.silver { background: rgba(148,163,184,0.15); color: #94a3b8; }
+    .rank-badge.bronze { background: rgba(180,83,9,0.15); color: #d97706; }
+    .rank-badge.default { background: rgba(255,255,255,0.05); color: var(--text-muted); }
+
+    /* Event Feed */
+    .event-feed { max-height: 600px; overflow-y: auto; }
+    .event-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 14px; border-radius: 10px;
+      transition: background .15s;
+      animation: slideInEvent .3s ease;
+    }
+    .event-item:hover { background: rgba(255,255,255,0.03); }
+    @keyframes slideInEvent { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: translateX(0); } }
+    .event-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--brand-red-dim); display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; overflow: hidden;
+    }
+    .event-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .event-avatar i { color: var(--brand-red); font-size: 0.85rem; }
+    .event-body { flex: 1; min-width: 0; }
+    .event-user { font-weight: 600; font-size: 0.85rem; }
+    .event-action { font-size: 0.78rem; color: var(--text-secondary); }
+    .event-meta { text-align: left; flex-shrink: 0; }
+    .event-time { font-size: 0.7rem; color: var(--text-muted); }
+    .event-type-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 10px;
+      font-size: 0.65rem; font-weight: 600; margin-top: 2px;
+    }
+    .event-type-badge.like { background: rgba(255,45,85,0.15); color: #ff6b8a; }
+    .event-type-badge.gift { background: rgba(251,191,36,0.15); color: #fbbf24; }
+    .event-type-badge.follow { background: rgba(96,165,250,0.15); color: #60a5fa; }
+    .event-type-badge.chat { background: rgba(52,211,153,0.15); color: #34d399; }
+    .event-type-badge.share { background: rgba(167,139,250,0.15); color: #a78bfa; }
+    .event-type-badge.join { background: rgba(244,114,182,0.15); color: #f472b6; }
+    .event-type-badge.sub { background: rgba(245,158,11,0.15); color: #f59e0b; }
+
+    /* Chat */
+    .chat-messages {
+      max-height: 500px; overflow-y: auto;
+      scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent;
+    }
+    .chat-msg {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 12px; border-radius: 8px;
+      animation: slideInEvent .2s ease;
+    }
+    .chat-msg:hover { background: rgba(255,255,255,0.02); }
+    .chat-msg-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--brand-red-dim); display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; overflow: hidden;
+    }
+    .chat-msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .chat-msg-avatar i { color: var(--brand-red); font-size: 0.75rem; }
+    .chat-msg-content { flex: 1; min-width: 0; }
+    .chat-msg-name { font-weight: 600; font-size: 0.82rem; margin-bottom: 2px; }
+    .chat-msg-text { font-size: 0.82rem; color: var(--text-secondary); word-break: break-word; }
+    .chat-msg-time { font-size: 0.65rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* Placeholder / Empty State */
+    .empty-state {
+      text-align: center; padding: 60px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state i { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.3; }
+    .empty-state p { font-size: 0.9rem; }
+
+    /* Section Title */
+    .section-title {
+      font-size: 1.1rem; font-weight: 700; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-title i { color: var(--brand-red); }
+
+    /* Connection Card */
+    .connect-card { max-width: 480px; margin: 40px auto; text-align: center; }
+    .connect-card .card-title { justify-content: center; font-size: 1.1rem; }
+    .connect-card .card-title i { font-size: 1.2rem; }
+    .connect-form { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+    .connect-input-group {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg-primary); border: 1px solid var(--border-color);
+      border-radius: 10px; padding: 10px 14px;
+    }
+    .connect-input-group i { color: var(--text-muted); font-size: 1rem; }
+    .connect-input {
+      flex: 1; background: transparent; border: none; outline: none;
+      color: var(--text-primary); font-size: 0.9rem; padding: 4px 0;
+    }
+    .connect-input::placeholder { color: var(--text-muted); }
+    .connect-status {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 8px; border-radius: 8px; font-size: 0.8rem;
+      background: rgba(255,255,255,0.03);
+      color: var(--text-secondary);
+    }
+    .connect-status i { font-size: 0.85rem; }
+
+    /* Config Panel (actions, alerts, tts, etc.) */
+    .config-panel { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+    .config-item {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 10px; padding: 16px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .config-item i { font-size: 1.1rem; color: var(--brand-red); width: 24px; text-align: center; }
+    .config-item-info { flex: 1; }
+    .config-item-title { font-size: 0.85rem; font-weight: 600; }
+    .config-item-desc { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+    .config-toggle {
+      width: 40px; height: 22px; border-radius: 11px;
+      background: rgba(255,255,255,0.1); border: none; cursor: pointer;
+      position: relative; transition: background .2s;
+    }
+    .config-toggle.on { background: var(--brand-red); }
+    .config-toggle::after {
+      content: ''; position: absolute; top: 3px; right: 3px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #fff; transition: transform .2s;
+    }
+    .config-toggle.on::after { transform: translateX(-18px); }
+
+    /* Room Info Display */
+    .room-info-display {
+      display: flex; align-items: center; gap: 10px;
+      margin-left: auto;
+    }
+    .room-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 2px solid var(--brand-red);
+    }
+    .room-nickname { font-size: 0.82rem; font-weight: 600; }
+    .room-title-text { font-size: 0.72rem; color: var(--text-muted); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar { width: 56px; }
+      .sidebar-brand-name, .nav-text, .nav-badge-new { display: none; }
+      .nav-btn { justify-content: center; padding: 10px; }
+      .sidebar-brand { justify-content: center; padding: 12px 4px; }
+      .main-content { right: 56px; }
+      .header-tiktok-field { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading Screen -->
+  <div id="appLoadingScreen" class="app-loading-screen">
+    <div class="loading-content">
+      <div class="loading-logo">TikFlux</div>
+      <div class="loading-spinner">
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+      </div>
+      <div class="loading-text">جاري التحميل...</div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-brand">
+      <img src="https://tikoverlay.live/assets/img/tikoverlay-mark.png" alt="TikFlux" width="28" height="28">
+      <span class="header-brand-name">TikFlux</span>
+    </div>
+
+    <div class="header-divider"></div>
+
+    <div class="header-meta-zone">
+      <div class="header-tools">
+        <div class="viewers-chip" title="المشاهدون الآن">
+          <i class="fas fa-eye"></i>
+          <span class="viewers-value" id="currentViewersValue">-</span>
+        </div>
+        <div class="viewers-chip" title="إجمالي المشاهدين">
+          <i class="fas fa-users"></i>
+          <span class="viewers-value" id="totalUserValue">-</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-divider"></div>
+
+    <div class="header-connect-zone">
+      <div class="header-connect-bar">
+        <div class="connection-status-indicator">
+          <span class="status-dot" id="headerStatusDot"></span>
+          <span class="status-label" id="headerStatusLabel">غير متصل</span>
+        </div>
+        <div class="header-tiktok-field">
+          <i class="fab fa-tiktok"></i>
+          <input type="text" id="tiktokInput" class="input-tiktok" autocapitalize="none" spellcheck="false" placeholder="اسم حساب TikTok" />
+        </div>
+        <button class="btn-connect" id="connectBtn">اتصال</button>
+      </div>
+    </div>
+
+    <div class="room-info-display" id="roomInfoDisplay" style="display: none;">
+      <div style="text-align:right;">
+        <div class="room-nickname" id="roomNickname">-</div>
+        <div class="room-title-text" id="roomTitle">-</div>
+      </div>
+      <img class="room-avatar" id="roomAvatar" src="" alt="Avatar" />
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img class="sidebar-brand-mark" src="https://tikoverlay.live/assets/img/tikoverlay-mark.png" alt="" width="32" height="32">
+      <span class="sidebar-brand-name">TikFlux</span>
+    </div>
+    <nav class="sidebar-nav" id="sidebarNav">
+      <button class="nav-btn active" data-view="accountView">
+        <span class="nav-icon"><i class="fas fa-user-circle"></i></span>
+        <span class="nav-text">الحساب</span>
+      </button>
+      <button class="nav-btn" data-view="latestEventsView">
+        <span class="nav-icon"><i class="fas fa-clock-rotate-left"></i></span>
+        <span class="nav-text">آخر الأحداث</span>
+      </button>
+      <button class="nav-btn" data-view="statsView">
+        <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+        <span class="nav-text">الإحصائيات</span>
+        <span class="nav-badge-new">NEW</span>
+      </button>
+      <button class="nav-btn" data-view="goalsView">
+        <span class="nav-icon"><i class="fas fa-bullseye"></i></span>
+        <span class="nav-text">الأهداف</span>
+      </button>
+      <button class="nav-btn" data-view="topLikesView">
+        <span class="nav-icon"><i class="fas fa-crown"></i></span>
+        <span class="nav-text">Top</span>
+      </button>
+      <button class="nav-btn" data-view="actionsView">
+        <span class="nav-icon"><i class="fas fa-bolt"></i></span>
+        <span class="nav-text">الإجراءات</span>
+      </button>
+      <button class="nav-btn" data-view="donationAlertsView">
+        <span class="nav-icon"><i class="fas fa-hand-holding-dollar"></i></span>
+        <span class="nav-text">تنبيهات التبرعات</span>
+      </button>
+      <button class="nav-btn" data-view="ttsView">
+        <span class="nav-icon"><i class="fas fa-volume-up"></i></span>
+        <span class="nav-text">TTS</span>
+      </button>
+      <button class="nav-btn" data-view="chatView">
+        <span class="nav-icon"><i class="fas fa-comments"></i></span>
+        <span class="nav-text">التعليقات</span>
+      </button>
+      <button class="nav-btn" data-view="botChatView">
+        <span class="nav-icon"><i class="fas fa-robot"></i></span>
+        <span class="nav-text">Bot Chat</span>
+      </button>
+      <button class="nav-btn" data-view="musicPlayerView">
+        <span class="nav-icon"><i class="fas fa-music"></i></span>
+        <span class="nav-text">مشغل الموسيقى</span>
+      </button>
+      <button class="nav-btn" data-view="supportersLeaderboardView">
+        <span class="nav-icon"><i class="fas fa-trophy"></i></span>
+        <span class="nav-text">تصنيف الداعمين</span>
+      </button>
+      <button class="nav-btn" data-view="socialMediaView">
+        <span class="nav-icon"><i class="fas fa-share-nodes"></i></span>
+        <span class="nav-text">السوشيال ميديا</span>
+      </button>
+      <button class="nav-btn" data-view="challengesView">
+        <span class="nav-icon"><i class="fas fa-gamepad"></i></span>
+        <span class="nav-text">تحديات</span>
+      </button>
+      <button class="nav-btn" data-view="linkScenesView">
+        <span class="nav-icon"><i class="fas fa-object-group"></i></span>
+        <span class="nav-text">تجميع الروابط</span>
+      </button>
+      <button class="nav-btn" data-view="overlaysView">
+        <span class="nav-icon"><i class="fas fa-layer-group"></i></span>
+        <span class="nav-text">Overlays</span>
+      </button>
+      <button class="nav-btn" data-view="alertStoreView">
+        <span class="nav-icon"><i class="fas fa-store"></i></span>
+        <span class="nav-text">متجر التنبيهات</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content" id="mainContent">
+
+    <!-- Account View -->
+    <div id="accountView" class="view active">
+      <div class="connect-card card">
+        <div class="card-title"><i class="fas fa-plug"></i> الاتصال بـ TikTok LIVE</div>
+        <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:4px;">أدخل اسم المستخدم للاتصال ببث مباشر</p>
+        <div class="connect-form">
+          <div class="connect-input-group">
+            <i class="fab fa-tiktok"></i>
+            <input type="text" id="accountTiktokInput" class="connect-input" autocapitalize="none" spellcheck="false" placeholder="اسم حساب TikTok (بدون @)" />
+          </div>
+          <button class="btn-connect" id="accountConnectBtn" style="width:100%; padding:12px;">اتصال بالبث</button>
+          <div class="connect-status" id="accountConnectStatus">
+            <i class="fas fa-circle-xmark"></i>
+            <span>غير متصل</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="streamInfoCard" style="display:none;">
+        <div class="card-title"><i class="fas fa-info-circle"></i> معلومات البث</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px;">
+          <div class="stat-card">
+            <div class="stat-icon likes"><i class="fas fa-eye"></i></div>
+            <div class="stat-value" id="infoCurrentViewers">0</div>
+            <div class="stat-label">المشاهدون الآن</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon followers"><i class="fas fa-users"></i></div>
+            <div class="stat-value" id="infoTotalViewers">0</div>
+            <div class="stat-label">إجمالي المشاهدين</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Latest Events View -->
+    <div id="latestEventsView" class="view">
+      <div class="section-title"><i class="fas fa-clock-rotate-left"></i> آخر الأحداث</div>
+      <div class="card">
+        <div class="event-feed" id="eventFeed">
+          <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>لا توجد أحداث بعد</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats View -->
+    <div id="statsView" class="view">
+      <div class="section-title"><i class="fas fa-chart-line"></i> إحصائيات البث</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon likes"><i class="fas fa-heart"></i></div>
+          <div class="stat-value" id="totalLikes">0</div>
+          <div class="stat-label">إجمالي الإعجابات</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon gifts"><i class="fas fa-gift"></i></div>
+          <div class="stat-value" id="totalGifts">0</div>
+          <div class="stat-label">قيمة الهدايا</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon followers"><i class="fas fa-user-plus"></i></div>
+          <div class="stat-value" id="totalFollowers">0</div>
+          <div class="stat-label">المتابعون الجدد</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon chat"><i class="fas fa-comment"></i></div>
+          <div class="stat-value" id="totalChatMsgs">0</div>
+          <div class="stat-label">رسائل الشات</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon shares"><i class="fas fa-share"></i></div>
+          <div class="stat-value" id="totalShares">0</div>
+          <div class="stat-label">المشاركات</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Goals View -->
+    <div id="goalsView" class="view">
+      <div class="section-title"><i class="fas fa-bullseye"></i> الأهداف</div>
+      <div class="goals-grid">
+        <div class="goal-card">
+          <div class="goal-header">
+            <div class="goal-title"><i class="fas fa-heart" style="color:#ff2d55;"></i> هدف الإعجابات</div>
+            <div class="goal-progress-text"><span id="likesGoalCurrent">0</span> / <span id="likesGoalTarget">1000</span></div>
+          </div>
+          <div class="goal-bar"><div class="goal-fill likes" id="likesGoalBar" style="width:0%"></div></div>
+        </div>
+        <div class="goal-card">
+          <div class="goal-header">
+            <div class="goal-title"><i class="fas fa-gift" style="color:#fbbf24;"></i> هدف الهدايا</div>
+            <div class="goal-progress-text"><span id="giftsGoalCurrent">0</span> / <span id="giftsGoalTarget">500</span></div>
+          </div>
+          <div class="goal-bar"><div class="goal-fill gifts" id="giftsGoalBar" style="width:0%"></div></div>
+        </div>
+        <div class="goal-card">
+          <div class="goal-header">
+            <div class="goal-title"><i class="fas fa-user-plus" style="color:#60a5fa;"></i> هدف المتابعين</div>
+            <div class="goal-progress-text"><span id="followsGoalCurrent">0</span> / <span id="followsGoalTarget">200</span></div>
+          </div>
+          <div class="goal-bar"><div class="goal-fill follows" id="followsGoalBar" style="width:0%"></div></div>
+        </div>
+        <div class="goal-card">
+          <div class="goal-header">
+            <div class="goal-title"><i class="fas fa-hand-holding-heart" style="color:#f472b6;"></i> هدف Heart Me</div>
+            <div class="goal-progress-text"><span id="heartsGoalCurrent">0</span> / <span id="heartsGoalTarget">300</span></div>
+          </div>
+          <div class="goal-bar"><div class="goal-fill hearts" id="heartsGoalBar" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Likes View -->
+    <div id="topLikesView" class="view">
+      <div class="section-title"><i class="fas fa-crown"></i> تصنيف الإعجابات</div>
+      <div class="card">
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>المستخدم</th>
+              <th>الإعجابات</th>
+            </tr>
+          </thead>
+          <tbody id="topLikesTableBody">
+            <tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:30px;">لا توجد بيانات بعد</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-title" style="margin-top:24px;"><i class="fas fa-gift"></i> أعلى المتبرعين</div>
+      <div class="card">
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>المستخدم</th>
+              <th>قيمة الهدايا</th>
+            </tr>
+          </thead>
+          <tbody id="topGiftersTableBody">
+            <tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:30px;">لا توجد بيانات بعد</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Actions View -->
+    <div id="actionsView" class="view">
+      <div class="section-title"><i class="fas fa-bolt"></i> إعدادات الإجراءات</div>
+      <div class="config-panel">
+        <div class="config-item">
+          <i class="fas fa-heart"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">تنبيه الإعجابات</div>
+            <div class="config-item-desc">عرض تنبيه عند حصول على إعجاب</div>
+          </div>
+          <button class="config-toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="config-item">
+          <i class="fas fa-user-plus"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">تنبيه المتابعة</div>
+            <div class="config-item-desc">عرض تنبيه عند متابعة مستخدم جديد</div>
+          </div>
+          <button class="config-toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="config-item">
+          <i class="fas fa-gift"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">تنبيه الهدايا</div>
+            <div class="config-item-desc">عرض تنبيه عند استلام هدية</div>
+          </div>
+          <button class="config-toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="config-item">
+          <i class="fas fa-share"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">تنبيه المشاركة</div>
+            <div class="config-item-desc">عرض تنبيه عند مشاركة البث</div>
+          </div>
+          <button class="config-toggle" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="config-item">
+          <i class="fas fa-user-group"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">تنبيه الانضمام</div>
+            <div class="config-item-desc">عرض تنبيه عند دخول مشاهد جديد</div>
+          </div>
+          <button class="config-toggle" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="config-item">
+          <i class="fas fa-star"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">تنبيه الاشتراك</div>
+            <div class="config-item-desc">عرض تنبيه عند اشتراك عضو جديد</div>
+          </div>
+          <button class="config-toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Donation Alerts View -->
+    <div id="donationAlertsView" class="view">
+      <div class="section-title"><i class="fas fa-hand-holding-dollar"></i> تنبيهات التبرعات</div>
+      <div class="config-panel">
+        <div class="config-item">
+          <i class="fas fa-dollar-sign"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">تنبيه التبرعات المباشرة</div>
+            <div class="config-item-desc">عرض تنبيه عند تبرع مباشر</div>
+          </div>
+          <button class="config-toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="config-item">
+          <i class="fas fa-music"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">تنبيه الأغاني المطلوبة</div>
+            <div class="config-item-desc">تشغيل أغنية عند التبرع</div>
+          </div>
+          <button class="config-toggle" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="config-item">
+          <i class="fas fa-tts"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">TTS للتبرعات</div>
+            <div class="config-item-desc">قراءة رسالة التبرع بصوت عالٍ</div>
+          </div>
+          <button class="config-toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TTS View -->
+    <div id="ttsView" class="view">
+      <div class="section-title"><i class="fas fa-volume-up"></i> إعدادات TTS</div>
+      <div class="card">
+        <div class="config-panel">
+          <div class="config-item">
+            <i class="fas fa-toggle-on"></i>
+            <div class="config-item-info">
+              <div class="config-item-title">تفعيل TTS</div>
+              <div class="config-item-desc">تشغيل تحويل النص إلى كلام</div>
+            </div>
+            <button class="config-toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="config-item">
+            <i class="fas fa-comment"></i>
+            <div class="config-item-info">
+              <div class="config-item-title">TTS للتعليقات</div>
+              <div class="config-item-desc">قراءة التعليقات بصوت عالٍ</div>
+            </div>
+            <button class="config-toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="config-item">
+            <i class="fas fa-gift"></i>
+            <div class="config-item-info">
+              <div class="config-item-title">TTS للهدايا</div>
+              <div class="config-item-desc">قراءة أسماء المتبرعين</div>
+            </div>
+            <button class="config-toggle" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="config-item">
+            <i class="fas fa-language"></i>
+            <div class="config-item-info">
+              <div class="config-item-title">اللغة</div>
+              <div class="config-item-desc">العربية</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat View -->
+    <div id="chatView" class="view">
+      <div class="section-title"><i class="fas fa-comments"></i> التعليقات المباشرة</div>
+      <div class="card">
+        <div class="chat-messages" id="chatMessages">
+          <div class="empty-state">
+            <i class="fas fa-comments"></i>
+            <p>لا توجد تعليقات بعد</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bot Chat View -->
+    <div id="botChatView" class="view">
+      <div class="section-title"><i class="fas fa-robot"></i> Bot Chat</div>
+      <div class="config-panel">
+        <div class="config-item">
+          <i class="fas fa-toggle-on"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">تفعيل البوت</div>
+            <div class="config-item-desc">تشغيل الروبوت للرد التلقائي</div>
+          </div>
+          <button class="config-toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="config-item">
+          <i class="fas fa-clock"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">الرد التلقائي</div>
+            <div class="config-item-desc">إرسال رسالة ترحيب للمستخدمين الجدد</div>
+          </div>
+          <button class="config-toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="config-item">
+          <i class="fas fa-hand-wave"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">رسالة الترحيب</div>
+            <div class="config-item-desc">مرحباً بك في البث!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Music Player View -->
+    <div id="musicPlayerView" class="view">
+      <div class="section-title"><i class="fas fa-music"></i> مشغل الموسيقى</div>
+      <div class="card" style="text-align:center; padding:40px;">
+        <i class="fas fa-music" style="font-size:2.5rem; color:var(--text-muted); opacity:0.3;"></i>
+        <p style="margin-top:12px; color:var(--text-secondary);">مشغل الموسيقى متاح في التطبيق المكتبي</p>
+        <a href="https://tikoverlay.live/app" target="_blank" class="btn-connect" style="margin-top:16px; display:inline-flex; gap:8px; align-items:center; text-decoration:none;">
+          <i class="fas fa-download"></i> تحميل التطبيق
+        </a>
+      </div>
+    </div>
+
+    <!-- Supporters Leaderboard View -->
+    <div id="supportersLeaderboardView" class="view">
+      <div class="section-title"><i class="fas fa-trophy"></i> تصنيف الداعمين</div>
+      <div class="card">
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>المستخدم</th>
+              <th>النوع</th>
+              <th>القيمة</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardTableBody">
+            <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:30px;">لا توجد بيانات بعد</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Social Media View -->
+    <div id="socialMediaView" class="view">
+      <div class="section-title"><i class="fas fa-share-nodes"></i> السوشيال ميديا</div>
+      <div class="config-panel">
+        <div class="config-item">
+          <i class="fab fa-tiktok"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">TikTok</div>
+            <div class="config-item-desc">رابط حساب TikTok</div>
+          </div>
+        </div>
+        <div class="config-item">
+          <i class="fab fa-instagram"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">Instagram</div>
+            <div class="config-item-desc">رابط حساب Instagram</div>
+          </div>
+        </div>
+        <div class="config-item">
+          <i class="fab fa-telegram"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">Telegram</div>
+            <div class="config-item-desc">رابط قناة Telegram</div>
+          </div>
+        </div>
+        <div class="config-item">
+          <i class="fab fa-twitter"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">Twitter / X</div>
+            <div class="config-item-desc">رابط حساب Twitter</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Challenges View -->
+    <div id="challengesView" class="view">
+      <div class="section-title"><i class="fas fa-gamepad"></i> التحديات</div>
+      <div class="card" style="text-align:center; padding:40px;">
+        <i class="fas fa-gamepad" style="font-size:2.5rem; color:var(--text-muted); opacity:0.3;"></i>
+        <p style="margin-top:12px; color:var(--text-secondary);">لا توجد تحديات نشطة</p>
+      </div>
+    </div>
+
+    <!-- Link Scenes View -->
+    <div id="linkScenesView" class="view">
+      <div class="section-title"><i class="fas fa-object-group"></i> تجميع الروابط</div>
+      <div class="card" style="text-align:center; padding:40px;">
+        <i class="fas fa-object-group" style="font-size:2.5rem; color:var(--text-muted); opacity:0.3;"></i>
+        <p style="margin-top:12px; color:var(--text-secondary);">إدارة مشاهد الروابط</p>
+      </div>
+    </div>
+
+    <!-- Overlays View -->
+    <div id="overlaysView" class="view">
+      <div class="section-title"><i class="fas fa-layer-group"></i> إعدادات Overlays</div>
+      <div class="config-panel">
+        <div class="config-item">
+          <i class="fas fa-heart"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">أوفلاي الإعجابات</div>
+            <div class="config-item-desc">عرض تأثير الإعجابات على الشاشة</div>
+          </div>
+          <button class="config-toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="config-item">
+          <i class="fas fa-gift"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">أوفلاي الهدايا</div>
+            <div class="config-item-desc">عرض تأثير الهدايا على الشاشة</div>
+          </div>
+          <button class="config-toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="config-item">
+          <i class="fas fa-user-plus"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">أوفلاي المتابعين</div>
+            <div class="config-item-desc">عرض تأثير المتابعين على الشاشة</div>
+          </div>
+          <button class="config-toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="config-item">
+          <i class="fas fa-bullseye"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">أوفلاي الأهداف</div>
+            <div class="config-item-desc">عرض شريط التقدم على الشاشة</div>
+          </div>
+          <button class="config-toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="config-item">
+          <i class="fas fa-crown"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">أوفلاي التصنيف</div>
+            <div class="config-item-desc">عرض لوحة التصنيف على الشاشة</div>
+          </div>
+          <button class="config-toggle" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="config-item">
+          <i class="fas fa-clock-rotate-left"></i>
+          <div class="config-item-info">
+            <div class="config-item-title">أوفلاي آخر الأحداث</div>
+            <div class="config-item-desc">عرض آخر الأحداث على الشاشة</div>
+          </div>
+          <button class="config-toggle" onclick="this.classList.toggle('on')"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert Store View -->
+    <div id="alertStoreView" class="view">
+      <div class="section-title"><i class="fas fa-store"></i> متجر التنبيهات</div>
+      <div class="card" style="text-align:center; padding:40px;">
+        <i class="fas fa-store" style="font-size:2.5rem; color:var(--text-muted); opacity:0.3;"></i>
+        <p style="margin-top:12px; color:var(--text-secondary);">تصفح المتجر لشراء تنبيهات مخصصة</p>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+  (function() {
+    'use strict';
+
+    // ===== State =====
+    var state = {
+      ws: null,
+      connected: false,
+      tiktokUsername: '',
+      stats: { likes: 0, gifts: 0, followers: 0, chatMsgs: 0, shares: 0 },
+      goals: {
+        likes: { current: 0, target: 1000 },
+        gifts: { current: 0, target: 500 },
+        follows: { current: 0, target: 200 },
+        hearts: { current: 0, target: 300 }
+      },
+      topLikes: [],
+      topGifters: [],
+      leaderboard: [],
+      chatMessages: [],
+      events: [],
+      viewers: { current: 0, total: 0 }
+    };
+
+    var MAX_EVENTS = 200;
+    var MAX_CHAT = 200;
+
+    // ===== DOM refs =====
+    var $ = function(id) { return document.getElementById(id); };
+    var loadingScreen = $('appLoadingScreen');
+    var sidebarNav = $('sidebarNav');
+    var mainContent = $('mainContent');
+    var connectBtn = $('connectBtn');
+    var accountConnectBtn = $('accountConnectBtn');
+    var tiktokInput = $('tiktokInput');
+    var accountTiktokInput = $('accountTiktokInput');
+    var headerStatusDot = $('headerStatusDot');
+    var headerStatusLabel = $('headerStatusLabel');
+
+    // ===== Navigation =====
+    function switchView(viewId) {
+      var views = mainContent.querySelectorAll('.view');
+      for (var i = 0; i < views.length; i++) {
+        views[i].classList.remove('active');
+      }
+      var btns = sidebarNav.querySelectorAll('.nav-btn');
+      for (var j = 0; j < btns.length; j++) {
+        btns[j].classList.remove('active');
+      }
+      var target = $(viewId);
+      if (target) target.classList.add('active');
+      var activeBtn = sidebarNav.querySelector('[data-view="' + viewId + '"]');
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+
+    sidebarNav.addEventListener('click', function(e) {
+      var btn = e.target.closest('.nav-btn');
+      if (!btn) return;
+      var viewId = btn.getAttribute('data-view');
+      if (viewId) switchView(viewId);
+    });
+
+    // ===== Connection =====
+    function setStatus(status) {
+      headerStatusDot.className = 'status-dot';
+      if (status === 'connected') {
+        headerStatusDot.classList.add('connected');
+        headerStatusLabel.textContent = 'متصل';
+      } else if (status === 'connecting') {
+        headerStatusDot.classList.add('connecting');
+        headerStatusLabel.textContent = 'جاري الاتصال...';
+      } else {
+        headerStatusLabel.textContent = 'غير متصل';
+      }
+      var cs = $('accountConnectStatus');
+      if (cs) {
+        var icon = cs.querySelector('i');
+        var text = cs.querySelector('span');
+        if (status === 'connected') {
+          icon.className = 'fas fa-circle-check';
+          icon.style.color = 'var(--success)';
+          text.textContent = 'متصل بـ ' + state.tiktokUsername;
+        } else if (status === 'connecting') {
+          icon.className = 'fas fa-spinner fa-spin';
+          icon.style.color = 'var(--warning)';
+          text.textContent = 'جاري الاتصال...';
+        } else {
+          icon.className = 'fas fa-circle-xmark';
+          icon.style.color = 'var(--text-muted)';
+          text.textContent = 'غير متصل';
+        }
+      }
+    }
+
+    function updateConnectButton() {
+      if (state.connected) {
+        connectBtn.textContent = 'قطع الاتصال';
+        connectBtn.classList.add('disconnect');
+        connectBtn.disabled = false;
+        if (accountConnectBtn) {
+          accountConnectBtn.textContent = 'قطع الاتصال';
+          accountConnectBtn.classList.add('disconnect');
+          accountConnectBtn.disabled = false;
+        }
+      } else {
+        connectBtn.textContent = 'اتصال';
+        connectBtn.classList.remove('disconnect');
+        connectBtn.disabled = false;
+        if (accountConnectBtn) {
+          accountConnectBtn.textContent = 'اتصال بالبث';
+          accountConnectBtn.classList.remove('disconnect');
+          accountConnectBtn.disabled = false;
+        }
+      }
+    }
+
+    function connect() {
+      var username = (tiktokInput.value || accountTiktokInput.value || '').trim().replace(/^@/, '');
+      if (!username) {
+        tiktokInput.focus();
+        accountTiktokInput && accountTiktokInput.focus();
+        return;
+      }
+      state.tiktokUsername = username;
+      tiktokInput.value = username;
+      if (accountTiktokInput) accountTiktokInput.value = username;
+      setStatus('connecting');
+
+      // POST connect to API
+      fetch('http://localhost:3000/stream/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uniqueId: username })
+      }).catch(function() {});
+
+      // Open WebSocket
+      if (state.ws) {
+        try { state.ws.close(); } catch(e) {}
+      }
+      var wsUrl = 'ws://localhost:3000/ws';
+      try {
+        state.ws = new WebSocket(wsUrl);
+      } catch(e) {
+        setStatus('disconnected');
+        return;
+      }
+
+      state.ws.onopen = function() {
+        state.connected = true;
+        updateConnectButton();
+        setStatus('connected');
+        // Subscribe
+        state.ws.send(JSON.stringify({ type: 'subscribe', username: username }));
+      };
+
+      state.ws.onmessage = function(evt) {
+        var msg;
+        try { msg = JSON.parse(evt.data); } catch(e) { return; }
+        handleWSMessage(msg);
+      };
+
+      state.ws.onclose = function() {
+        state.connected = false;
+        updateConnectButton();
+        setStatus('disconnected');
+      };
+
+      state.ws.onerror = function() {
+        state.connected = false;
+        updateConnectButton();
+        setStatus('disconnected');
+      };
+    }
+
+    function disconnect() {
+      if (state.ws) {
+        try {
+          state.ws.send(JSON.stringify({ type: 'unsubscribe' }));
+          state.ws.close();
+        } catch(e) {}
+      }
+      state.ws = null;
+      state.connected = false;
+      updateConnectButton();
+      setStatus('disconnected');
+
+      fetch('http://localhost:3000/stream/disconnect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      }).catch(function() {});
+    }
+
+    connectBtn.addEventListener('click', function() {
+      if (state.connected) disconnect(); else connect();
+    });
+    if (accountConnectBtn) {
+      accountConnectBtn.addEventListener('click', function() {
+        if (state.connected) disconnect(); else connect();
+      });
+    }
+
+    // Enter key to connect
+    tiktokInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); if (!state.connected) connect(); }
+    });
+    if (accountTiktokInput) {
+      accountTiktokInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); if (!state.connected) connect(); }
+      });
+    }
+
+    // ===== WebSocket Event Handler =====
+    function handleWSMessage(msg) {
+      var type = msg.type || '';
+      switch(type) {
+        case 'like':
+          handleLike(msg);
+          break;
+        case 'chat':
+          handleChat(msg);
+          break;
+        case 'follow_overlay_update':
+          handleFollow(msg);
+          break;
+        case 'gift_overlay_update':
+          handleGift(msg);
+          break;
+        case 'subscribe_overlay_update':
+          handleSubscribe(msg);
+          break;
+        case 'member_join_overlay_update':
+          handleJoin(msg);
+          break;
+        case 'stream-state-updated':
+          handleStreamState(msg);
+          break;
+        case 'connection_status':
+          handleConnectionStatus(msg);
+          break;
+        case 'room_viewers_update':
+          handleViewersUpdate(msg);
+          break;
+        case 'top_likes_update':
+          handleTopLikes(msg);
+          break;
+        case 'top_gifters_update':
+          handleTopGifters(msg);
+          break;
+        case 'leaderboard_update':
+          handleLeaderboard(msg);
+          break;
+        case 'top_rankers_update':
+          handleLeaderboard(msg);
+          break;
+        case 'latest_event_update':
+          handleLatestEvent(msg);
+          break;
+        case 'room_info_update':
+          handleRoomInfo(msg);
+          break;
+        case 'like_goal_update':
+          handleGoalUpdate('likes', msg);
+          break;
+        case 'gift_goal_update':
+          handleGoalUpdate('gifts', msg);
+          break;
+        case 'follow_goal_update':
+          handleGoalUpdate('follows', msg);
+          break;
+        case 'heart_me_goal_update':
+          handleGoalUpdate('hearts', msg);
+          break;
+      }
+    }
+
+    // ===== Event Handlers =====
+    function makeAvatarHTML(avatar, name) {
+      if (avatar) {
+        return '<img src="' + escapeHTML(avatar) + '" alt="" onerror="this.parentNode.innerHTML=\'<i class=\\\'fas fa-user\\\'></i>\'">';
+      }
+      var initial = (name || '?').charAt(0).toUpperCase();
+      return '<i class="fas fa-user"></i>';
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function timeNow() {
+      var d = new Date();
+      return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2);
+    }
+
+    function addEvent(type, username, action, avatar) {
+      var feed = $('eventFeed');
+      if (!feed) return;
+      // Remove empty state
+      var empty = feed.querySelector('.empty-state');
+      if (empty) empty.remove();
+
+      var item = document.createElement('div');
+      item.className = 'event-item';
+      item.innerHTML =
+        '<div class="event-avatar">' + makeAvatarHTML(avatar, username) + '</div>' +
+        '<div class="event-body">' +
+          '<div class="event-user">' + escapeHTML(username) + '</div>' +
+          '<div class="event-action">' + escapeHTML(action) + '</div>' +
+        '</div>' +
+        '<div class="event-meta">' +
+          '<div class="event-time">' + timeNow() + '</div>' +
+          '<span class="event-type-badge ' + type + '">' + type + '</span>' +
+        '</div>';
+
+      feed.insertBefore(item, feed.firstChild);
+
+      // Trim
+      while (feed.children.length > MAX_EVENTS) {
+        feed.removeChild(feed.lastChild);
+      }
+
+      state.events.unshift({ type: type, username: username, action: action, time: timeNow() });
+      if (state.events.length > MAX_EVENTS) state.events.pop();
+    }
+
+    function handleLike(msg) {
+      var username = msg.uniqueId || msg.username || 'مستخدم';
+      var nickname = msg.nickname || username;
+      var count = msg.likeCount || msg.count || 1;
+      var avatar = msg.profilePictureUrl || msg.avatar || '';
+      state.stats.likes += count;
+      updateStats();
+      updateGoal('likes');
+      addEvent('like', nickname, 'أرسل ' + count + ' إعجاب' + (count > 1 ? 'ات' : ''), avatar);
+    }
+
+    function handleChat(msg) {
+      var username = msg.uniqueId || msg.username || 'مستخدم';
+      var nickname = msg.nickname || username;
+      var comment = msg.comment || msg.text || '';
+      var avatar = msg.profilePictureUrl || msg.avatar || '';
+      state.stats.chatMsgs++;
+      updateStats();
+      addChatMessage(nickname, comment, avatar);
+      addEvent('chat', nickname, comment, avatar);
+    }
+
+    function handleFollow(msg) {
+      var username = msg.uniqueId || msg.username || 'مستخدم';
+      var nickname = msg.nickname || username;
+      var avatar = msg.profilePictureUrl || msg.avatar || '';
+      state.stats.followers++;
+      updateStats();
+      updateGoal('follows');
+      addEvent('follow', nickname, 'تابعك', avatar);
+    }
+
+    function handleGift(msg) {
+      var username = msg.uniqueId || msg.username || 'مستخدم';
+      var nickname = msg.nickname || username;
+      var giftName = msg.giftName || msg.gift_name || 'هدية';
+      var giftValue = msg.diamondCount || msg.giftValue || msg.diamond_count || 1;
+      var avatar = msg.profilePictureUrl || msg.avatar || '';
+      state.stats.gifts += giftValue;
+      updateStats();
+      updateGoal('gifts');
+      addEvent('gift', nickname, 'أرسل ' + giftName + ' (' + giftValue + ' 💎)', avatar);
+    }
+
+    function handleSubscribe(msg) {
+      var username = msg.uniqueId || msg.username || 'مستخدم';
+      var nickname = msg.nickname || username;
+      var avatar = msg.profilePictureUrl || msg.avatar || '';
+      addEvent('sub', nickname, 'اشترك كعضو', avatar);
+    }
+
+    function handleJoin(msg) {
+      var username = msg.uniqueId || msg.username || 'مستخدم';
+      var nickname = msg.nickname || username;
+      var avatar = msg.profilePictureUrl || msg.avatar || '';
+      addEvent('join', nickname, 'انضم للبث', avatar);
+    }
+
+    function handleStreamState(msg) {
+      var live = msg.isLive || msg.live || false;
+      if (live) {
+        setStatus('connected');
+      } else {
+        setStatus('disconnected');
+      }
+    }
+
+    function handleConnectionStatus(msg) {
+      var status = msg.status || msg.connection_status || 'disconnected';
+      if (status === 'connected' || status === 'live') {
+        setStatus('connected');
+        state.connected = true;
+      } else {
+        setStatus('disconnected');
+        state.connected = false;
+      }
+      updateConnectButton();
+    }
+
+    function handleViewersUpdate(msg) {
+      var current = msg.viewers || msg.current || msg.roomViewers || 0;
+      var total = msg.totalViewers || msg.total || 0;
+      state.viewers.current = current;
+      state.viewers.total = total;
+      $('currentViewersValue').textContent = current.toLocaleString();
+      $('totalUserValue').textContent = total.toLocaleString();
+      $('infoCurrentViewers').textContent = current.toLocaleString();
+      $('infoTotalViewers').textContent = total.toLocaleString();
+      $('streamInfoCard').style.display = '';
+    }
+
+    function handleTopLikes(msg) {
+      var data = msg.data || msg.topLikes || msg.rankers || [];
+      state.topLikes = data;
+      renderTopLikes(data);
+    }
+
+    function handleTopGifters(msg) {
+      var data = msg.data || msg.topGifters || [];
+      state.topGifters = data;
+      renderTopGifters(data);
+    }
+
+    function handleLeaderboard(msg) {
+      var data = msg.data || msg.leaderboard || msg.rankers || [];
+      state.leaderboard = data;
+      renderLeaderboard(data);
+    }
+
+    function handleLatestEvent(msg) {
+      var eventType = msg.eventType || msg.event_type || 'like';
+      var username = msg.uniqueId || msg.username || 'مستخدم';
+      var nickname = msg.nickname || username;
+      var avatar = msg.profilePictureUrl || msg.avatar || '';
+      var action = msg.action || msg.message || '';
+      var typeMap = { 'like': 'like', 'gift': 'gift', 'follow': 'follow', 'chat': 'chat', 'share': 'share', 'join': 'join', 'subscribe': 'sub' };
+      addEvent(typeMap[eventType] || 'like', nickname, action || eventType, avatar);
+    }
+
+    function handleRoomInfo(msg) {
+      var nickname = msg.nickname || msg.host || '';
+      var title = msg.title || msg.roomTitle || '';
+      var avatar = msg.avatar || msg.profilePictureUrl || '';
+      var infoDisplay = $('roomInfoDisplay');
+      if (nickname || title) {
+        infoDisplay.style.display = 'flex';
+        $('roomNickname').textContent = nickname;
+        $('roomTitle').textContent = title;
+        if (avatar) $('roomAvatar').src = avatar;
+      }
+    }
+
+    // ===== Render Functions =====
+    function updateStats() {
+      $('totalLikes').textContent = state.stats.likes.toLocaleString();
+      $('totalGifts').textContent = state.stats.gifts.toLocaleString();
+      $('totalFollowers').textContent = state.stats.followers.toLocaleString();
+      $('totalChatMsgs').textContent = state.stats.chatMsgs.toLocaleString();
+      $('totalShares').textContent = state.stats.shares.toLocaleString();
+    }
+
+    function updateGoal(type) {
+      var g = state.goals[type];
+      if (!g) return;
+      if (type === 'likes') g.current = state.stats.likes;
+      else if (type === 'gifts') g.current = state.stats.gifts;
+      else if (type === 'follows') g.current = state.stats.followers;
+      var pct = Math.min(100, (g.current / g.target) * 100);
+      var barEl = $(type + 'GoalBar');
+      var currentEl = $(type + 'GoalCurrent');
+      if (barEl) barEl.style.width = pct + '%';
+      if (currentEl) currentEl.textContent = g.current.toLocaleString();
+    }
+
+    function handleGoalUpdate(type, msg) {
+      var current = msg.current || msg.value || 0;
+      var target = msg.target || state.goals[type].target;
+      state.goals[type].current = current;
+      state.goals[type].target = target;
+      var barEl = $(type + 'GoalBar');
+      var currentEl = $(type + 'GoalCurrent');
+      var targetEl = $(type + 'GoalTarget');
+      var pct = Math.min(100, (current / target) * 100);
+      if (barEl) barEl.style.width = pct + '%';
+      if (currentEl) currentEl.textContent = current.toLocaleString();
+      if (targetEl) targetEl.textContent = target.toLocaleString();
+    }
+
+    function renderTopLikes(data) {
+      var tbody = $('topLikesTableBody');
+      if (!tbody) return;
+      if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:30px;">لا توجد بيانات بعد</td></tr>';
+        return;
+      }
+      var html = '';
+      for (var i = 0; i < data.length; i++) {
+        var item = data[i];
+        var name = item.nickname || item.uniqueId || item.username || '-';
+        var likes = item.likeCount || item.count || item.likes || 0;
+        var rank = i + 1;
+        var badgeClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : 'default';
+        html += '<tr>' +
+          '<td><span class="rank-badge ' + badgeClass + '">' + rank + '</span></td>' +
+          '<td>' + escapeHTML(name) + '</td>' +
+          '<td style="font-weight:600; color:var(--brand-red);">' + likes.toLocaleString() + '</td>' +
+          '</tr>';
+      }
+      tbody.innerHTML = html;
+    }
+
+    function renderTopGifters(data) {
+      var tbody = $('topGiftersTableBody');
+      if (!tbody) return;
+      if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:30px;">لا توجد بيانات بعد</td></tr>';
+        return;
+      }
+      var html = '';
+      for (var i = 0; i < data.length; i++) {
+        var item = data[i];
+        var name = item.nickname || item.uniqueId || item.username || '-';
+        var value = item.diamondCount || item.giftValue || item.value || item.diamond_count || 0;
+        var rank = i + 1;
+        var badgeClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : 'default';
+        html += '<tr>' +
+          '<td><span class="rank-badge ' + badgeClass + '">' + rank + '</span></td>' +
+          '<td>' + escapeHTML(name) + '</td>' +
+          '<td style="font-weight:600; color:#fbbf24;">' + value.toLocaleString() + ' 💎</td>' +
+          '</tr>';
+      }
+      tbody.innerHTML = html;
+    }
+
+    function renderLeaderboard(data) {
+      var tbody = $('leaderboardTableBody');
+      if (!tbody) return;
+      if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:30px;">لا توجد بيانات بعد</td></tr>';
+        return;
+      }
+      var html = '';
+      for (var i = 0; i < data.length; i++) {
+        var item = data[i];
+        var name = item.nickname || item.uniqueId || item.username || '-';
+        var type = item.type || item.eventType || '-';
+        var value = item.value || item.score || item.count || 0;
+        var rank = i + 1;
+        var badgeClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : 'default';
+        var typeLabel = type === 'like' ? 'إعجاب' : type === 'gift' ? 'هدية' : type === 'follow' ? 'متابعة' : type;
+        html += '<tr>' +
+          '<td><span class="rank-badge ' + badgeClass + '">' + rank + '</span></td>' +
+          '<td>' + escapeHTML(name) + '</td>' +
+          '<td>' + escapeHTML(typeLabel) + '</td>' +
+          '<td style="font-weight:600;">' + value.toLocaleString() + '</td>' +
+          '</tr>';
+      }
+      tbody.innerHTML = html;
+    }
+
+    function addChatMessage(name, text, avatar) {
+      var container = $('chatMessages');
+      if (!container) return;
+      var empty = container.querySelector('.empty-state');
+      if (empty) empty.remove();
+
+      var msg = document.createElement('div');
+      msg.className = 'chat-msg';
+      msg.innerHTML =
+        '<div class="chat-msg-avatar">' + makeAvatarHTML(avatar, name) + '</div>' +
+        '<div class="chat-msg-content">' +
+          '<div class="chat-msg-name">' + escapeHTML(name) + '</div>' +
+          '<div class="chat-msg-text">' + escapeHTML(text) + '</div>' +
+          '<div class="chat-msg-time">' + timeNow() + '</div>' +
+        '</div>';
+
+      container.appendChild(msg);
+
+      while (container.children.length > MAX_CHAT) {
+        container.removeChild(container.firstChild);
+      }
+
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // ===== Loading Screen =====
+    setTimeout(function() {
+      if (loadingScreen) loadingScreen.classList.add('hidden');
+    }, 1200);
+
+    // ===== Init =====
+    updateStats();
+    updateConnectButton();
+    setStatus('disconnected');
+    switchView('accountView');
+
+  })();
+  </script>
+</body>
+</html>

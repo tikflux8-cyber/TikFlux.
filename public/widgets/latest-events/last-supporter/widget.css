@@ -1,0 +1,218 @@
+/* آخر داعم — كل الألوان تُبنى في widget.js من لون الأكسنت وتُضبط كمتغيرات هنا */
+:root {
+  --ls-core-light: rgba(186, 214, 255, 0.45);
+  --ls-core-mid: #2a3d6e;
+  --ls-core-dark: #12172c;
+  --ls-core-darker: #0b0e1c;
+  --ls-core-inset: rgba(140, 190, 255, 0.25);
+  --ls-core-glow: rgba(120, 180, 255, 0.2);
+
+  --ls-panel-light: rgba(190, 220, 255, 0.28);
+  --ls-panel-top: #2a3d6e;
+  --ls-panel-mid: #141a32;
+  --ls-panel-bottom: #0d1224;
+  --ls-panel-border: rgba(186, 214, 255, 0.28);
+  --ls-panel-inset-dark: rgba(8, 12, 28, 0.35);
+  --ls-panel-shadow: rgba(20, 40, 80, 0.28);
+
+  --ls-amount-light: rgba(220, 238, 255, 0.38);
+  --ls-amount-top: #4a6aa0;
+  --ls-amount-bottom: #24375e;
+  --ls-amount-glow: rgba(140, 190, 255, 0.28);
+  --ls-amount-shadow: rgba(20, 40, 80, 0.45);
+
+  --ls-heart-glow: rgba(186, 220, 255, 0.9);
+
+  --ls-frame-tint: hue-rotate(0deg) saturate(5.55) brightness(1);
+  --ls-frame-glow-50: hsla(0, 90%, 52%, 0.5);
+  --ls-frame-glow-40: hsla(0, 90%, 52%, 0.4);
+  --ls-frame-glow-35: hsla(0, 90%, 52%, 0.35);
+  --ls-frame-glow-25: hsla(0, 90%, 52%, 0.25);
+  --ls-frame-glow-70: hsla(0, 90%, 52%, 0.7);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  font-family: 'Almarai', 'Tajawal', sans-serif;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.widget {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: auto;
+  direction: ltr;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  transform: translateY(-50%);
+}
+
+.badge {
+  position: relative;
+  z-index: 2;
+  width: 190px;
+  height: 190px;
+  flex: 0 0 190px;
+}
+
+.core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  width: 72%;
+  height: 72%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, var(--ls-core-light), transparent 42%),
+    radial-gradient(circle at 50% 50%, var(--ls-core-mid) 0%, var(--ls-core-dark) 70%, var(--ls-core-darker) 100%);
+  box-shadow:
+    inset 0 0 18px var(--ls-core-inset),
+    0 0 24px var(--ls-core-glow);
+}
+
+/* الإطار: نفس أصول _shared + hue-rotate يتبع لون الأكسنت */
+.badge-frame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  width: calc(82% + 5px);
+  height: calc(82% + 5px);
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  pointer-events: none;
+  filter:
+    var(--ls-frame-tint)
+    drop-shadow(0 0 5px var(--ls-frame-glow-50))
+    drop-shadow(0 0 12px var(--ls-frame-glow-40))
+    drop-shadow(0 0 25px var(--ls-frame-glow-25));
+  animation: frameGlow 2s ease-in-out infinite;
+}
+
+@keyframes frameGlow {
+  0%, 100% {
+    filter:
+      var(--ls-frame-tint)
+      drop-shadow(0 0 5px var(--ls-frame-glow-50))
+      drop-shadow(0 0 12px var(--ls-frame-glow-40))
+      drop-shadow(0 0 25px var(--ls-frame-glow-25));
+  }
+  50% {
+    filter:
+      var(--ls-frame-tint)
+      drop-shadow(0 0 8px var(--ls-frame-glow-70))
+      drop-shadow(0 0 18px var(--ls-frame-glow-50))
+      drop-shadow(0 0 35px var(--ls-frame-glow-35));
+  }
+}
+
+.heart {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  width: 56px;
+  height: 56px;
+  transform: translate(-50%, -50%);
+  fill: #fff;
+  filter: drop-shadow(0 0 10px var(--ls-heart-glow));
+  animation: beat 1.6s ease-in-out infinite;
+}
+
+@keyframes beat {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.08); }
+}
+
+.info {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex: 0 0 auto;
+  width: max-content;
+  min-height: 52px;
+  margin-inline-start: -70px;
+  padding-block: 8px;
+  padding-inline-start: 78px;
+  padding-inline-end: 24px;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 12% 0%, var(--ls-panel-light), transparent 46%),
+    linear-gradient(180deg, var(--ls-panel-top) 0%, var(--ls-panel-mid) 58%, var(--ls-panel-bottom) 100%);
+  border: 1px solid var(--ls-panel-border);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -10px 18px var(--ls-panel-inset-dark),
+    0 8px 24px var(--ls-panel-shadow);
+}
+
+.name {
+  color: #fff;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  unicode-bidi: plaintext;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+}
+
+.amount {
+  font-family: 'Outfit', sans-serif;
+  flex-shrink: 0;
+  color: #f4fbff;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  padding: 5px 18px 6px;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 30% 20%, var(--ls-amount-light), transparent 55%),
+    linear-gradient(180deg, var(--ls-amount-top) 0%, var(--ls-amount-bottom) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 0 16px var(--ls-amount-glow);
+  text-shadow: 0 1px 8px var(--ls-amount-shadow);
+}
+
+/* عكس التصميم: البادج يمين واللوحة تمتد يساراً */
+.stage.layout-reversed .widget {
+  left: auto;
+  right: 0;
+  direction: rtl;
+}
+
+.stage.layout-reversed .badge-frame {
+  transform: translate(-50%, -50%) scaleX(-1);
+}
+
+.stage.swap .info,
+.stage.swap .badge {
+  animation: swapIn 0.35s ease;
+}
+
+@keyframes swapIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

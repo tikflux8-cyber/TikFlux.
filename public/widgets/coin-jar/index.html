@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="/assets/img/tikflux-mark.png?v=20260802" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikFlux - Coin Jar</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+      font-family: "Segoe UI", system-ui, sans-serif;
+    }
+    #coin-jar-theme-mount {
+      position: fixed;
+      inset: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="coin-jar-theme-mount"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
+  <script src="/assets/b/8c386c8dbec5a57f.js"></script>
+  <script src="/assets/b/28b98888f9aaae4a.js"></script>
+  <script src="/assets/b/739dedc0d008de99.js"></script>
+  <script src="/assets/b/8ad3aa0d0a55a895.js"></script>
+  <script>
+(function () {
+  'use strict';
+
+  const hostname = window.location.hostname;
+  const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+  const API_BASE = isLocal ? 'http://localhost:3000' : 'https://api.tikflux.live';
+  const EDGE_WS_URL = window.ENV_CONFIG?.EDGE_WS_URL || (isLocal ? 'ws://localhost:3000/ws' : 'wss://edge.tikflux.live/ws');
+
+  const params = new URLSearchParams(window.location.search);
+  const userId = params.get('uid');
+  const isMock = params.get('mock') === '1';
+  const isDebug = params.get('debug') === '1';
+  const urlTheme = (params.get('theme') || '').trim().toLowerCase();
+
+  const imgBase = new URL('/assets/img/', window.location.origin).href;
+
+  const TEST_SENDERS = [
+    { username: 'Alex', avatarUrl: imgBase + 'avatar1.png' },
+    { username: 'Sam', avatarUrl: imgBase + 'avatar2.png' },
+    { username: 'Mia', avatarUrl: imgBase + 'avatar3.png' },
+  ];
+
+  const COIN_SVG = '<svg class="tiktok-coin" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g clip-path="url(#coin-bubble-clip)"><defs><clipPath id="coin-bubble-clip"><circle cx="24" cy="24" r="24"/></clipPath></defs><path d="M48 24a24 24 0 1 1-48 0 24 24 0 0 1 48 0Z" fill="#FFB84D"/><path d="M47 24a23 23 0 1 1-46 0 23 23 0 0 1 46 0Z" fill="#FFDE55"/><path d="M42 24a18 18 0 1 1-36 0 18 18 0 0 1 36 0Z" fill="#F7A300"/><path d="M42 24a18 18 0 1 1-36 0 18 18 0 0 1 36 0Z" fill="#F7A80F"/><path d="M41.94 25.5a18 18 0 1 0-35.88 0 18 18 0 0 1 35.88 0Z" fill="#E88B00"/><path d="M41.94 25.5a18 18 0 1 0-35.88 0 18 18 0 0 1 35.88 0Z" fill="#F09207"/><path d="M34.74 17.77v5.86c-2.06 0-4.05-.44-5.81-1.55v7.2a7.79 7.79 0 0 1-7.84 7.75a7.79 7.79 0 0 1-7.8-8.35a7.79 7.79 0 0 1 9.19-8.24v6c-.47-.13-.9-.26-1.39-.26a3.14 3.14 0 0 0-3.09 2.5a3.14 3.14 0 0 0 3.1 2.5c1.74 0 3.14-1.4 3.14-3.11V12.03h4.69a5.6 5.6 0 0 0 5.81 5.74Z" fill="#F09207"/><path d="M34.34 18.18a5.78 5.78 0 0 1-5.82-5.74h-3.87v15.63c0 1.94-1.6 3.5-3.56 3.5a3.53 3.53 0 0 1-3.55-3.5a3.53 3.53 0 0 1 4.52-3.38v-3.9a7.38 7.38 0 0 0-8.4 7.28a7.38 7.38 0 0 0 7.43 7.34c4.1 0 7.43-3.29 7.43-7.34v-7.98a9.73 9.73 0 0 0 5.82 1.92v-3.83Z" fill="#fff"/></g></svg>';
+
+  const BUBBLE_SLOTS = [
+    { side: 'left',  top: 0.16 },
+    { side: 'right', top: 0.22 },
+    { side: 'left',  top: 0.32 },
+    { side: 'right', top: 0.38 },
+    { side: 'left',  top: 0.48 },
+    { side: 'right', top: 0.54 },
+    { side: 'left',  top: 0.64 },
+    { side: 'right', top: 0.70 },
+    { side: 'left',  top: 0.80 },
+    { side: 'right', top: 0.86 },
+  ];
+  const BUBBLE_LIFETIME_MS = 2800;
+  const BUBBLE_MIN_DY = 52;
+  const BUBBLE_OUTWARD_PX = 32;
+
+  let coinCountEl = null;
+  let canvas = null;
+  let stage = null;
+  let jarFront = null;
+  let giftToastLayer = null;
+  let jarArtInset = null;
+
+  let engine = null;
+  let socket = null;
+  let testSenderIndex = 0;
+  let currentRoomId = null;
+  let currentThemeKey = null; // null until first successful theme mount
+  let currentAccentColor = '#fe70d3';
+  let currentShowScore = true;
+  const activeBubbles = [];
+  const COIN_JAR_DEFAULT_ACCENT = '#fe70d3';
+  const COIN_JAR_BASE_JAR_HUE = 305;
+  const COIN_JAR_DEFAULT_ACCENT_HUE = 318.2;
+
+  function normalizeAccentColor(value) {
+    const raw = String(value || '').trim();
+    if (/^#([0-9a-f]{6})$/i.test(raw)) return raw.toLowerCase();
+    if (/^#([0-9a-f]{3})$/i.test(raw)) {
+      const h = raw.slice(1).toLowerCase();
+      return '#' + h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    }
+    return COIN_JAR_DEFAULT_ACCENT;
+  }
+
+  function hexToRgbChannels(hex) {
+    const h = normalizeAccentColor(hex).slice(1);
+    return {
+      r: parseInt(h.slice(0, 2), 16),
+      g: parseInt(h.slice(2, 4), 16),
+      b: parseInt(h.slice(4, 6), 16),
+    };
+  }
+
+  function rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0;
+    let s = 0;
+    const l = (max + min) / 2;
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = ((g - b) / d + (g < b ? 6 : 0)); break;
+        case g: h = (b - r) / d + 2; break;
+        default: h = (r - g) / d + 4; break;
+      }
+      h *= 60;
+    }
+    return { h, s, l };
+  }
+
+  function hslToHex(h, s, l) {
+    h = ((h % 360) + 360) % 360;
+    const c = (1 - Math.abs(2 * l - 1)) * s;
+    const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+    const m = l - c / 2;
+    let r = 0;
+    let g = 0;
+    let b = 0;
+    if (h < 60) { r = c; g = x; }
+    else if (h < 120) { r = x; g = c; }
+    else if (h < 180) { g = c; b = x; }
+    else if (h < 240) { g = x; b = c; }
+    else if (h < 300) { r = x; b = c; }
+    else { r = c; b = x; }
+    const to = (v) => Math.round((v + m) * 255).toString(16).padStart(2, '0');
+    return '#' + to(r) + to(g) + to(b);
+  }
+
+  function buildAccentPalette(accent) {
+    const mid = normalizeAccentColor(accent);
+    const { r, g, b } = hexToRgbChannels(mid);
+    const { h, s, l } = rgbToHsl(r, g, b);
+    return {
+      mid,
+      light: hslToHex(h, Math.min(1, s), Math.min(0.9, l + 0.06)),
+      dark: hslToHex(h, Math.min(1, s + 0.05), Math.max(0.28, l - 0.18)),
+      glowB: hslToHex(h, s, Math.min(0.88, l + 0.03)),
+      jarHue: COIN_JAR_BASE_JAR_HUE + (h - COIN_JAR_DEFAULT_ACCENT_HUE),
+    };
+  }
+
+  function applyShowScore(showScore) {
+    currentShowScore = showScore !== false;
+    const counter = document.getElementById('coinCounter');
+    if (counter) {
+      counter.style.display = currentShowScore ? '' : 'none';
+    }
+  }
+
+  function applyAccentColor(accent) {
+    currentAccentColor = normalizeAccentColor(accent);
+    const stageEl = document.getElementById('stage');
+    const palette = buildAccentPalette(currentAccentColor);
+
+    if (window.CoinJarThemeConfig) {
+      window.CoinJarThemeConfig.glowColor = palette.mid;
+      window.CoinJarThemeConfig.glowColorB = palette.glowB;
+    }
+
+    if (!stageEl || stageEl.getAttribute('data-theme') !== 'sakura') {
+      return palette;
+    }
+
+    stageEl.style.setProperty('--cj-accent', palette.mid);
+    stageEl.style.setProperty('--cj-accent-light', palette.light);
+    stageEl.style.setProperty('--cj-accent-dark', palette.dark);
+    stageEl.style.setProperty('--cj-jar-hue', palette.jarHue.toFixed(1) + 'deg');
+
+    if (engine && typeof engine.setGlowColors === 'function') {
+      engine.setGlowColors(palette.mid, palette.glowB);
+    }
+    return palette;
+  }
+
+  function themeCfg() {
+    return window.CoinJarThemeLoader?.getConfig?.() || window.CoinJarThemeConfig || {};
+  }
+
+  function assetsBase() {
+    return themeCfg().assetsBase || new URL('assets/', window.location.href).href;
+  }
+
+  function bindDom() {
+    coinCountEl = document.getElementById('coinCount');
+    canvas = document.getElementById('coin-jar-canvas');
+    stage = document.getElementById('stage');
+    jarFront = document.getElementById('jarFront');
+    giftToastLayer = document.getElementById('giftToastLayer');
+    jarArtInset = themeCfg().jarArtInset || {
+      left: 256 / 1254,
+      top: 301 / 1254,
+      right: (1254 - 1001) / 1254,
+      bottom: (1254 - 1006) / 1254,
+    };
+  }
+
+  function jarInwardForHeight(topRatio) {
+    let base;
+    if (topRatio < 0.38) base = 10;
+    else if (topRatio > 0.58) base = 18;
+    else base = 14;
+    return Math.round(base + Math.random() * 6);
+  }
+
+  function clearGiftBubbles() {
+    while (activeBubbles.length) {
+      const record = activeBubbles.pop();
+      if (record?.el) record.el.remove();
+    }
+    if (giftToastLayer) giftToastLayer.replaceChildren();
+  }
+
+  function resetJarState() {
+    clearGiftBubbles();
+    if (engine) engine.resetJar();
+  }
+
+  function applyRoomId(roomId) {
+    if (!roomId || isMock) return;
+    if (currentRoomId && currentRoomId !== roomId) resetJarState();
+    currentRoomId = roomId;
+    if (userId) {
+      try { sessionStorage.setItem('coinJarRoom:' + userId, roomId); } catch (_) {}
+    }
+  }
+
+  function restoreRoomIdFromStorage() {
+    if (!userId || isMock) return;
+    try {
+      const stored = sessionStorage.getItem('coinJarRoom:' + userId);
+      if (stored) currentRoomId = stored;
+    } catch (_) {}
+  }
+
+  function syncJarVisualScale() {
+    if (!stage || !jarFront) return;
+    const scale = Math.min(1, Math.max(0.55, window.innerHeight / 920));
+    const width = Math.min(window.innerWidth * 0.84, 640) * scale;
+    stage.style.setProperty('--jar-w', width + 'px');
+    if (engine) {
+      const r = jarFront.getBoundingClientRect();
+      engine.setJarRect({ x: r.left, y: r.top, w: r.width, h: r.height });
+    }
+  }
+
+  function updateCoinCount(n) {
+    if (coinCountEl) coinCountEl.textContent = Math.round(n).toLocaleString('en-US');
+  }
+
+  function resolveGiftImageUrl(url) {
+    const fallback = (themeCfg().giftMinUrl) || (assetsBase() + 'rose_5655.webp');
+    if (!url) return fallback;
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    if (url.startsWith('/')) return window.location.origin + url;
+    return new URL(url, window.location.href).href;
+  }
+
+  function resolveAvatarUrl(url) {
+    if (!url || url === 'avatar.png') return imgBase + 'avatar1.png';
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    if (url.startsWith('/')) return window.location.origin + url;
+    return new URL(url, window.location.href).href;
+  }
+
+  function mapGiftPayload(data) {
+    if (!data || typeof data !== 'object') return null;
+    const url = data.giftPictureUrl || data.giftImageUrl;
+    const sender = data.sender || {};
+    const value = Number(data.value ?? data.giftCoins ?? data.diamondCount ?? 1) || 1;
+    const repeatCount = Math.max(1, Number(data.repeatCount ?? data.giftCount ?? 1) || 1);
+    let username = sender.nickname || sender.uniqueId || data.username || data.nickname;
+    let avatarUrl = sender.avatar || data.profilePictureUrl || data.avatarUrl || data.avatar;
+
+    if ((!username || !avatarUrl) && isMock) {
+      const s = TEST_SENDERS[testSenderIndex % TEST_SENDERS.length];
+      testSenderIndex++;
+      if (!username) username = s.username;
+      if (!avatarUrl) avatarUrl = s.avatarUrl;
+    }
+    if (!username) username = 'Guest';
+
+    return {
+      giftPictureUrl: resolveGiftImageUrl(url),
+      value,
+      repeatCount,
+      giftName: data.giftName || 'Gift',
+      username,
+      avatarUrl: resolveAvatarUrl(avatarUrl),
+      totalValue: value * repeatCount,
+    };
+  }
+
+  function getVisibleJarRect() {
+    const box = jarFront.getBoundingClientRect();
+    const w = box.width;
+    const h = box.height;
+    const inset = jarArtInset;
+    const left = box.left + w * inset.left;
+    const top = box.top + h * inset.top;
+    const right = box.right - w * inset.right;
+    const bottom = box.bottom - h * inset.bottom;
+    return { left, top, right, bottom, width: right - left, height: bottom - top };
+  }
+
+  function getBubblePosition(side, topRatio) {
+    const jar = getVisibleJarRect();
+    const inward = jarInwardForHeight(topRatio);
+    const top = jar.top + jar.height * topRatio;
+    if (side === 'left') {
+      return { left: jar.left + inward - BUBBLE_OUTWARD_PX, top, side: 'left' };
+    }
+    return { left: jar.right - inward + BUBBLE_OUTWARD_PX, top, side: 'right' };
+  }
+
+  function isSlotFree(slotIndex, side, top) {
+    for (let i = 0; i < activeBubbles.length; i++) {
+      const b = activeBubbles[i];
+      if (b.slotIndex === slotIndex) return false;
+      if (b.side === side && Math.abs(b.top - top) < BUBBLE_MIN_DY) return false;
+    }
+    return true;
+  }
+
+  function pickBubbleSlot() {
+    const free = [];
+    for (let i = 0; i < BUBBLE_SLOTS.length; i++) {
+      const slot = BUBBLE_SLOTS[i];
+      const pos = getBubblePosition(slot.side, slot.top);
+      if (isSlotFree(i, pos.side, pos.top)) {
+        free.push({
+          slotIndex: i,
+          side: pos.side,
+          top: pos.top,
+          left: pos.left,
+        });
+      }
+    }
+    if (!free.length) return null;
+    return free[Math.floor(Math.random() * free.length)];
+  }
+
+  function escapeHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function showGiftBubble(gift) {
+    if (!giftToastLayer || !gift) return;
+    const slot = pickBubbleSlot();
+    if (!slot) return;
+    const el = document.createElement('div');
+    el.className = 'gift-bubble gift-bubble--' + slot.side;
+    el.style.left = Math.round(slot.left) + 'px';
+    el.style.top = Math.round(slot.top) + 'px';
+    el.innerHTML =
+      '<div class="gift-bubble__tail"></div>' +
+      '<img class="gift-bubble__avatar" src="' + escapeHtml(gift.avatarUrl) + '" alt="" onerror="this.src=\'' + imgBase + 'avatar1.png\'">' +
+      '<span class="gift-bubble__name">' + escapeHtml(gift.username) + '</span>' +
+      '<img class="gift-bubble__gift" src="' + escapeHtml(gift.giftPictureUrl) + '" alt="">' +
+      '<span class="gift-bubble__value">' +
+        '<span>' + Number(gift.totalValue || gift.value).toLocaleString('en-US') + '</span>' +
+        COIN_SVG +
+      '</span>';
+    giftToastLayer.appendChild(el);
+    const record = {
+      el,
+      side: slot.side,
+      left: slot.left,
+      top: slot.top,
+      slotIndex: slot.slotIndex,
+    };
+    activeBubbles.push(record);
+    setTimeout(() => {
+      el.classList.add('is-leaving');
+      const idx = activeBubbles.indexOf(record);
+      if (idx >= 0) activeBubbles.splice(idx, 1);
+      setTimeout(() => el.remove(), 420);
+    }, BUBBLE_LIFETIME_MS);
+  }
+
+  function fitSakuraTagName(name) {
+    const el = document.getElementById('tag-username');
+    if (!el) return;
+    el.style.fontSize = '';
+    el.textContent = name || 'Guest';
+    let len = 0;
+    try { len = el.getComputedTextLength(); } catch (_) { /* ignore */ }
+    if (len > 155) {
+      el.style.fontSize = Math.max(9, 4380.3 / len).toFixed(1) + 'px';
+    }
+  }
+
+  function showSakuraTag(gift) {
+    const cfg = themeCfg();
+    if (!cfg.paperTag || !gift) return;
+    const plate = document.getElementById('tag-nameplate');
+    const avatarEl = document.getElementById('tag-avatar');
+    fitSakuraTagName(gift.username || 'Guest');
+    if (avatarEl && gift.avatarUrl) {
+      avatarEl.setAttribute('href', gift.avatarUrl);
+      avatarEl.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', gift.avatarUrl);
+      avatarEl.style.opacity = '1';
+    }
+    if (plate) plate.classList.add('tag-show');
+  }
+
+  function setupPartialAnim() {
+    const cfg = themeCfg();
+    const video = document.getElementById('partialAnim');
+    if (!video) return;
+    if (!cfg.partialAnim) {
+      video.style.display = 'none';
+      return;
+    }
+    video.style.display = 'block';
+    video.loop = true;
+    if (video.paused) video.play().catch(function () {});
+  }
+
+  function handleGift(data) {
+    if (data?.roomId) applyRoomId(data.roomId);
+    const gift = mapGiftPayload(data);
+    if (!gift) return;
+    showGiftBubble(gift);
+    showSakuraTag(gift);
+    if (engine) engine.addGift(gift);
+  }
+
+  function destroyEngine() {
+    if (engine) {
+      try { engine.destroy(); } catch (_) {}
+      engine = null;
+    }
+  }
+
+  function bootEngine() {
+    destroyEngine();
+    bindDom();
+    if (!canvas || !window.CoinJarEngine) {
+      console.error('[CoinJar] canvas / engine missing');
+      return;
+    }
+    const cfg = themeCfg();
+    const palette = buildAccentPalette(currentAccentColor);
+    syncJarVisualScale();
+    engine = new CoinJarEngine(canvas);
+    engine.onCoinsChange = updateCoinCount;
+    engine.init({
+      wallLineUrl: cfg.wallLineUrl,
+      gateUrl: cfg.gateUrl,
+      debug: isDebug,
+      glow: !!cfg.glow,
+      glowIntensity: cfg.glowIntensity,
+      glowColor: palette.mid,
+      glowColorB: palette.glowB,
+    });
+    syncJarVisualScale();
+    setupPartialAnim();
+    applyAccentColor(currentAccentColor);
+    applyShowScore(currentShowScore);
+    if (coinCountEl && engine) updateCoinCount(engine.coinsCollected || 0);
+  }
+
+  async function applyTheme(themeKey, accentColor, showScore) {
+    const requested = String(themeKey || '').toLowerCase();
+    const nextKey = requested === 'sakura' ? 'sakura' : 'classic';
+    // First boot: currentThemeKey is null, so classic mock must still mount.
+    const themeChanged = nextKey !== currentThemeKey;
+
+    if (accentColor !== undefined) {
+      currentAccentColor = normalizeAccentColor(accentColor);
+    }
+    if (showScore !== undefined) {
+      currentShowScore = showScore !== false;
+    }
+
+    if (themeChanged) {
+      const key = await window.CoinJarThemeLoader.switchTheme(nextKey);
+      currentThemeKey = key || 'classic';
+      clearGiftBubbles();
+      bootEngine();
+    } else {
+      // Same theme: keep physics gifts; only refresh visual settings.
+      applyAccentColor(currentAccentColor);
+      applyShowScore(currentShowScore);
+    }
+
+    return currentThemeKey;
+  }
+
+  async function fetchThemeSettings() {
+    if (!userId || isMock) {
+      const tk = (urlTheme === 'sakura' || urlTheme === 'classic') ? urlTheme : 'classic';
+      const q = new URLSearchParams(window.location.search);
+      const accentFromUrl = q.get('accent');
+      const showFromUrl = q.get('showScore') ?? q.get('show_score');
+      return {
+        theme_key: tk,
+        accent_color: normalizeAccentColor(accentFromUrl || COIN_JAR_DEFAULT_ACCENT),
+        show_score: showFromUrl == null ? true : !(showFromUrl === '0' || showFromUrl === 'false' || showFromUrl === 'off'),
+      };
+    }
+    try {
+      const res = await fetch(
+        API_BASE + '/api/widget/coin-jar/' + encodeURIComponent(userId) + '/settings',
+        { cache: 'no-store' },
+      );
+      if (!res.ok) throw new Error('settings ' + res.status);
+      const data = await res.json();
+      const tk = (data.theme_key || data.themeKey || 'classic').toLowerCase();
+      return {
+        theme_key: tk === 'sakura' ? 'sakura' : 'classic',
+        accent_color: normalizeAccentColor(data.accent_color || data.accentColor),
+        show_score: data.show_score !== false && data.showScore !== false,
+      };
+    } catch (err) {
+      console.warn('[CoinJar] settings fetch failed, default classic', err);
+      return {
+        theme_key: urlTheme === 'sakura' ? 'sakura' : 'classic',
+        accent_color: COIN_JAR_DEFAULT_ACCENT,
+        show_score: true,
+      };
+    }
+  }
+
+  function connectSocket() {
+    if (!userId || isMock || typeof createEdgeWsClient !== 'function') return null;
+    console.log('🔌 [CoinJar] Connecting to socket...', EDGE_WS_URL);
+    const s = createEdgeWsClient({
+      streamerId: userId,
+      url: EDGE_WS_URL,
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: Infinity,
+    });
+
+    s.on('connect', function () {
+      console.log('✅ [CoinJar] Connected:', s.id);
+    });
+
+    s.on('coin_jar_gift', function (data) {
+      if (document.hidden) return;
+      handleGift(data);
+    });
+
+    s.on('coin_jar_reset', function (data) {
+      if (data?.roomId) currentRoomId = data.roomId;
+      resetJarState();
+    });
+
+    s.on('coin_jar_settings', function (data) {
+      const tk = (data?.theme_key || data?.themeKey || '').toLowerCase();
+      const accent = data?.accent_color || data?.accentColor;
+      const showScore = data?.show_score ?? data?.showScore;
+      if (tk === 'classic' || tk === 'sakura') {
+        void applyTheme(tk, accent, showScore);
+      } else {
+        if (accent) applyAccentColor(accent);
+        if (showScore !== undefined) applyShowScore(showScore);
+      }
+    });
+
+    s.on('connect_error', function (error) {
+      console.error('❌ [CoinJar] Connection error:', error);
+    });
+
+    return s;
+  }
+
+  function setupMessageHandlers() {
+    window.addEventListener('message', (e) => {
+      if (!e.data || typeof e.data !== 'object') return;
+      if (e.data.type === 'coin_jar_preview_gift') handleGift(e.data);
+      if (e.data.type === 'coin_jar_reset') resetJarState();
+      if (e.data.type === 'coin_jar_set_theme') {
+        const tk = String(e.data.theme_key || e.data.theme || '').toLowerCase();
+        const accent = e.data.accent_color || e.data.accentColor;
+        const showScore = e.data.show_score ?? e.data.showScore;
+        if (tk === 'classic' || tk === 'sakura') void applyTheme(tk, accent, showScore);
+        else {
+          if (accent) applyAccentColor(accent);
+          if (showScore !== undefined) applyShowScore(showScore);
+        }
+      }
+    });
+  }
+
+  function runMockPreview() {
+    const MOCK_THEMES = ['classic', 'sakura'];
+    let themeIndex = MOCK_THEMES.indexOf(currentThemeKey);
+    if (themeIndex < 0) themeIndex = 0;
+
+    function buildMockGifts() {
+      const cfg = themeCfg();
+      return [
+        {
+          giftPictureUrl: cfg.giftMinUrl,
+          value: 1,
+          giftName: 'Rose',
+        },
+        {
+          giftPictureUrl: cfg.giftMaxUrl,
+          value: 100,
+          giftName: 'Hand Heart',
+        },
+      ];
+    }
+
+    let gifts = buildMockGifts();
+    let giftIndex = 0;
+    let senderIndex = 0;
+
+    setInterval(() => {
+      const base = gifts[giftIndex % gifts.length];
+      giftIndex++;
+      const sender = TEST_SENDERS[senderIndex % TEST_SENDERS.length];
+      senderIndex++;
+      handleGift({
+        ...base,
+        username: sender.username,
+        avatarUrl: sender.avatarUrl,
+        repeatCount: 1 + Math.floor(Math.random() * 3),
+      });
+    }, 2200);
+
+    setInterval(() => {
+      themeIndex = (themeIndex + 1) % MOCK_THEMES.length;
+      const next = MOCK_THEMES[themeIndex];
+      void applyTheme(next, currentAccentColor, currentShowScore).then(() => {
+        gifts = buildMockGifts();
+      });
+    }, 10000);
+  }
+
+  async function boot() {
+    const mount = document.getElementById('coin-jar-theme-mount');
+    if (!mount || !window.CoinJarThemeLoader || !window.CoinJarEngine) {
+      console.error('[CoinJar] mount / loader / engine missing');
+      return;
+    }
+
+    CoinJarThemeLoader.init(mount);
+    restoreRoomIdFromStorage();
+
+    const settings = await fetchThemeSettings();
+    await applyTheme(settings.theme_key, settings.accent_color, settings.show_score);
+
+    window.addGift = function (data) { handleGift(data || {}); };
+    window.resetJar = function () { resetJarState(); };
+    window.setCoinJarTheme = function (key, accent, showScore) { return applyTheme(key, accent, showScore); };
+    window.setCoinJarAccent = function (accent) { return applyAccentColor(accent); };
+    window.setCoinJarShowScore = function (show) { return applyShowScore(show); };
+
+    setupMessageHandlers();
+    socket = connectSocket();
+
+    if (isMock) runMockPreview();
+    window.addEventListener('resize', syncJarVisualScale);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
+  </script>
+</body>
+</html>

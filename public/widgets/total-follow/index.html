@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/assets/img/tikoverlay-mark.png?v=20260802" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <title>Total Followers · TikOverlay</title>
+  <style>
+    :root {
+      --ink: #050506;
+      --surface: linear-gradient(145deg, #00000088 0%, #000000 48%, #00000088 100%);
+      --border-inner: rgba(255, 255, 255, 0.06);
+      --crimson: #ff0000;
+      --crimson-bright: #ff0000;
+      --crimson-glow: rgba(196, 40, 58, 0.5);
+      --glow-deep: rgba(232, 92, 92, 0.55);
+      --text: #ff0000;
+      --muted: rgb(255, 255, 255);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      background: transparent;
+      font-family: "Tajawal", "Segoe UI", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: geometricPrecision;
+    }
+    .wrap {
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+    }
+
+    /* ========== بطاقة + إطار دوّار + ديب جلوو ========== */
+    /* الحاوية الخارجية: الهالة فقط (بدون قص). القص على .card-shell حتى لا يظهر مربع الدوران كاملاً. */
+    .card-stack {
+      position: relative;
+      width: min(232px, 92vw);
+      isolation: isolate;
+      animation: shell-deep-glow 4.2s ease-in-out infinite;
+    }
+    .card-shell {
+      position: relative;
+      z-index: 1;
+      border-radius: 22px;
+      padding: 2px;
+      overflow: hidden; /* يقصّ card-shell__spin — يمنع مربع أحمر مائل كبير */
+      background: #0a0a0c;
+    }
+    @keyframes shell-deep-glow {
+      0%, 100% {
+        filter: drop-shadow(0 0 14px rgba(196, 40, 58, 0.35)) drop-shadow(0 0 36px rgba(92, 15, 28, 0.28));
+      }
+      50% {
+        filter: drop-shadow(0 0 22px rgba(232, 92, 108, 0.55)) drop-shadow(0 0 56px rgba(139, 21, 40, 0.42)) drop-shadow(0 0 90px rgba(60, 10, 18, 0.35));
+      }
+    }
+
+    @keyframes bloom-pulse {
+      0%, 100% { opacity: 0.45; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.03); }
+    }
+    .card-shell__spin {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 170%;
+      height: 170%;
+      margin: -85% 0 0 -85%;
+      z-index: 0;
+      transform-origin: 50% 50%;
+      will-change: transform;
+      background: conic-gradient(
+        from 0deg,
+        #1a0508 0deg,
+        #5c0f1c 45deg,
+        #c4283a 90deg,
+        #ff8f9e 130deg,
+        #c4283a 170deg,
+        #2d080e 220deg,
+        #8b1528 280deg,
+        #e85c6c 320deg,
+        #1a0508 360deg
+      );
+      animation: border-spin 5.5s linear infinite;
+    }
+    @keyframes border-spin {
+      to { transform: rotate(360deg); }
+    }
+    .card-shell__mask {
+      position: relative;
+      z-index: 1;
+      border-radius: 20px;
+      background: var(--surface);
+      box-shadow:
+        0 0 0 1px var(--border-inner) inset,
+        0 20px 40px rgba(0, 0, 0, 0.72);
+      overflow: hidden;
+    }
+    .card-shell__mask::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      border-radius: 0 0 6px 6px;
+      background: linear-gradient(90deg, transparent, rgba(232, 92, 108, 0.5), transparent);
+      pointer-events: none;
+      z-index: 3;
+    }
+    .card-shell__mask::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      z-index: 2;
+    }
+    .card {
+      position: relative;
+      z-index: 1;
+      padding: 5px 5px 15px;
+      text-align: center;
+    }
+
+    /* ========== صورة — حلقة دوّارة خفيفة ========== */
+    .avatar-orbit {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      margin: 6px auto 14px;
+      z-index: 1;
+    }
+    .avatar-orbit__spin {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      z-index: 0;
+      background: conic-gradient(
+        from 0deg,
+        #1a0508,
+        #5c0f1c,
+        #c4283a,
+        #ffb3bd,
+        #c4283a,
+        #8b1528,
+        #1a0508
+      );
+      animation: border-spin 3.8s linear infinite reverse;
+      box-shadow: 0 0 18px rgba(196, 40, 58, 0.35);
+    }
+    .avatar-ring {
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      padding: 2px;
+      background: linear-gradient(165deg, #0e0e12 0%, #1f1218 100%);
+      box-shadow:
+        0 8px 22px rgba(0, 0, 0, 0.65),
+        0 0 20px rgba(196, 40, 58, 0.18);
+      z-index: 1;
+    }
+    .avatar-ring img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      background: var(--ink);
+      border: 2px solid rgba(0, 0, 0, 0.45);
+    }
+    .avatar-orbit.pulse .avatar-orbit__spin {
+      animation: border-spin 3.8s linear infinite reverse, orbit-flash 0.65s ease-out;
+    }
+    .avatar-orbit.pulse .avatar-ring {
+      animation: orbit-scale 0.65s ease-out;
+    }
+    @keyframes orbit-flash {
+      0%, 100% { filter: brightness(1); }
+      40% { filter: brightness(1.35); }
+    }
+    @keyframes orbit-scale {
+      0%, 100% { transform: scale(1); }
+      45% { transform: scale(1.04); }
+    }
+
+    .name {
+      position: relative;
+      z-index: 1;
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+      letter-spacing: 0.03em;
+      line-height: 1.35;
+      min-height: 1.35em;
+      text-shadow:
+        0 1px 0 rgba(0, 0, 0, 0.85),
+        0 2px 4px rgba(0, 0, 0, 0.65);
+    }
+    .label {
+      position: relative;
+      z-index: 1;
+      font-size: 1.00rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
+    }
+    .count {
+      position: relative;
+      z-index: 1;
+      font-size: 2.5rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      color: #b81010;
+      line-height: 1.05;
+      letter-spacing: 0.02em;
+      transition: transform 0.25s ease, filter 0.25s ease;
+      text-shadow:
+        0 0 1px rgba(0, 0, 0, 0.95),
+        0 1px 0 #1a0508,
+        0 2px 0 #0d0204,
+        0 3px 8px rgba(0, 0, 0, 0.9),
+        0 0 22px var(--crimson-glow);
+    }
+    .count.tick {
+      animation: countTick 0.55s cubic-bezier(0.34, 1.45, 0.64, 1);
+    }
+    @keyframes countTick {
+      0% { transform: scale(1); filter: brightness(1); }
+      40% { transform: scale(1.06); filter: brightness(1.12); }
+      100% { transform: scale(1); filter: brightness(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card-stack">
+      <div class="card-shell__glow-bloom" aria-hidden="true"></div>
+      <div class="card-shell">
+        <div class="card-shell__spin" aria-hidden="true"></div>
+        <div class="card-shell__mask">
+          <div class="card">
+            <div class="avatar-orbit" id="avatarRing">
+              <div class="avatar-orbit__spin" aria-hidden="true"></div>
+              <div class="avatar-ring">
+                <img id="avatarImg" alt="" />
+              </div>
+            </div>
+            <div class="name" id="nickEl">—</div>
+            <div class="label">إجمالي المتابعين</div>
+            <div class="count" id="countEl">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/b/8c386c8dbec5a57f.js"></script>
+  <script src="/assets/b/28b98888f9aaae4a.js"></script>
+  <script src="/assets/b/aa9c4c6deef9b265.js"></script>
+  <script src="/assets/b/8a2b87cb324285f2.js"></script>
+</body>
+</html>

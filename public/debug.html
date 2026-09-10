@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head><title>TikFlux Debug</title></head>
+<body style="background:#111;color:#0f0;font-family:monospace;padding:20px;">
+<h2>TikFlux Connection Debug</h2>
+<div id="log"></div>
+<script>
+function log(msg, color) {
+  var el = document.getElementById('log');
+  el.innerHTML += '<div style="color:'+(color||'#0f0')+'">'+msg+'</div>';
+  console.log(msg);
+}
+
+log('1. Script started');
+
+// Check ENV_CONFIG
+log('2. ENV_CONFIG: ' + JSON.stringify(window.ENV_CONFIG));
+
+// Check API URL
+var oo = window.ENV_CONFIG?.API_URL || 'https://api.tikoverlay.live';
+log('3. API URL (oo): ' + oo);
+
+// Check supabase
+log('4. window.supabase: ' + (typeof window.supabase));
+
+// Check authManager
+log('5. window.authManager: ' + (typeof window.authManager));
+if (window.authManager) {
+  log('   isAuthenticated: ' + (typeof window.authManager.isAuthenticated));
+  log('   cachedSession: ' + JSON.stringify(!!window.authManager.cachedSession));
+  log('   initialized: ' + window.authManager.initialized);
+}
+
+// Test /config endpoint
+fetch(oo + '/config').then(function(r) { return r.json(); }).then(function(c) {
+  log('6. /config OK: apiUrl=' + c.apiUrl + ' edgeWsUrl=' + c.edgeWsUrl);
+}).catch(function(e) {
+  log('6. /config FAILED: ' + e.message, '#f00');
+});
+
+// Test /api/subscriptions/status
+fetch(oo + '/api/subscriptions/status', {method:'GET'}).then(function(r) { return r.json(); }).then(function(c) {
+  log('7. /api/subscriptions/status: ' + JSON.stringify(c));
+}).catch(function(e) {
+  log('7. /subscriptions/status FAILED: ' + e.message, '#f00');
+});
+
+// Test /stream/connect
+log('8. Testing /stream/connect...');
+fetch(oo + '/stream/connect', {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({uniqueId: 'c6w.x'})
+}).then(function(r) { return r.json(); }).then(function(c) {
+  log('9. /stream/connect OK: ' + JSON.stringify(c), '#0ff');
+}).catch(function(e) {
+  log('9. /stream/connect FAILED: ' + e.message, '#f00');
+});
+
+// Test WebSocket
+log('10. Testing WebSocket...');
+try {
+  var wsUrl = window.ENV_CONFIG?.EDGE_WS_URL || 'ws://localhost:3000/ws';
+  log('    WS URL: ' + wsUrl);
+  var ws = new WebSocket(wsUrl);
+  ws.onopen = function() {
+    log('    WS OPEN!', '#0ff');
+    ws.send(JSON.stringify({type:'subscribe', streamerId:'debug_test'}));
+  };
+  ws.onmessage = function(e) {
+    var msg = JSON.parse(e.data);
+    log('    WS MSG: type=' + msg.type, '#ff0');
+  };
+  ws.onerror = function(e) {
+    log('    WS ERROR', '#f00');
+  };
+  ws.onclose = function(e) {
+    log('    WS CLOSED: ' + e.reason, '#f80');
+  };
+} catch(e) {
+  log('    WS FAILED: ' + e.message, '#f00');
+}
+</script>
+</body>
+</html>

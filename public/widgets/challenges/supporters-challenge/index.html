@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="/assets/img/tikoverlay-mark.png?v=20260802" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supporters Challenge</title>
+  <style>
+    :root {
+      --bg: rgba(16, 8, 10, 0.92);
+      --card: rgba(36, 18, 22, 0.94);
+      --line: rgba(255, 255, 255, 0.12);
+      --text: #f8f8ff;
+      --muted: #d2c4c7;
+      --gold: #f7b500;
+      --silver: #b8b8b8;
+      --bronze: #d28a4f;
+      --accent: #ff475f;
+      --accent-2: #b91c1c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      color: var(--text);
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .stage {
+      width: 460px;
+      height: 620px;
+      transform-origin: center center;
+      will-change: transform;
+    }
+    .wrap {
+      width: 100%;
+      height: 100%;
+      padding: 18px;
+      position: relative;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 12px;
+      border-radius: 20px;
+      background:
+        radial-gradient(120% 80% at 0% 0%, rgba(255, 56, 79, 0.16), transparent 55%),
+        radial-gradient(120% 80% at 100% 100%, rgba(100, 14, 20, 0.26), transparent 55%),
+        var(--bg);
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 55px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+    .title {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 800;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--line);
+    }
+    .timer {
+      text-align: center;
+      font-size: 56px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: 1px;
+      padding: 16px 8px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.07);
+      text-shadow: 0 0 22px rgba(255, 69, 95, 0.45);
+    }
+    .timer.warning { color: #ffe786; }
+    .timer.danger {
+      color: #ff9bbf;
+      animation: pulse 0.8s ease-in-out infinite alternate;
+    }
+    @keyframes pulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.03); }
+    }
+    .board {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+    }
+    .podium {
+      display: none;
+      align-items: end;
+      justify-content: center;
+      gap: 0.1px;
+      min-height: 0;
+      perspective: 900px;
+      padding-top: 10px;
+      direction: ltr;
+    }
+    .podium-col {
+      width: 31%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .supporter-head {
+      width: 100%;
+      min-height: 88px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 6px;
+      text-align: center;
+    }
+    .supporter-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.65);
+      object-fit: cover;
+      background: #1d1d1d;
+      margin-bottom: 4px;
+      display: block;
+    }
+    .supporter-name {
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .supporter-score {
+      margin-top: 2px;
+      font-size: 23px;
+      color: #ffd24f;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .platform {
+      width: 100%;
+      
+      border: none;
+      position: relative;
+      transform: rotateX(8deg);
+      
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      font-weight: 900;
+      overflow: hidden;
+    }
+    .platform-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+    }
+    .platform-rank {
+      position: absolute;
+      
+      left: 50%;
+      transform: translateX(-50%);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    .platform-rank img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+    }
+    .platform.rank-1 {
+      height: 150px;
+      color: #ffcd45;
+    }
+    .platform.rank-2 {
+      height: 116px;
+      color: #d2d2d2;
+    }
+    .platform.rank-3 {
+      height: 100px;
+      color: #ffad67;
+    }
+    .wrap.ended-view .board {
+      display: none;
+    }
+    .wrap.ended-view .podium {
+      display: flex;
+      animation: podiumIn .5s ease-out;
+    }
+    @keyframes podiumIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 96px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      min-height: 50px;
+    }
+    .row.placeholder {
+      opacity: 0.5;
+    }
+    .row.rank-1 { background: linear-gradient(90deg, rgba(247,181,0,.28), rgba(247,181,0,.08)); border-color: rgba(247,181,0,.45); }
+    .row.rank-2 { background: linear-gradient(90deg, rgba(184,184,184,.2), rgba(184,184,184,.06)); border-color: rgba(184,184,184,.4); }
+    .row.rank-3 { background: linear-gradient(90deg, rgba(210,138,79,.2), rgba(210,138,79,.06)); border-color: rgba(210,138,79,.42); }
+    .badge {
+      width: 88px;
+      min-height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      background: transparent;
+    }
+    .rank-icon {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .rank-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+    .badge-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      object-fit: cover;
+      background: #2a2a2a;
+      flex-shrink: 0;
+    }
+    .name {
+      font-size: 18px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .score {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 0px 12px;
+      font-weight: 800;
+      font-size: 25px;
+      background: rgba(255, 214, 46, 0.16);
+      color: #ffd64d;
+      border: 1px solid rgba(255, 214, 46, 0.34);
+    }
+    .coin-icon {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+      flex-shrink: 0;
+      position: relative;
+      top: 2px;
+    }
+    .status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 16px;
+      font-weight: 600;
+      padding: 2px 2px 0;
+    }
+    .status strong { color: #ffffff; }
+    .winner {
+      color: #fff5c7;
+      text-shadow: 0 0 18px rgba(255, 214, 46, 0.45);
+    }
+    .status-live { color: #ff7f92; }
+    .status-paused { color: #ffd27d; }
+    .status-ready { color: #dfd4d6; }
+    .status-ended { color: #ffd27d; }
+  </style>
+</head>
+<body>
+  <div id="stage" class="stage">
+    <div class="wrap">
+      <div id="challengeTitle" class="title">تحدي العملات</div>
+      <div id="timer" class="timer">00:00</div>
+      <div id="board" class="board"></div>
+      <div id="podium" class="podium">
+        <div class="podium-col">
+          <div class="supporter-head">
+            <img id="avatar2" class="supporter-avatar" alt="" />
+            <div id="name2" class="supporter-name">—</div>
+            <div id="score2" class="supporter-score">0</div>
+          </div>
+          <div class="platform rank-2">
+            <img class="platform-img" src="./second-place.png" alt="" />
+            <span class="platform-rank"><img src="./second.png" alt="" /></span>
+          </div>
+        </div>
+        <div class="podium-col">
+          <div class="supporter-head">
+            <img id="avatar1" class="supporter-avatar" alt="" />
+            <div id="name1" class="supporter-name">—</div>
+            <div id="score1" class="supporter-score">0</div>
+          </div>
+          <div class="platform rank-1">
+            <img class="platform-img" src="./first-place.png" alt="" />
+            <span class="platform-rank"><img src="./first.png" alt="" /></span>
+          </div>
+        </div>
+        <div class="podium-col">
+          <div class="supporter-head">
+            <img id="avatar3" class="supporter-avatar" alt="" />
+            <div id="name3" class="supporter-name">—</div>
+            <div id="score3" class="supporter-score">0</div>
+          </div>
+          <div class="platform rank-3">
+            <img class="platform-img" src="./third-place.png" alt="" />
+            <span class="platform-rank"><img src="./third.png" alt="" /></span>
+          </div>
+        </div>
+      </div>
+      <div class="status">
+        <span>الحالة: <strong id="statusText" class="status-ready">جاهز</strong></span>
+        <span id="participants">مشاركين: 0</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const stage = document.getElementById('stage');
+      if (!stage) return;
+      const BASE_WIDTH = 460;
+      const BASE_HEIGHT = 620;
+      const PADDING = 16;
+
+      function fitStage() {
+        const sx = (window.innerWidth - PADDING) / BASE_WIDTH;
+        const sy = (window.innerHeight - PADDING) / BASE_HEIGHT;
+        const scale = Math.max(0.1, Math.min(1, sx, sy));
+        stage.style.transform = `scale(${scale})`;
+      }
+
+      window.addEventListener('resize', fitStage);
+      fitStage();
+    })();
+  </script>
+  <script src="/assets/b/8c386c8dbec5a57f.js"></script>
+    <script src="/assets/b/28b98888f9aaae4a.js"></script>
+    <script src="/assets/b/c85913e7678df2bb.js"></script>
+</body>
+</html>

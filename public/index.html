@@ -1,0 +1,489 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikFlux - منصة احترافية لصناع البث على TikTok LIVE</title>
+  <meta name="description" content="TikFlux منصة احترافية لصناع البث على TikTok LIVE. أضف تراكبات تفاعلية، اعرض أفضل الداعمين، فعّل TTS وبوت الدردشة، وأنشئ تجربة بث تفاعلية بالكامل.">
+  <link rel="icon" href="/assets/img/tikflux-mark.png?v=20260802" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Thmanyah+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="/assets/css/thmanyah-font.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #151515;
+      --bg-tertiary: #1a1a1a;
+      --text-primary: #e0e0e0;
+      --text-secondary: #a0a0a0;
+      --border-color: #2a2a2a;
+      --primary-color: #ff0000;
+      --primary-color-light: #ff3333;
+      --primary-color-dark: #cc0000;
+      --font-family: 'Thmanyah Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      direction: rtl;
+    }
+
+    /* Loading Screen */
+    .app-loading-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    .app-loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .loading-content {
+      text-align: center;
+    }
+    .loading-logo {
+      font-size: 48px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-color-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 30px;
+      font-family: var(--font-family);
+      letter-spacing: 2px;
+    }
+    .loading-spinner {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .spinner-ring {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      animation: spin 1.2s ease-in-out infinite;
+    }
+    .spinner-ring:nth-child(2) { animation-delay: 0.2s; }
+    .spinner-ring:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes spin {
+      0%, 100% { transform: scale(0.8); opacity: 0.4; }
+      50% { transform: scale(1.2); opacity: 1; }
+    }
+    .loading-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(55vw, 720px);
+      height: min(55vh, 720px);
+      background: radial-gradient(circle, rgba(255,0,0,0.14) 0%, transparent 62%);
+      pointer-events: none;
+    }
+    .hero-brand {
+      position: relative;
+      z-index: 1;
+    }
+    .hero-logo {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 30px;
+      border-radius: 24px;
+      animation: brand-mark-enter 1.15s cubic-bezier(0.5, 0, 0.5, 1) 0.42s both;
+    }
+    @keyframes brand-mark-enter {
+      0% { opacity: 0; transform: translateY(50%) rotate(26deg) scale(0.88); }
+      70% { opacity: 1; transform: translateY(-6%) rotate(-5deg) scale(1.04); }
+      90% { transform: translateY(1%) rotate(2deg) scale(1); }
+      100% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+    }
+    .hero-title {
+      font-size: clamp(36px, 8vw, 72px);
+      font-weight: 900;
+      letter-spacing: 3px;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-color-light), #ff6666);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+      line-height: 1.1;
+    }
+    .hero-subtitle {
+      font-size: clamp(14px, 2.5vw, 20px);
+      color: var(--text-secondary);
+      max-width: 600px;
+      line-height: 1.8;
+      margin-bottom: 48px;
+      font-weight: 400;
+    }
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: var(--font-family);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(255, 0, 0, 0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(255, 0, 0, 0.5);
+    }
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    .btn-secondary:hover {
+      background: var(--bg-secondary);
+      border-color: var(--primary-color);
+      color: var(--primary-color-light);
+    }
+
+    /* Features Section */
+    .features {
+      padding: 80px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .section-title {
+      text-align: center;
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+    .section-desc {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 15px;
+      margin-bottom: 48px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.8;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 32px 24px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-color), var(--primary-color-light));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .feature-card:hover {
+      border-color: var(--primary-color);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(255, 0, 0, 0.12);
+    }
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(255,0,0,0.15), rgba(255,0,0,0.05));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: var(--primary-color-light);
+      margin-bottom: 20px;
+    }
+    .feature-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text-primary);
+    }
+    .feature-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* Navigation Cards */
+    .nav-cards {
+      padding: 40px 20px 80px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .nav-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .nav-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 32px;
+      text-decoration: none;
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .nav-card:hover {
+      border-color: var(--primary-color);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(255, 0, 0, 0.12);
+      color: var(--text-primary);
+    }
+    .nav-card-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(255,0,0,0.2), rgba(255,0,0,0.08));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: var(--primary-color-light);
+      flex-shrink: 0;
+    }
+    .nav-card-info h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .nav-card-info p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .nav-card-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      background: rgba(255,0,0,0.15);
+      color: var(--primary-color-light);
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .footer-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s ease;
+    }
+    .footer-link:hover {
+      color: var(--primary-color-light);
+    }
+    .footer-copy {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .footer-copy span {
+      color: var(--primary-color-light);
+      font-weight: 700;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading Screen -->
+  <div class="app-loading-screen" id="loadingScreen">
+    <div class="loading-content">
+      <div class="loading-logo">TikFlux</div>
+      <div class="loading-spinner">
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+      </div>
+      <div class="loading-text">جارٍ تحميل المنصة...</div>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-brand">
+      <img class="hero-logo" src="/assets/img/tikflux-mark.png" alt="TikFlux Logo" width="100" height="100" decoding="async">
+      <h1 class="hero-title">TikFlux</h1>
+      <p class="hero-subtitle">منصة احترافية لصناع البث على TikTok LIVE.<br>تراكبات تفاعلية، أهداف، TTS، بوت دردشة، وأدوات بث متكاملة.</p>
+      <div class="hero-cta">
+        <a href="/top-likes.html" class="btn btn-primary">
+          <i class="fas fa-rocket"></i>
+          ابدأ الآن
+        </a>
+        <a href="#features" class="btn btn-secondary">
+          <i class="fas fa-info-circle"></i>
+         了解更多
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <h2 class="section-title">مميزات المنصة</h2>
+    <p class="section-desc">أدوات متكاملة لرفع مستوى بثك على TikTok LIVE</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-layer-group"></i></div>
+        <h3 class="feature-title">Overlays تفاعلية</h3>
+        <p class="feature-desc">تراكبات بصرية احترافية تضيف عناصر تفاعلية لبثك المباشر بجودة عالية.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-bullseye"></i></div>
+        <h3 class="feature-title">نظام الأهداف</h3>
+        <p class="feature-desc">أهداف المتابعين والتبرعات والإعجابات مع رسوم متحركة مذهلة وتتبع مباشر.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-volume-up"></i></div>
+        <h3 class="feature-title">TTS Text-to-Speech</h3>
+        <p class="feature-desc">تحويل النصوص إلى كلام أثناء البث مع أصوات احترافية متعددة اللغات.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-comments"></i></div>
+        <h3 class="feature-title">بوت الدردشة</h3>
+        <p class="feature-desc">إدارة ذكية للدردشة مع ردود تلقائية وفلاتر وميزات تفاعلية.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-crown"></i></div>
+        <h3 class="feature-title">Top Likes & الداعمين</h3>
+        <p class="feature-desc">عرض أفضل الداعمين والمعجبين مع تصنيفات وتلميحات بصرية جذابة.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-music"></i></div>
+        <h3 class="feature-title">مشغل موسيقى</h3>
+        <p class="feature-desc">تشغيل الموسيقى أثناء البث مباشرة مع تحكم سلس وخيارات متقدمة.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Navigation Cards -->
+  <section class="nav-cards" id="dashboards">
+    <h2 class="section-title">اذهب إلى لوحة التحكم</h2>
+    <p class="section-desc">اختر لتصفح المنصات المختلفة</p>
+    <div class="nav-cards-grid">
+      <a href="/top-likes.html" class="nav-card">
+        <div class="nav-card-icon"><i class="fas fa-tachometer-alt"></i></div>
+        <div class="nav-card-info">
+          <h3>لوحة التحكم الرئيسية</h3>
+          <p>Top Likes Dashboard - الإحصائيات، الأهداف، الأدوات والتحكم الكامل</p>
+          <span class="nav-card-badge">MAIN DASHBOARD</span>
+        </div>
+      </a>
+      <a href="/overlays.html" class="nav-card">
+        <div class="nav-card-icon"><i class="fas fa-eye"></i></div>
+        <div class="nav-card-info">
+          <h3>التراكبات Overlays</h3>
+          <p>إدارة وتخصيص التراكبات التفاعلية للبث المباشر</p>
+          <span class="nav-card-badge">OVERLAYS</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="#" class="footer-link"><i class="fas fa-file-contract"></i> Terms</a>
+      <a href="#" class="footer-link"><i class="fas fa-shield-alt"></i> Privacy</a>
+      <a href="https://t.me/c6w_x" class="footer-link" target="_blank" rel="noopener"><i class="fas fa-headset"></i> الدعم الفني</a>
+    </div>
+    <p class="footer-copy">&copy; 2026 <span>TikFlux</span>. جميع الحقوق محفوظة.</p>
+  </footer>
+
+  <script>
+    // Hide loading screen
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        document.getElementById('loadingScreen').classList.add('hidden');
+      }, 800);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Comments</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: transparent;
+      overflow: hidden;
+      height: 100vh;
+    }
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 10px;
+      gap: 8px;
+    }
+    .chat-message {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 14px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      animation: slideIn 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .chat-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: #333;
+      overflow: hidden;
+    }
+    .chat-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .chat-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .chat-username {
+      font-size: 13px;
+      font-weight: 700;
+      color: #ff4444;
+      margin-bottom: 3px;
+    }
+    .chat-text {
+      font-size: 14px;
+      color: #fff;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+    .chat-time {
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 3px;
+    }
+    .chat-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-right: 5px;
+    }
+    .badge-mod { background: #2ecc71; color: #000; }
+    .badge-vip { background: #9b59b6; color: #fff; }
+    .badge-sub { background: #e74c3c; color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="chat-container" id="chatContainer"></div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const uid = params.get('uid') || 'demo';
+    const mock = params.get('mock') === '1';
+    const container = document.getElementById('chatContainer');
+    const messages = [];
+    const MAX_MESSAGES = 30;
+
+    const mockNames = ['Ahmad', 'Sara', 'Mohammed', 'Fatima', 'Omar', 'Layla', 'Youssef', 'Nour', 'Ali', 'Mona'];
+    const mockComments = [
+      'مرحبا بالجميع! 👋',
+      'بث رائع! 🔥',
+      'أحب هذا المحتوى!',
+      'ممكن ت交互 معنا؟',
+      'أفضل بث على تيك توك!',
+      'كيف حالكم؟',
+      'أنا من السعودية 🇸🇦',
+      'محتوى رائع استمر! 💪',
+      'صباح الخير للجميع ☀️',
+      'هلا والله! 👋',
+      'البث ممتاز今天',
+      'أهلاً من مصر 🇪🇬',
+      'انضم للبث للتو!',
+      'أين أفضل المعلقات؟',
+      'LOBSTER 🦞'
+    ];
+
+    function createMessage(name, text, avatar, isMod) {
+      const div = document.createElement('div');
+      div.className = 'chat-message';
+      const badge = isMod ? '<span class="chat-badge badge-mod">MOD</span>' : '';
+      const time = new Date().toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit' });
+      div.innerHTML = `
+        <div class="chat-avatar">
+          <img src="${avatar || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36"><circle cx="18" cy="18" r="18" fill="%23444"/><text x="18" y="23" text-anchor="middle" fill="%23888" font-size="14">${name[0]}</text></svg>'}" alt="${name}">
+        </div>
+        <div class="chat-content">
+          <div class="chat-username">${badge}${name}</div>
+          <div class="chat-text">${text}</div>
+          <div class="chat-time">${time}</div>
+        </div>
+      `;
+      return div;
+    }
+
+    function addMessage(name, text, avatar, isMod) {
+      const msg = createMessage(name, text, avatar, isMod);
+      container.appendChild(msg);
+      messages.push(msg);
+      if (messages.length > MAX_MESSAGES) {
+        const old = messages.shift();
+        if (old.parentNode) old.parentNode.removeChild(old);
+      }
+      container.scrollTop = container.scrollHeight;
+    }
+
+    if (mock) {
+      // Mock mode - generate random messages
+      function generateMock() {
+        const name = mockNames[Math.floor(Math.random() * mockNames.length)];
+        const text = mockComments[Math.floor(Math.random() * mockComments.length)];
+        const isMod = Math.random() > 0.8;
+        addMessage(name, text, null, isMod);
+      }
+      // Initial messages
+      for (let i = 0; i < 5; i++) generateMock();
+      setInterval(generateMock, 3000 + Math.random() * 4000);
+    } else {
+      // Connect to WebSocket for real messages
+      const wsUrl = `ws://${window.location.hostname}:3000/ws`;
+      try {
+        const ws = new WebSocket(wsUrl);
+        ws.onopen = () => {
+          ws.send(JSON.stringify({ type: 'subscribe', streamerId: uid }));
+        };
+        ws.onmessage = (event) => {
+          try {
+            const msg = JSON.parse(event.data);
+            if (msg.type === 'chat') {
+              const d = msg.data;
+              const user = d.user || {};
+              addMessage(
+                user.nickname || user.uniqueId || 'User',
+                d.comment || '',
+                user.avatar || user.profilePicture || '',
+                user.isModerator || false
+              );
+            }
+          } catch (e) {}
+        };
+        ws.onerror = () => {
+          addMessage('System', 'WebSocket error - using mock mode', null, false);
+          for (let i = 0; i < 3; i++) generateMock();
+          setInterval(generateMock, 5000);
+        };
+      } catch (e) {
+        addMessage('System', 'Connection failed - mock mode', null, false);
+        for (let i = 0; i < 3; i++) generateMock();
+        setInterval(generateMock, 5000);
+      }
+    }
+  </script>
+</body>
+</html>
