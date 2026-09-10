@@ -736,7 +736,22 @@ const AUTH_BYPASS_SCRIPT = `
 
   // === 2. Create Supabase client factory ===
   function makeMockClient(){
-    var client={auth:{},from:function(){return{select:function(){return{data:[],error:null}}}}};
+    var client={auth:{},from:function(table){
+      return{
+        select:function(){return Promise.resolve({data:[],error:null})},
+        insert:function(){return Promise.resolve({data:[],error:null})},
+        update:function(){return Promise.resolve({data:[],error:null})},
+        delete:function(){return Promise.resolve({data:[],error:null})},
+        eq:function(){return this},
+        single:function(){return Promise.resolve({data:null,error:null})},
+        maybeSingle:function(){return Promise.resolve({data:null,error:null})}
+      };
+    },
+    rpc:function(){return Promise.resolve({data:true,error:null})},
+    storage:{from:function(){return{getPublicUrl:function(){return{data:{publicUrl:''}}}}}}};
+    client.auth.getSession=function(){return Promise.resolve({data:{session:MOCK_SESSION},error:null})};
+    client.auth.getUser=function(){return Promise.resolve({data:{user:MOCK_USER},error:null})};
+    client.auth.signOut=function(){return Promise.resolve({error:null})};
     client.auth.getSession=function(){return Promise.resolve({data:{session:MOCK_SESSION},error:null})};
     client.auth.getUser=function(){return Promise.resolve({data:{user:MOCK_USER},error:null})};
     client.auth.signOut=function(){return Promise.resolve({error:null})};
@@ -834,9 +849,30 @@ const AUTH_BYPASS_SCRIPT = `
     var sp=document.getElementById('subscriptionPanel');if(sp)sp.style.display='none';
     document.querySelectorAll('[data-subscription-gate]').forEach(function(el){el.style.pointerEvents='auto';el.style.opacity='1'});
     document.querySelectorAll('.premium-only,.subscription-required,.pro-only').forEach(function(el){el.style.display='';el.style.opacity='1';el.style.pointerEvents='auto'});
+    var sg=document.getElementById('subscriptionGuardModal');if(sg)sg.remove();
+    var sgs=document.getElementById('subscriptionGuardStyles');if(sgs)sgs.remove();
   }
   hideLogin();
   for(var d=100;d<=10000;d+=d<1000?200:500)setTimeout(hideLogin,d);
+
+  // === 8. Override subscription guard globally ===
+  var _subPatchIV=setInterval(function(){
+    // Patch vn (SubscriptionGuard)
+    if(typeof vn!=='undefined'&&vn){
+      vn.hasActiveSubscription=function(){return Promise.resolve(true)};
+      vn.guardFeature=function(){return Promise.resolve(true)};
+      vn.showSubscriptionModal=function(){};
+    }
+    // Patch _o (SubscriptionManager)
+    if(typeof _o!=='undefined'&&_o){
+      _o.hasActiveSubscription=true;
+      _o.checkSubscriptionStatus=function(){return Promise.resolve()};
+    }
+    // Remove modal if it appears
+    var sg=document.getElementById('subscriptionGuardModal');if(sg)sg.remove();
+    var sgs=document.getElementById('subscriptionGuardStyles');if(sgs)sgs.remove();
+  },50);
+  setTimeout(function(){clearInterval(_subPatchIV)},30000);
 })();
 </script>`;
 
