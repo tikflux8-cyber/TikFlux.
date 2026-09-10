@@ -825,7 +825,7 @@ const AUTH_BYPASS_SCRIPT = `
     });
   }
 
-  // === 7. Hide login UI and subscription guard ===
+  // === 7. Hide login UI ===
   function hideLogin(){
     ['loginForm','login-form','loginOverlay','loginScreen','authScreen','auth-overlay'].forEach(function(id){
       var el=document.getElementById(id);if(el)el.style.display='none';
@@ -834,8 +834,6 @@ const AUTH_BYPASS_SCRIPT = `
     var sp=document.getElementById('subscriptionPanel');if(sp)sp.style.display='none';
     document.querySelectorAll('[data-subscription-gate]').forEach(function(el){el.style.pointerEvents='auto';el.style.opacity='1'});
     document.querySelectorAll('.premium-only,.subscription-required,.pro-only').forEach(function(el){el.style.display='';el.style.opacity='1';el.style.pointerEvents='auto'});
-    var sg=document.getElementById('subscriptionGuardModal');if(sg)sg.remove();
-    var sgs=document.getElementById('subscriptionGuardStyles');if(sgs)sgs.remove();
   }
   hideLogin();
   for(var d=100;d<=10000;d+=d<1000?200:500)setTimeout(hideLogin,d);
