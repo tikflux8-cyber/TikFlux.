@@ -6,9 +6,9 @@
   "author": "TikFlux",
   "license": "MIT",
   "scripts": {
-    "start": "electron .",
-    "build": "electron-builder --win",
-    "build:dir": "electron-builder --win --dir"
+    "start": "node server.js",
+    "build": "echo skip",
+    "build:dir": "echo skip"
   },
   "dependencies": {
     "@tiktool/live": "^2.12.1",
